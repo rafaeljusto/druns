@@ -1,4 +1,4 @@
 druns
 =====
 
-Personal Trainer Scheduler
+Web application that schedule clients in a weekday agenda, developed for Evandro Pelissoni Levy.
