@@ -1,17 +1,19 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gustavo-hms/trama"
 )
 
 func init() {
-	Mux.RegisterPage("/client/{id}", func() trama.WebHandler {
+	Mux.RegisterService("/client/{id}", func() trama.AJAXHandler {
 		return new(client)
 	})
 }
 
 type client struct {
-	handy.DefaultHandler
+	trama.DefaultAJAXHandler
 
 	Id string `param:"id"`
 }
