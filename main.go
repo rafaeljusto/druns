@@ -3,7 +3,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/rafaeljusto/druns/handler"
+	"github.com/rafaeljusto/druns/webserver/handler"
 )
 
 func main() {

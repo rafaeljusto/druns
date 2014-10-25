@@ -1,7 +1,7 @@
 package dao
 
 import (
-	"github.com/rafaeljusto/druns/model"
+	"github.com/rafaeljusto/druns/core/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -11,10 +11,10 @@ const (
 )
 
 type Client struct {
-	db mgo.Database
+	db *mgo.Database
 }
 
-func NewClient(db mgo.Database) Client {
+func NewClient(db *mgo.Database) Client {
 	return Client{
 		db: db,
 	}
@@ -45,7 +45,7 @@ func (dao *Client) Delete(client *model.Client) error {
 }
 
 func (dao *Client) FindAll() ([]model.Client, error) {
-	query = dao.db.C(clientsCollection).Find(bson.M{})
+	query := dao.db.C(clientsCollection).Find(bson.M{})
 
 	var clients []model.Client
 	if err := query.All(&clients); err != nil {
