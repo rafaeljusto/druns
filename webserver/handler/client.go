@@ -17,6 +17,7 @@ func init() {
 type client struct {
 	trama.DefaultAJAXHandler
 	interceptor.DatabaseCompliant
+	interceptor.JSONCompliant
 
 	Id string `param:"id"`
 }
@@ -40,6 +41,7 @@ func (h *client) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (h *client) Interceptors() trama.AJAXInterceptorChain {
 	return trama.NewAJAXInterceptorChain(
+		interceptor.NewJSON(h),
 		interceptor.NewDatabase(h),
 	)
 }
