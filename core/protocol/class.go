@@ -1,15 +1,11 @@
 package protocol
 
-import (
-	"time"
-)
-
 type ClassRequest struct {
-	Weekday time.Weekday `json:"weekday"`
-	Time    time.Time    `json:"time"`
+	Weekday *string `json:"weekday"`
+	Time    *string `json:"time"`
 }
 
 type ClassResponse struct {
-	Weekday time.Weekday `json:"weekday"`
-	Time    time.Time    `json:"time"`
+	Weekday string `json:"weekday"`
+	Time    string `json:"time"`
 }

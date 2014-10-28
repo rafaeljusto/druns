@@ -21,10 +21,6 @@ func NewClient(db *mgo.Database) Client {
 }
 
 func (dao *Client) Save(client *model.Client) error {
-	if dao.db == nil {
-		// TODO!
-	}
-
 	if len(client.Id.Hex()) == 0 {
 		client.Id = bson.NewObjectId()
 	}
@@ -37,17 +33,21 @@ func (dao *Client) Save(client *model.Client) error {
 }
 
 func (dao *Client) Delete(client *model.Client) error {
-	if dao.db == nil {
-		// TODO!
-	}
-
 	return dao.db.C(clientsCollection).RemoveId(client.Id)
 }
 
-func (dao *Client) FindAll() ([]model.Client, error) {
+func (dao *Client) FindById(id string) (model.Client, error) {
+	query := dao.db.C(clientsCollection).FindId(id)
+
+	var client model.Client
+	err := query.One(client)
+	return client, err
+}
+
+func (dao *Client) FindAll() (model.Clients, error) {
 	query := dao.db.C(clientsCollection).Find(bson.M{})
 
-	var clients []model.Client
+	var clients model.Clients
 	if err := query.All(&clients); err != nil {
 		return nil, err
 	}
