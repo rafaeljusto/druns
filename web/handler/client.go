@@ -8,7 +8,7 @@ import (
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/core/protocol"
-	"github.com/rafaeljusto/druns/webserver/interceptor"
+	"github.com/rafaeljusto/druns/web/interceptor"
 	"gopkg.in/mgo.v2"
 )
 
@@ -37,7 +37,9 @@ type newClient struct {
 func (h *newClient) Post(w http.ResponseWriter, r *http.Request) {
 	var client model.Client
 	if err := client.Apply(h.Request); err != nil {
-		// TODO
+		h.SetMessage(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	clientDAO := dao.NewClient(h.DB())
@@ -67,7 +69,7 @@ type client struct {
 	interceptor.JSONCompliant
 
 	Id       string                   `param:"id"`
-	Request  *protocol.ClientRequest  `request:"post"`
+	Request  *protocol.ClientRequest  `request:"put"`
 	Response *protocol.ClientResponse `response:"get"`
 }
 
@@ -98,7 +100,9 @@ func (h *client) Put(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := client.Apply(h.Request); err != nil {
-		// TODO
+		h.SetMessage(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	if err := clientDAO.Save(&client); err != nil {

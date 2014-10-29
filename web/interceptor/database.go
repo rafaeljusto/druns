@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rafaeljusto/druns/webserver/config"
+	"github.com/rafaeljusto/druns/web/config"
 	"gopkg.in/mgo.v2"
 )
 

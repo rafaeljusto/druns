@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/rafaeljusto/druns/webserver/config"
-	"github.com/rafaeljusto/druns/webserver/handler"
+	"github.com/rafaeljusto/druns/web/config"
+	"github.com/rafaeljusto/druns/web/handler"
 )
 
 func main() {

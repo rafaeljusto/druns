@@ -6,7 +6,7 @@ import (
 	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/core/protocol"
-	"github.com/rafaeljusto/druns/webserver/interceptor"
+	"github.com/rafaeljusto/druns/web/interceptor"
 )
 
 func init() {
