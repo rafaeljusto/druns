@@ -27,6 +27,12 @@ type Config struct {
 		Port int
 	}
 
+	Paths struct {
+		Home                 string
+		ProtocolTranslations string
+		WebTranslations      string
+	}
+
 	Languages []string
 }
 

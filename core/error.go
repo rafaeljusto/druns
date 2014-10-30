@@ -1,10 +1,17 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 
 	"github.com/rafaeljusto/druns/core/log"
+)
+
+var (
+	ErrNotFound = Error{
+		Err: errors.New("Object not found"),
+	}
 )
 
 type Error struct {

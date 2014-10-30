@@ -48,7 +48,10 @@ func (dao *Client) FindById(id string) (model.Client, error) {
 	query := dao.db.C(clientsCollection).FindId(id)
 
 	var client model.Client
-	if err := query.One(client); err != nil {
+	if err := query.One(client); err == mgo.ErrNotFound {
+		return client, core.ErrNotFound
+
+	} else if err != nil {
 		return client, core.NewError(err)
 	}
 	return client, nil

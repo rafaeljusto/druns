@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/core/protocol"
 	"github.com/rafaeljusto/druns/web/interceptor"
-	"gopkg.in/mgo.v2"
 )
 
 func init() {
@@ -87,7 +87,7 @@ func (h *client) Get(w http.ResponseWriter, r *http.Request) {
 	clientDAO := dao.NewClient(h.DB())
 
 	client, err := clientDAO.FindById(h.Id)
-	if err == mgo.ErrNotFound {
+	if err == core.ErrNotFound {
 		w.WriteHeader(http.StatusNotFound)
 		return
 
@@ -105,7 +105,11 @@ func (h *client) Put(w http.ResponseWriter, r *http.Request) {
 	clientDAO := dao.NewClient(h.DB())
 
 	client, err := clientDAO.FindById(h.Id)
-	if err != mgo.ErrNotFound && err != nil {
+	if err == core.ErrNotFound {
+		w.WriteHeader(http.StatusNotFound)
+		return
+
+	} else if err != nil {
 		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -130,7 +134,7 @@ func (h *client) Delete(w http.ResponseWriter, r *http.Request) {
 	clientDAO := dao.NewClient(h.DB())
 
 	client, err := clientDAO.FindById(h.Id)
-	if err == mgo.ErrNotFound {
+	if err == core.ErrNotFound {
 		w.WriteHeader(http.StatusNotFound)
 		return
 
