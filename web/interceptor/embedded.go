@@ -1,9 +1,12 @@
 package interceptor
 
 import (
+	"net"
 	"reflect"
 
+	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/protocol"
+	"github.com/rafaeljusto/druns/web/tr"
 	"gopkg.in/mgo.v2"
 )
 
@@ -60,4 +63,61 @@ func (j *JSONCompliant) Message() protocol.Translator {
 
 func (j *JSONCompliant) SetMessage(m protocol.Translator) {
 	j.message = m
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+type LanguageCompliant struct {
+	language string
+	messages tr.MessageHolder
+}
+
+func (h *LanguageCompliant) SetLanguage(language string) {
+	h.language = language
+}
+
+func (h *LanguageCompliant) Language() string {
+	return h.language
+}
+
+func (h *LanguageCompliant) SetMessages(messages tr.MessageHolder) {
+	h.messages = messages
+}
+
+func (h *LanguageCompliant) Msg(code tr.Code, args ...interface{}) string {
+	return h.messages.Get(code, args...)
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+type RemoteAddressCompliant struct {
+	remoteAddress net.IP
+}
+
+func (r *RemoteAddressCompliant) SetRemoteAddress(a net.IP) {
+	r.remoteAddress = a
+}
+
+func (r *RemoteAddressCompliant) RemoteAddress() net.IP {
+	return r.remoteAddress
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+type LogCompliant struct {
+	logger log.Logger
+}
+
+func (l *LogCompliant) SetLogger(logger log.Logger) {
+	l.logger = logger
+}
+
+func (l *LogCompliant) Logger() *log.Logger {
+	return &l.logger
 }

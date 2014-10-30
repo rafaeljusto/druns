@@ -2,10 +2,10 @@ package handler
 
 import (
 	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/core/log"
 )
 
 var (
-	Mux = trama.New(func(err error) {
-
-	})
+	Logger = log.NewLogger("system")
+	Mux    = trama.New(Logger.Error)
 )

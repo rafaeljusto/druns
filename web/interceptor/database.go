@@ -5,6 +5,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/web/config"
 	"gopkg.in/mgo.v2"
 )
@@ -20,19 +22,21 @@ type DatabaseHandler interface {
 	SetDBSession(*mgo.Session)
 	DBSession() *mgo.Session
 	SetDB(*mgo.Database)
+	Logger() *log.Logger
 }
 
 type Database struct {
-	databaseHandler DatabaseHandler
+	handler DatabaseHandler
 }
 
 func NewDatabase(h DatabaseHandler) *Database {
-	return &Database{databaseHandler: h}
+	return &Database{handler: h}
 }
 
 func (i *Database) Before(w http.ResponseWriter, r *http.Request) {
 	err := initializeSession(config.DrunsConfig.Database.URI, config.DrunsConfig.Database.Name)
 	if err != nil {
+		i.handler.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -40,12 +44,12 @@ func (i *Database) Before(w http.ResponseWriter, r *http.Request) {
 	localSession := session.Copy()
 	database := localSession.DB(config.DrunsConfig.Database.Name)
 
-	i.databaseHandler.SetDBSession(localSession)
-	i.databaseHandler.SetDB(database)
+	i.handler.SetDBSession(localSession)
+	i.handler.SetDB(database)
 }
 
 func (i *Database) After(w http.ResponseWriter, r *http.Request) {
-	i.databaseHandler.DBSession().Close()
+	i.handler.DBSession().Close()
 }
 
 func initializeSession(uri string, databaseName string) error {
@@ -63,6 +67,8 @@ func initializeSession(uri string, databaseName string) error {
 	}
 
 	var err error
-	session, err = mgo.DialWithInfo(&dialInfo)
-	return err
+	if session, err = mgo.DialWithInfo(&dialInfo); err != nil {
+		return core.NewError(err)
+	}
+	return nil
 }

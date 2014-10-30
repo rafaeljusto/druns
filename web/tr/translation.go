@@ -1,4 +1,4 @@
-package protocol
+package tr
 
 import (
 	"io/ioutil"
@@ -6,28 +6,26 @@ import (
 	"path"
 	"regexp"
 	"strings"
-
-	"github.com/rafaeljusto/druns/core"
 )
 
 var (
 	testLanguageFilename = regexp.MustCompile(`[a-z]{2,3}(-[A-Z]{2,3})?\.json`)
 )
 
-var Translations map[string]Translation
+var translations map[string]translation
 
-type Translation map[msgCode]string
+type translation map[Code]string
 
 func init() {
-	Translations = make(map[string]Translation)
+	translations = make(map[string]translation)
 }
 
 func LoadTranslations(dirname string) error {
-	Translations = map[string]Translation{}
+	translations = map[string]translation{}
 
 	files, err := ioutil.ReadDir(dirname)
 	if err != nil {
-		return core.NewError(err)
+		return err
 	}
 
 	for _, file := range files {
@@ -37,14 +35,14 @@ func LoadTranslations(dirname string) error {
 
 		language := file.Name()[:strings.Index(file.Name(), ".")]
 		language = strings.Split(language, "-")[0]
-		translation := make(map[msgCode]string)
+		translation := make(map[Code]string)
 
 		err := jsonconf.LoadConfigFile(path.Join(dirname, file.Name()), &translation)
 		if err != nil {
-			return core.NewError(err)
+			return err
 		}
 
-		Translations[language] = translation
+		translations[language] = translation
 	}
 
 	return nil

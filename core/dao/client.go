@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/model"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -29,19 +30,28 @@ func (dao *Client) Save(client *model.Client) error {
 		"_id": client.Id,
 	}, client)
 
-	return err
+	if err != nil {
+		return core.NewError(err)
+	}
+
+	return nil
 }
 
 func (dao *Client) Delete(client *model.Client) error {
-	return dao.db.C(clientsCollection).RemoveId(client.Id)
+	if err := dao.db.C(clientsCollection).RemoveId(client.Id); err != nil {
+		return core.NewError(err)
+	}
+	return nil
 }
 
 func (dao *Client) FindById(id string) (model.Client, error) {
 	query := dao.db.C(clientsCollection).FindId(id)
 
 	var client model.Client
-	err := query.One(client)
-	return client, err
+	if err := query.One(client); err != nil {
+		return client, core.NewError(err)
+	}
+	return client, nil
 }
 
 func (dao *Client) FindAll() (model.Clients, error) {
@@ -49,7 +59,7 @@ func (dao *Client) FindAll() (model.Clients, error) {
 
 	var clients model.Clients
 	if err := query.All(&clients); err != nil {
-		return nil, err
+		return nil, core.NewError(err)
 	}
 
 	return clients, nil

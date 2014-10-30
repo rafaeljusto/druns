@@ -17,6 +17,7 @@ type requestResponser interface {
 	SetResponseValue(reflect.Value)
 	Message() protocol.Translator
 	SetMessage(protocol.Translator)
+	Language() string
 }
 
 type JSON struct {
@@ -54,7 +55,7 @@ func (i *JSON) After(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	if message := i.handler.Message(); message != nil {
-		if message.Translate(r.Header.Get("Accept-Language")) {
+		if message.Translate(i.handler.Language()) {
 			if body, err := json.Marshal(message); err == nil {
 				w.Write(body)
 

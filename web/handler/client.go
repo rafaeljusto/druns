@@ -30,6 +30,9 @@ type newClient struct {
 	trama.DefaultAJAXHandler
 	interceptor.DatabaseCompliant
 	interceptor.JSONCompliant
+	interceptor.LanguageCompliant
+	interceptor.RemoteAddressCompliant
+	interceptor.LogCompliant
 
 	Request *protocol.ClientRequest `request:"post"`
 }
@@ -44,6 +47,7 @@ func (h *newClient) Post(w http.ResponseWriter, r *http.Request) {
 
 	clientDAO := dao.NewClient(h.DB())
 	if err := clientDAO.Save(&client); err != nil {
+		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -54,6 +58,9 @@ func (h *newClient) Post(w http.ResponseWriter, r *http.Request) {
 
 func (h *newClient) Interceptors() trama.AJAXInterceptorChain {
 	return trama.NewAJAXInterceptorChain(
+		interceptor.NewAcceptLanguage(h),
+		interceptor.NewRemoteAddress(h),
+		interceptor.NewLog(h),
 		interceptor.NewJSON(h),
 		interceptor.NewDatabase(h),
 	)
@@ -67,6 +74,9 @@ type client struct {
 	trama.DefaultAJAXHandler
 	interceptor.DatabaseCompliant
 	interceptor.JSONCompliant
+	interceptor.LanguageCompliant
+	interceptor.RemoteAddressCompliant
+	interceptor.LogCompliant
 
 	Id       string                   `param:"id"`
 	Request  *protocol.ClientRequest  `request:"put"`
@@ -82,6 +92,7 @@ func (h *client) Get(w http.ResponseWriter, r *http.Request) {
 		return
 
 	} else if err != nil {
+		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -95,6 +106,7 @@ func (h *client) Put(w http.ResponseWriter, r *http.Request) {
 
 	client, err := clientDAO.FindById(h.Id)
 	if err != mgo.ErrNotFound && err != nil {
+		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -106,6 +118,7 @@ func (h *client) Put(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := clientDAO.Save(&client); err != nil {
+		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -122,11 +135,13 @@ func (h *client) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 
 	} else if err != nil {
+		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := clientDAO.Delete(&client); err != nil {
+		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -136,6 +151,9 @@ func (h *client) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (h *client) Interceptors() trama.AJAXInterceptorChain {
 	return trama.NewAJAXInterceptorChain(
+		interceptor.NewAcceptLanguage(h),
+		interceptor.NewRemoteAddress(h),
+		interceptor.NewLog(h),
 		interceptor.NewJSON(h),
 		interceptor.NewDatabase(h),
 	)
