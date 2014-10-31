@@ -30,13 +30,13 @@
 			<tbody>
 				<tr data-ng-repeat="time in times">
 					<th>{{time}}</th>
-					<td><client data-ng-repeat="client in clients(time, sunday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clients(time, monday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clients(time, tuesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clients(time, wednesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clients(time, thursday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clients(time, friday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clients(time, saturday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, sunday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, monday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, tuesday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, wednesday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, thursday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, friday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, saturday)" client="client" /></td>
 				</tr>
 			</tbody>
 		</table>
@@ -48,8 +48,6 @@
     </footer>
 		
 		<script src="/assets/js/angular.min.js"></script>
-		<script src="/assets/js/angular-translate.min.js"></script>
-    <script src="/assets/js/angular-translate-loader-static-files.min.js"></script>
 		<script src="/assets/js/druns.js"></script>
 	</body>
 </html>

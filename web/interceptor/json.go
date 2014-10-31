@@ -79,7 +79,6 @@ func (i *JSON) After(w http.ResponseWriter, r *http.Request) {
 	elem := response.Interface()
 	elemType := reflect.TypeOf(elem)
 
-	// We are also checking for map types because they work like pointers
 	if (elemType.Kind() == reflect.Ptr ||
 		elemType.Kind() == reflect.Map ||
 		elemType.Kind() == reflect.Slice) &&
@@ -95,8 +94,6 @@ func (i *JSON) After(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// For HTTP HEAD method we never add the body, but we add the other headers as a
-	// normal GET method. For more information check the RFC 2616 - 14.13.
 	if len(body) > 0 && r.Method != "HEAD" {
 		w.Write(body)
 	}
