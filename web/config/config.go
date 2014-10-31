@@ -2,7 +2,9 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"path"
 
 	"github.com/rafaeljusto/druns/core"
 )
@@ -10,6 +12,10 @@ import (
 var (
 	DrunsConfig Config
 )
+
+func init() {
+	DrunsConfig.Files = make(map[string][]string)
+}
 
 type Config struct {
 	Server struct {
@@ -31,9 +37,25 @@ type Config struct {
 		Home                 string
 		ProtocolTranslations string
 		WebTranslations      string
+		HTMLTemplates        string
+		WebAssets            string
 	}
 
+	Files     map[string][]string
 	Languages []string
+}
+
+func (c Config) HTMLTemplates(language, handlerName string) []string {
+	p := fmt.Sprintf(c.Paths.HTMLTemplates, language)
+
+	templates := make([]string, len(c.Files[handlerName]))
+	copy(templates, c.Files[handlerName])
+
+	for i, template := range templates {
+		templates[i] = path.Join(p, template)
+	}
+
+	return templates
 }
 
 func LoadConfig(path string) error {

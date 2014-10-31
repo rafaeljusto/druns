@@ -6,7 +6,7 @@ const thursday = "thursday"
 const friday = "friday"
 const saturday = "saturday"
 
-angular.module("druns")
+angular.module("druns", [])
 	.controller("scheduleCtrl", function($scope) {
 		$scope.times = [
 			"5:00", "5:30", "6:00", "6:30", "7:00", "7:30", "8:00", "8:30", "9:00", "9:30", "10:00",
@@ -19,4 +19,4 @@ angular.module("druns")
 		$scope.clients = function(time, dayOfTheWeek) {
 			return [];
 		};
-	}
+	});

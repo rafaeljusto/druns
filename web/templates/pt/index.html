@@ -1,0 +1,55 @@
+<!doctype html>
+
+<html lang="pt" data-ng-app="druns">
+	<head>
+		<meta charset="utf-8">
+		<meta name="description" content="Aplicação web para agendar clientes semanalmente">
+		<meta name="author" content="Rafael Dantas Justo">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link rel="stylesheet" type="text/css" href="/assets/css/druns.css">
+		<link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css">
+
+		<title>Druns</title>
+	</head>
+	
+	<body>
+		<table data-ng-controller="scheduleCtrl">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Domingo</th>
+					<th>Segunda-Feira</th>
+					<th>Terça-Feira</th>
+					<th>Quarta-feira</th>
+					<th>Quinta-Feira</th>
+					<th>Sexta-Feira</th>
+					<th>Sábado</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr data-ng-repeat="time in times">
+					<th>{{time}}</th>
+					<td><client data-ng-repeat="client in clients(time, sunday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clients(time, monday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clients(time, tuesday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clients(time, wednesday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clients(time, thursday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clients(time, friday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clients(time, saturday)" client="client" /></td>
+				</tr>
+			</tbody>
+		</table>
+		
+		<button>Novo Cliente</button>
+		
+		<footer>
+      <small>© Copyright 2014 Rafael Dantas Justo. Todos os direitos reservados.</small>
+    </footer>
+		
+		<script src="/assets/js/angular.min.js"></script>
+		<script src="/assets/js/angular-translate.min.js"></script>
+    <script src="/assets/js/angular-translate-loader-static-files.min.js"></script>
+		<script src="/assets/js/druns.js"></script>
+	</body>
+</html>

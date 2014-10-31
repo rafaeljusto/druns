@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/protocol"
@@ -48,11 +49,9 @@ func main() {
 		return
 	}
 
-	handler.Mux.Recover = func(r interface{}) {
-		const size = 64 << 10
-		buf := make([]byte, size)
-		buf = buf[:runtime.Stack(buf, false)]
-		Logger.Critf("Panic detected. Details: %v\n%s", r, buf)
+	if err := initializeTrama(); err != nil {
+		Logger.Critf("Error initializing trama framework. Details: %s", err)
+		return
 	}
 
 	serverConfig := config.DrunsConfig.Server
@@ -85,4 +84,33 @@ func initializeWebTranslations() error {
 		config.DrunsConfig.Paths.WebTranslations)
 
 	return tr.LoadTranslations(translationsPath)
+}
+
+func initializeTrama() error {
+	handler.Mux.Recover = func(r interface{}) {
+		const size = 64 << 10
+		buf := make([]byte, size)
+		buf = buf[:runtime.Stack(buf, false)]
+		Logger.Critf("Panic detected. Details: %v\n%s", r, buf)
+	}
+	handler.Mux.SetTemplateDelims("[[", "]]")
+
+	groupSet := trama.NewTemplateGroupSet(nil)
+	for _, language := range config.DrunsConfig.Languages {
+		templates := config.DrunsConfig.HTMLTemplates(language, "global")
+
+		groupSet.Insert(trama.TemplateGroup{
+			Name:  language,
+			Files: templates,
+		})
+	}
+	handler.Mux.GlobalTemplates = groupSet
+
+	handler.Mux.RegisterStatic("/assets", http.Dir(config.DrunsConfig.Paths.WebAssets))
+
+	if err := handler.Mux.ParseTemplates(); err != nil {
+		return core.NewError(err)
+	}
+
+	return nil
 }
