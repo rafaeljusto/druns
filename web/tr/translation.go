@@ -1,11 +1,13 @@
 package tr
 
 import (
+	"encoding/json"
 	"io/ioutil"
-	"jsonconf"
 	"path"
 	"regexp"
 	"strings"
+
+	"github.com/rafaeljusto/druns/core"
 )
 
 var (
@@ -25,7 +27,7 @@ func LoadTranslations(dirname string) error {
 
 	files, err := ioutil.ReadDir(dirname)
 	if err != nil {
-		return err
+		return core.NewError(err)
 	}
 
 	for _, file := range files {
@@ -37,9 +39,13 @@ func LoadTranslations(dirname string) error {
 		language = strings.Split(language, "-")[0]
 		translation := make(map[Code]string)
 
-		err := jsonconf.LoadConfigFile(path.Join(dirname, file.Name()), &translation)
+		bytes, err := ioutil.ReadFile(path.Join(dirname, file.Name()))
 		if err != nil {
-			return err
+			return core.NewError(err)
+		}
+
+		if err := json.Unmarshal(bytes, &translation); err != nil {
+			return core.NewError(err)
 		}
 
 		translations[language] = translation

@@ -1,8 +1,8 @@
 package protocol
 
 import (
+	"encoding/json"
 	"io/ioutil"
-	"jsonconf"
 	"path"
 	"regexp"
 	"strings"
@@ -39,8 +39,12 @@ func LoadTranslations(dirname string) error {
 		language = strings.Split(language, "-")[0]
 		translation := make(map[msgCode]string)
 
-		err := jsonconf.LoadConfigFile(path.Join(dirname, file.Name()), &translation)
+		bytes, err := ioutil.ReadFile(path.Join(dirname, file.Name()))
 		if err != nil {
+			return core.NewError(err)
+		}
+
+		if err := json.Unmarshal(bytes, &translation); err != nil {
 			return core.NewError(err)
 		}
 
