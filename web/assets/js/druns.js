@@ -1,12 +1,18 @@
-const sunday = "sunday"
-const monday = "monday"
-const tuesday = "tuesday"
-const wednesday = "wednesday"
-const thursday = "thursday"
-const friday = "friday"
-const saturday = "saturday"
-
 angular.module("druns", [])
+	.constant("WEEKDAYS", {
+		sunday: "sunday",
+		monday: "monday",
+		tuesday: "tuesday",
+		wednesday: "wednesday",
+		thursday: "thursday",
+		friday: "friday",
+		saturday: "saturday"
+	})
+
+	.run(function($rootScope, WEEKDAYS) {
+		$rootScope.WEEKDAYS = WEEKDAYS
+   })
+
 	.service("clientService", function($http, $q) {
 		return({
 			retrieveAll: retrieveAll
@@ -57,4 +63,18 @@ angular.module("druns", [])
 		};
 
 		$scope.retrieveClients();
+	})
+
+	.controller("clientFormCtrl", function($scope, WEEKDAYS) {
+		$scope.client = {
+			name: "",
+			classes: [],
+			addClass: function() {
+				this.classes.push({
+					weekday: WEEKDAYS.sunday,
+					time: new Date(1970, 0, 1, 5, 0, 0),
+					duration: 30,
+				});
+			}
+		};
 	});

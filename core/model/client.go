@@ -12,7 +12,14 @@ type Client struct {
 }
 
 func (c *Client) Apply(request *protocol.ClientRequest) protocol.Translator {
-	return nil
+	if request.Name != nil {
+		c.Name = *request.Name
+	}
+
+	classes, translator := c.Classes.Apply(request.Classes)
+	c.Classes = classes
+
+	return translator
 }
 
 func (c *Client) Protocol() *protocol.ClientResponse {

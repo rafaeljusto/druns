@@ -140,6 +140,10 @@ button:active {
 	top: 1px;
 }
 
+input, label {
+	display: block;
+}
+
 footer {
 	text-align: center;
 }

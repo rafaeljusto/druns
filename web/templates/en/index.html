@@ -13,8 +13,8 @@
 		<title>Druns</title>
 	</head>
 	
-	<body>
-		<table data-ng-controller="scheduleCtrl">
+	<body data-ng-init="clientFormMode = false">
+		<table data-ng-controller="scheduleCtrl" data-ng-hide="$root.clientFormMode">
 			<thead>
 				<tr>
 					<th></th>
@@ -30,18 +30,52 @@
 			<tbody>
 				<tr data-ng-repeat="time in times">
 					<th>{{time}}</th>
-					<td><client data-ng-repeat="client in clientsAt(time, sunday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, monday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, tuesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, wednesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, thursday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, friday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, saturday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.sunday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.monday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.tuesday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.wednesday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.thursday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.friday)" client="client" /></td>
+					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.saturday)" client="client" /></td>
 				</tr>
 			</tbody>
 		</table>
 		
-		<button>New Client</button>
+		<button data-ng-click="clientFormMode = true" data-ng-hide="clientFormMode">New Client</button>
+
+		<form data-ng-controller="clientFormCtrl" data-ng-show="$root.clientFormMode">
+			<fieldset>
+				<label for="name">Name</label>
+				<input type="text" id="name" data-ng-model="client.name"/>
+			</fieldset>
+
+			<button data-ng-click="client.addClass()">Add Class</button>
+
+			<fieldset data-ng-repeat="class in client.classes track by $index">
+				<label>Weekday</label>
+				<select data-ng-model="client.classes[$index].weekday">
+					<option data-ng-selected="client.classes[$index].weekday == $root.WEEKDAYS.sunday">Sunday</option>
+					<option data-ng-selected="client.classes[$index].weekday == $root.WEEKDAYS.monday">Monday</option>
+					<option data-ng-selected="client.classes[$index].weekday == $root.WEEKDAYS.tuesday">Tuesday</option>
+					<option data-ng-selected="client.classes[$index].weekday == $root.WEEKDAYS.wednesday">Wednesday</option>
+					<option data-ng-selected="client.classes[$index].weekday == $root.WEEKDAYS.thursday">Thursday</option>
+					<option data-ng-selected="client.classes[$index].weekday == $root.WEEKDAYS.friday">Friday</option>
+					<option data-ng-selected="client.classes[$index].weekday == $root.WEEKDAYS.saturday">Saturday</option>
+				</select>
+
+				<label>Time</label>
+				<input type="time" min="05:00:00" max="23:30:00"
+					data-ng-model="client.classes[$index].time" required />
+
+				<label>Duration</label>
+				<input type="range" min="30" max="120"
+					data-ng-model="client.classes[$index].duration" required />
+				{{client.classes[$index].duration}} minutes
+			</fieldset>
+
+			<button data-ng-click="$root.clientFormMode = false">Cancel</button>
+			<button data-ng-click="save()">Save</button>
+		</form>
 		
 		<footer>
       <small>© Copyright 2014 Rafael Dantas Justo. All rights reserved.</small>
