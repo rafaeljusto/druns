@@ -1,3 +1,7 @@
 {
-	"corrupted-data": "Formato de requisição inválida"
+	"class-data-missing": "Faltando dados para a classe, os campos obrigatórios são 'dia da semana' e 'horário'",
+	"corrupted-data": "Formato de requisição inválida",
+	"invalid-class-duration": "Tempo de duração da classe inválido, deve ser um número entre 30 e 120",
+	"invalid-class-time": "Horário da classe inválido, deve seguir o formato da RFC 3339",
+	"invalid-class-weekday": "Dia da semana inválido, possíveis valores são: 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday' and 'saturday'"
 }

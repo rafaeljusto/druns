@@ -1,6 +1,7 @@
 package model
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/rafaeljusto/druns/core/protocol"
@@ -34,34 +35,43 @@ type Class struct {
 }
 
 func (c *Class) Apply(request *protocol.ClassRequest) protocol.Translator {
+	var messageHolder protocol.MessagesHolder
+
 	if request.Weekday != nil {
 		var ok bool
 		c.Weekday, ok = parseWeekday(*request.Weekday)
 		if !ok {
-			// TODO: ERROR!
+			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeInvalidClassWeekday,
+				"weekday", *request.Weekday))
 		}
 	}
 
 	if request.Time != nil {
 		var err error
-		c.Time, err = time.Parse("15:04:05", *request.Time)
+		c.Time, err = time.Parse(time.RFC3339, *request.Time)
 		if err != nil {
-			// TODO: ERROR!
+			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeInvalidClassTime,
+				"time", *request.Time))
 		}
 	}
 
 	if request.Duration != nil {
-		c.Duration = time.Duration(*request.Duration) * time.Minute
+		var err error
+		c.Duration, err = time.ParseDuration(*request.Duration + "m")
+		if err != nil {
+			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeInvalidClassDuration,
+				"duration", *request.Duration))
+		}
 	}
 
-	return nil
+	return messageHolder.Messages()
 }
 
 func (c *Class) Protocol() *protocol.ClassResponse {
 	return &protocol.ClassResponse{
 		Weekday:  c.Weekday.String(),
-		Time:     c.Time.Format(time.RFC1123),
-		Duration: int(c.Duration.Minutes()),
+		Time:     c.Time.Format(time.RFC3339),
+		Duration: strconv.FormatFloat(c.Duration.Minutes(), 'f', -1, 64),
 	}
 }
 
@@ -76,16 +86,20 @@ func (c Classes) Apply(requests []protocol.ClassRequest) (Classes, protocol.Tran
 
 	for _, request := range requests {
 		if request.Weekday == nil || request.Time == nil {
-			// TODO: ERROR!
+			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeClassDataMissing, "", ""))
 		}
 
 		weekday, ok := parseWeekday(*request.Weekday)
 		if !ok {
+			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeInvalidClassWeekday,
+				"weekday", *request.Weekday))
 			continue
 		}
 
-		classTime, err := time.Parse("15:04:05", *request.Time)
+		classTime, err := time.Parse(time.RFC3339, *request.Time)
 		if err != nil {
+			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeInvalidClassTime,
+				"time", *request.Time))
 			continue
 		}
 
@@ -106,6 +120,8 @@ func (c Classes) Apply(requests []protocol.ClassRequest) (Classes, protocol.Tran
 			c = append(c, class)
 		}
 	}
+
+	// TODO: Remove classes of the system!
 
 	return c, messageHolder.Messages()
 }

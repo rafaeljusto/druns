@@ -7,7 +7,7 @@ import (
 type ClassRequest struct {
 	Weekday  *string `json:"weekday"`
 	Time     *string `json:"time"`
-	Duration *int    `json:"duration"`
+	Duration *string `json:"duration"`
 }
 
 func (c *ClassRequest) Normalize() {
@@ -25,5 +25,5 @@ func (c *ClassRequest) Validate() {
 type ClassResponse struct {
 	Weekday  string `json:"weekday"`
 	Time     string `json:"time"`
-	Duration int    `json:"duration"`
+	Duration string `json:"duration"`
 }

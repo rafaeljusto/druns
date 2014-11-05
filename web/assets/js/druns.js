@@ -15,7 +15,8 @@ angular.module("druns", [])
 
 	.service("clientService", function($http, $q) {
 		return({
-			retrieveAll: retrieveAll
+			retrieveAll: retrieveAll,
+			save: save
 		})
 
 		function retrieveAll() {
@@ -23,6 +24,27 @@ angular.module("druns", [])
 				method: "GET",
 				url: "/clients"
 			});
+
+			return request.then(handleSuccess, handleError);
+		}
+
+		function save(client) {
+			var request;
+
+			if (client.id && client.id.length > 0) {
+				request = $http({
+					method: "PUT",
+					url: "/client/" + client.id,
+					data: client
+				});
+
+			} else {
+				request = $http({
+					method: "POST",
+					url: "/client",
+					data: client
+				});
+			}
 
 			return request.then(handleSuccess, handleError);
 		}
@@ -65,16 +87,27 @@ angular.module("druns", [])
 		$scope.retrieveClients();
 	})
 
-	.controller("clientFormCtrl", function($scope, WEEKDAYS) {
+	.controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, clientService) {
 		$scope.client = {
 			name: "",
-			classes: [],
-			addClass: function() {
-				this.classes.push({
-					weekday: WEEKDAYS.sunday,
-					time: new Date(1970, 0, 1, 5, 0, 0),
-					duration: 30,
-				});
-			}
+			classes: []
+		};
+
+		$scope.addClass = function() {
+			$scope.client.classes.push({
+				weekday: WEEKDAYS.sunday,
+				time: new Date(1970, 0, 1, 5, 0, 0),
+				duration: "30",
+			});
+		};
+
+		$scope.save = function() {
+			clientService.save($scope.client)
+				.then(
+					function() {
+						// TODO: Success
+						$rootScope.clientFormMode = false
+					}
+				);
 		};
 	});

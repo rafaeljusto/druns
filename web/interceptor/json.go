@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/protocol"
 )
 
@@ -18,6 +19,7 @@ type requestResponser interface {
 	Message() protocol.Translator
 	SetMessage(protocol.Translator)
 	Language() string
+	Logger() *log.Logger
 }
 
 type JSON struct {
@@ -37,7 +39,9 @@ func (i *JSON) Before(w http.ResponseWriter, r *http.Request) {
 		for {
 			if err := decoder.Decode(request.Addr().Interface()); err == io.EOF {
 				break
+
 			} else if err != nil {
+				i.handler.Logger().Error(err)
 				w.WriteHeader(http.StatusBadRequest)
 				i.handler.SetMessage(protocol.NewMessage(protocol.MsgCodeCorruptedData, ""))
 
@@ -60,6 +64,7 @@ func (i *JSON) After(w http.ResponseWriter, r *http.Request) {
 				w.Write(body)
 
 			} else {
+				i.handler.Logger().Error(err)
 				w.WriteHeader(http.StatusInternalServerError)
 			}
 

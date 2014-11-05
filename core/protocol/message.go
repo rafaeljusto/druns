@@ -5,7 +5,11 @@ import (
 )
 
 const (
-	MsgCodeCorruptedData = "corrupted-data"
+	MsgCodeCorruptedData        = "corrupted-data"
+	MsgCodeInvalidClassWeekday  = "invalid-class-weekday"
+	MsgCodeInvalidClassTime     = "invalid-class-time"
+	MsgCodeInvalidClassDuration = "invalid-class-duration"
+	MsgCodeClassDataMissing     = "class-data-missing"
 )
 
 type msgCode string
