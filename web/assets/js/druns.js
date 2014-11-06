@@ -1,12 +1,12 @@
 angular.module("druns", [])
 	.constant("WEEKDAYS", {
-		sunday: "sunday",
-		monday: "monday",
-		tuesday: "tuesday",
-		wednesday: "wednesday",
-		thursday: "thursday",
-		friday: "friday",
-		saturday: "saturday"
+		sunday: "Sunday",
+		monday: "Monday",
+		tuesday: "Tuesday",
+		wednesday: "Wednesday",
+		thursday: "Thursday",
+		friday: "Friday",
+		saturday: "Saturday"
 	})
 
 	.run(function($rootScope, WEEKDAYS) {
@@ -50,7 +50,7 @@ angular.module("druns", [])
 		}
 
 		function handleError(response) {
-			if (!angular.isObject(response.data) || !response.data.message) {
+			if (!angular.isObject(response.data)) {
 				return $q.reject("An unknown error occurred.");
 			}
 			return $q.reject(response.data.message);
@@ -64,15 +64,40 @@ angular.module("druns", [])
 	.controller("scheduleCtrl", function($scope, clientService) {
 		$scope.clients = [];
 		$scope.times = [
-			"5:00", "5:30", "6:00", "6:30", "7:00", "7:30", "8:00", "8:30", "9:00", "9:30", "10:00",
-			"10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00",
-			"15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00",
-			"20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"
+			"05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30",
+			"10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+			"15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30",
+			"20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"
 		];
 
 		// Returns a list of client objects
-		$scope.clientsAt = function(time, dayOfTheWeek) {
-			return [];
+		$scope.clientsAt = function(time, weekday) {
+			var clients = [];
+			var current = moment("1970-01-01 " + time);
+
+			$scope.clients.forEach(function(client) {
+				if (!client.classes) {
+					return;
+				}
+
+				client.classes.some(function(c) {
+					if (c.weekday != weekday) {
+						return false;
+					}
+
+					var begin = moment(c.time);
+					var end = angular.copy(begin);
+					end.add(c.duration, "minutes");
+
+					if (begin <= current && current < end) {
+						clients.push(client);
+						return true;
+					}
+
+					return false;
+				});
+			});
+			return clients;
 		};
 
 		$scope.retrieveClients = function() {

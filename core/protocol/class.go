@@ -17,9 +17,11 @@ func (c *ClassRequest) Normalize() {
 	}
 }
 
-func (c *ClassRequest) Validate() {
-	// 1. Time is in the correct format (hh:mm:ss)
+func (c *ClassRequest) Validate(checkMandatoryFields bool) Translator {
+	// TODO
+	// 1. Time is in the correct format (RFC3339)
 	// 2. Duration should be between 30 and 120
+	return nil
 }
 
 type ClassResponse struct {

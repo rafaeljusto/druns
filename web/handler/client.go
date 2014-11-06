@@ -62,6 +62,7 @@ func (h *newClient) Interceptors() trama.AJAXInterceptorChain {
 		interceptor.NewRemoteAddress(h),
 		interceptor.NewLog(h),
 		interceptor.NewJSON(h),
+		interceptor.NewValidate(h),
 		interceptor.NewDatabase(h),
 	)
 }
@@ -159,6 +160,7 @@ func (h *client) Interceptors() trama.AJAXInterceptorChain {
 		interceptor.NewRemoteAddress(h),
 		interceptor.NewLog(h),
 		interceptor.NewJSON(h),
+		interceptor.NewValidate(h),
 		interceptor.NewDatabase(h),
 	)
 }

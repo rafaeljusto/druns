@@ -70,7 +70,7 @@ func (c *Class) Apply(request *protocol.ClassRequest) protocol.Translator {
 func (c *Class) Protocol() *protocol.ClassResponse {
 	return &protocol.ClassResponse{
 		Weekday:  c.Weekday.String(),
-		Time:     c.Time.Format(time.RFC3339),
+		Time:     c.Time.UTC().Format(time.RFC3339),
 		Duration: strconv.FormatFloat(c.Duration.Minutes(), 'f', -1, 64),
 	}
 }

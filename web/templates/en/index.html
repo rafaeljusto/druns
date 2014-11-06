@@ -30,13 +30,41 @@
 			<tbody>
 				<tr data-ng-repeat="time in times">
 					<th>{{time}}</th>
-					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.sunday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.monday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.tuesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.wednesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.thursday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.friday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.saturday)" client="client" /></td>
+					<td>
+						<div data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.sunday)">
+							{{client.name}}
+						</div>
+					</td>
+					<td>
+						<div data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.monday)">
+							{{client.name}}
+						</div>
+					</td>
+					<td>
+						<div data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.tuesday)">
+							{{client.name}}
+						</div>
+					</td>
+					<td>
+						<div data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.wednesday)">
+							{{client.name}}
+						</div>
+					</td>
+					<td>
+						<div data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.thursday)">
+							{{client.name}}
+						</div>
+					</td>
+					<td>
+						<div data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.friday)">
+							{{client.name}}
+						</div>
+					</td>
+					<td>
+						<div data-ng-repeat="client in clientsAt(time, $root.WEEKDAYS.saturday)">
+							{{client.name}}
+						</div>
+					</td>
 				</tr>
 			</tbody>
 		</table>
@@ -82,6 +110,7 @@
     </footer>
 		
 		<script src="/assets/js/angular.min.js"></script>
+		<script src="/assets/js/moment.min.js"></script>
 		<script src="/assets/js/druns.js"></script>
 	</body>
 </html>
