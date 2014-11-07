@@ -27,24 +27,6 @@ body {
   display: none !important;
 }
 
-table a:link {
-	color: #666;
-	font-weight: bold;
-	text-decoration: none;
-}
-
-table a:visited {
-	color: #999999;
-	font-weight: bold;
-	text-decoration: none;
-}
-
-table a:active,
-table a:hover {
-	color: #bd5a35;
-	text-decoration: underline;
-}
-
 table {
 	background: #eaebec;
 	border-radius: 3px;
@@ -52,15 +34,21 @@ table {
 	box-shadow: 0 1px 2px #d1d1d1;
 	color: #666;
 	font-size: 0.75em;
-	margin: 20px;
+	margin: 20px auto 20px auto;
 	text-shadow: 1px 1px 0px #fff;
+	max-width: 90%;
 }
 
 table th {
 	background: #ededed;
 	border-bottom: 1px solid #e0e0e0;
 	border-top: 1px solid #fafafa;
-	padding: 1.3rem 1.6rem 1.4rem 1.6rem;
+	cursor: pointer;
+	padding: 1rem;
+}
+
+table th.selected {
+	background: #ffbaba;
 }
 
 table th:first-child {
