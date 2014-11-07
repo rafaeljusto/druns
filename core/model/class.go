@@ -82,6 +82,7 @@ func (c *Class) Protocol() *protocol.ClassResponse {
 type Classes []Class
 
 func (c Classes) Apply(requests []protocol.ClassRequest) (Classes, protocol.Translator) {
+	var classes Classes
 	var messageHolder protocol.MessagesHolder
 
 	for _, request := range requests {
@@ -104,11 +105,11 @@ func (c Classes) Apply(requests []protocol.ClassRequest) (Classes, protocol.Tran
 		}
 
 		found := false
-		for i, class := range c {
+		for _, class := range c {
 			if class.Weekday == weekday && class.Time.Equal(classTime) {
 				messageHolder.Add(class.Apply(&request))
 
-				c[i] = class
+				classes = append(classes, class)
 				found = true
 				break
 			}
@@ -117,13 +118,11 @@ func (c Classes) Apply(requests []protocol.ClassRequest) (Classes, protocol.Tran
 		if !found {
 			var class Class
 			messageHolder.Add(class.Apply(&request))
-			c = append(c, class)
+			classes = append(classes, class)
 		}
 	}
 
-	// TODO: Remove classes of the system!
-
-	return c, messageHolder.Messages()
+	return classes, messageHolder.Messages()
 }
 
 func (c Classes) Protocol() []protocol.ClassResponse {

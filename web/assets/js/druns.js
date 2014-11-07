@@ -11,7 +11,34 @@ angular.module("druns", [])
 
 	.run(function($rootScope, WEEKDAYS) {
 		$rootScope.WEEKDAYS = WEEKDAYS
+		$rootScope.WEEKDAYS_LIST = [
+			WEEKDAYS.sunday,
+			WEEKDAYS.monday,
+			WEEKDAYS.tuesday,
+			WEEKDAYS.wednesday,
+			WEEKDAYS.thursday,
+			WEEKDAYS.friday,
+			WEEKDAYS.saturday
+		];
    })
+
+	.service("client", function() {
+		var client = {
+			data: {
+				name: "",
+				classes: []
+			}
+		};
+
+		return {
+			getClient: function() {
+				return client;
+			},
+			setClient: function(c) {
+				client.data = c;
+			}
+		}
+	})
 
 	.service("clientService", function($http, $q) {
 		return({
@@ -61,7 +88,7 @@ angular.module("druns", [])
 		}
 	})
 
-	.controller("scheduleCtrl", function($scope, clientService) {
+	.controller("scheduleCtrl", function($rootScope, $scope, client, clientService) {
 		$scope.clients = [];
 		$scope.times = [
 			"05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30",
@@ -104,34 +131,63 @@ angular.module("druns", [])
 			clientService.retrieveAll()
 				.then(
 					function(clients) {
+						// Convert JSON string time to Date object
+						clients.forEach(function(client) {
+							if (!client || !client.classes) {
+								return;
+							}
+
+							client.classes.forEach(function(c) {
+								if (c.time) {
+									c.time = moment(c.time).toDate();
+								}
+							});
+						});
 						$scope.clients = clients;
 					}
 				);
 		};
 
+		$scope.editClient = function(c) {
+			client.setClient(c);
+			$rootScope.clientFormMode = true;
+		};
+
+		$scope.clientColor = function(c) {
+			var hash = 0;
+	    for (var i = 0; i < c.id.length; i++) {
+	       hash = c.id.charCodeAt(i) + ((hash << 5) - hash);
+	    }
+
+	    var colour = "#";
+	    for (var i = 0; i < 3; colour += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
+	    return colour;
+		};
+
 		$scope.retrieveClients();
 	})
 
-	.controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, clientService) {
-		$scope.client = {
-			name: "",
-			classes: []
-		};
+	.controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client, clientService) {
+		$scope.client = client.getClient();
 
 		$scope.addClass = function() {
-			$scope.client.classes.push({
+			$scope.client.data.classes.push({
 				weekday: WEEKDAYS.sunday,
 				time: new Date(1970, 0, 1, 5, 0, 0),
 				duration: "30",
 			});
 		};
 
+		$scope.removeClass = function(index) {
+			$scope.client.data.classes.splice(index, 1);
+		};
+
 		$scope.save = function() {
-			clientService.save($scope.client)
+			clientService.save($scope.client.data)
 				.then(
 					function() {
 						// TODO: Success
-						$rootScope.clientFormMode = false
+						$rootScope.clientFormMode = false;
 					}
 				);
 		};

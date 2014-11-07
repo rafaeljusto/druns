@@ -13,6 +13,7 @@ type ClassRequest struct {
 func (c *ClassRequest) Normalize() {
 	if c.Weekday != nil {
 		weekday := strings.ToLower(*c.Weekday)
+		weekday = strings.TrimSpace(weekday)
 		c.Weekday = &weekday
 	}
 }

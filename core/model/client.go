@@ -16,15 +16,14 @@ func (c *Client) Apply(request *protocol.ClientRequest) protocol.Translator {
 		c.Name = *request.Name
 	}
 
-	classes, translator := c.Classes.Apply(request.Classes)
+	classes, msg := c.Classes.Apply(request.Classes)
 	c.Classes = classes
-
-	return translator
+	return msg
 }
 
 func (c *Client) Protocol() *protocol.ClientResponse {
 	return &protocol.ClientResponse{
-		Id:      c.Id.String(),
+		Id:      c.Id.Hex(),
 		Name:    c.Name,
 		Classes: c.Classes.Protocol(),
 	}
