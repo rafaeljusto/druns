@@ -1,9 +1,9 @@
 <!doctype html>
 
-<html lang="pt" data-ng-app="druns">
+<html lang="en" data-ng-app="druns">
 	<head>
 		<meta charset="utf-8">
-		<meta name="description" content="Aplicação web para agendar clientes semanalmente">
+		<meta name="description" content="Web application that schedule clients in a weekday agenda">
 		<meta name="author" content="Rafael Dantas Justo">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -13,41 +13,124 @@
 		<title>Druns</title>
 	</head>
 	
-	<body>
-		<table data-ng-controller="scheduleCtrl">
+	<body data-ng-init="clientFormMode = false">
+		<table data-ng-controller="scheduleCtrl"
+			data-ng-hide="$root.clientFormMode"
+			data-ng-init="weekday = WEEKDAYS.sunday">
 			<thead>
 				<tr>
 					<th></th>
-					<th>Domingo</th>
-					<th>Segunda-Feira</th>
-					<th>Terça-Feira</th>
-					<th>Quarta-feira</th>
-					<th>Quinta-Feira</th>
-					<th>Sexta-Feira</th>
-					<th>Sábado</th>
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.sunday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.sunday}">
+						Dom
+					</th>
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.monday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.monday}">
+						Seg
+					</th>
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.tuesday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.tuesday}">
+						Ter
+					</th>
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.wednesday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.wednesday}">
+						Qua
+					</th>
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.thursday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.thursday}">
+						Qui
+					</th>
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.friday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.friday}">
+						Sex
+					</th>
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.saturday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.saturday}">
+						Sab
+					</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr data-ng-repeat="time in times">
 					<th>{{time}}</th>
-					<td><client data-ng-repeat="client in clientsAt(time, sunday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, monday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, tuesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, wednesday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, thursday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, friday)" client="client" /></td>
-					<td><client data-ng-repeat="client in clientsAt(time, saturday)" client="client" /></td>
+					<td colspan="7">
+						<div class="client"
+							data-ng-repeat="client in clientsAt(time, weekday)"
+							data-ng-click="editClient(client)"
+							data-ng-init="clientStyle[client.id] = {'background-color': clientColor(client)}"
+							data-ng-style="clientStyle[client.id]">
+							{{client.name}}
+						</div>
+					</td>
 				</tr>
 			</tbody>
 		</table>
 		
-		<button>Novo Cliente</button>
+		<button data-ng-click="clientFormMode = true" data-ng-hide="clientFormMode">New Client</button>
+
+		<form data-ng-controller="clientFormCtrl" data-ng-show="$root.clientFormMode">
+			<fieldset>
+				<label for="name">Nome</label>
+				<input type="text" id="name" data-ng-model="client.data.name"/>
+			</fieldset>
+
+			<button data-ng-click="addClass()">Adicionar Aula</button>
+
+			<fieldset data-ng-repeat="class in client.data.classes track by $index">
+				<label>Dia da Semana</label>
+				<select data-ng-model="client.data.classes[$index].weekday">
+					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.sunday">
+						Domingo
+					</option>
+					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.monday">
+						Segunda-feira
+					</option>
+					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.tuesday">
+						Ter&ccedil;a-feira
+					</option>
+					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.wednesday">
+						Quarta-feira
+					</option>
+					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.thursday">
+						Quinta-feira
+					</option>
+					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.friday">
+						Sexta-feira
+					</option>
+					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.saturday">
+						S&aacute;bado
+					</option>
+				</select>
+
+				<label>Hor&aacute;rio</label>
+				<input type="time" min="05:00:00" max="23:30:00"
+					data-ng-model="client.data.classes[$index].time" required />
+
+				<label>Dura&ccedil;&atilde;o</label>
+				<input type="range" min="30" max="120"
+					data-ng-model="client.data.classes[$index].duration" required />
+				{{client.data.classes[$index].duration}} minutes
+
+				<button data-ng-click="removeClass($index)">Remover</button>
+			</fieldset>
+
+			<button data-ng-click="$root.clientFormMode = false">Cancelar</button>
+			<button data-ng-click="save()">Salvar</button>
+		</form>
 		
 		<footer>
       <small>© Copyright 2014 Rafael Dantas Justo. Todos os direitos reservados.</small>
     </footer>
 		
 		<script src="/assets/js/angular.min.js"></script>
+		<script src="/assets/js/moment.min.js"></script>
 		<script src="/assets/js/druns.js"></script>
 	</body>
 </html>

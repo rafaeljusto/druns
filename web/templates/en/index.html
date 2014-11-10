@@ -20,32 +20,39 @@
 			<thead>
 				<tr>
 					<th></th>
-					<th data-ng-click="weekday = $root.WEEKDAYS.sunday"
-						data-ng-class="{selected: weekday == $root.WEEKDAYS.sunday}">
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.sunday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.sunday}">
 						Sun
 					</th>
-					<th data-ng-click="weekday = $root.WEEKDAYS.monday"
-						data-ng-class="{selected: weekday == $root.WEEKDAYS.monday}">
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.monday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.monday}">
 						Mon
 					</th>
-					<th data-ng-click="weekday = $root.WEEKDAYS.tuesday"
-						data-ng-class="{selected: weekday == $root.WEEKDAYS.tuesday}">
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.tuesday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.tuesday}">
 						Tue
 					</th>
-					<th data-ng-click="weekday = $root.WEEKDAYS.wednesday"
-						data-ng-class="{selected: weekday == $root.WEEKDAYS.wednesday}">
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.wednesday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.wednesday}">
 						Wed
 					</th>
-					<th data-ng-click="weekday = $root.WEEKDAYS.thursday"
-						data-ng-class="{selected: weekday == $root.WEEKDAYS.thursday}">
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.thursday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.thursday}">
 						Thu
 					</th>
-					<th data-ng-click="weekday = $root.WEEKDAYS.friday"
-						data-ng-class="{selected: weekday == $root.WEEKDAYS.friday}">
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.friday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.friday}">
 						Fri
 					</th>
-					<th data-ng-click="weekday = $root.WEEKDAYS.saturday"
-						data-ng-class="{selected: weekday == $root.WEEKDAYS.saturday}">
+					<th class="weekday"
+						data-ng-click="weekday = $root.WEEKDAYS.saturday"
+						data-ng-class="{selectedweekday: weekday == $root.WEEKDAYS.saturday}">
 						Sat
 					</th>
 				</tr>
@@ -54,7 +61,8 @@
 				<tr data-ng-repeat="time in times">
 					<th>{{time}}</th>
 					<td colspan="7">
-						<div data-ng-repeat="client in clientsAt(time, weekday)"
+						<div class="client"
+							data-ng-repeat="client in clientsAt(time, weekday)"
 							data-ng-click="editClient(client)"
 							data-ng-init="clientStyle[client.id] = {'background-color': clientColor(client)}"
 							data-ng-style="clientStyle[client.id]">
