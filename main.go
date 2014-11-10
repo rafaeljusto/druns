@@ -30,26 +30,31 @@ func main() {
 	}
 
 	if err := config.LoadConfig(os.Args[1]); err != nil {
+		fmt.Printf("Error loading configuration file. Details: %s\n", err)
 		Logger.Critf("Error loading configuration file. Details: %s", err)
 		return
 	}
 
 	if err := initializeLogger(); err != nil {
+		fmt.Printf("Error initializing logger. Details: %s\n", err)
 		Logger.Critf("Error initializing logger. Details: %s", err)
 		return
 	}
 
 	if err := initializeProtocolTranslations(); err != nil {
+		fmt.Printf("Error initializing protocol translations. Details: %s\n", err)
 		Logger.Critf("Error initializing protocol translations. Details: %s", err)
 		return
 	}
 
 	if err := initializeWebTranslations(); err != nil {
+		fmt.Printf("Error initializing web translations. Details: %s\n", err)
 		Logger.Critf("Error initializing web translations. Details: %s", err)
 		return
 	}
 
 	if err := initializeTrama(); err != nil {
+		fmt.Printf("Error initializing trama framework. Details: %s\n", err)
 		Logger.Critf("Error initializing trama framework. Details: %s", err)
 		return
 	}
@@ -106,7 +111,8 @@ func initializeTrama() error {
 	}
 	handler.Mux.GlobalTemplates = groupSet
 
-	handler.Mux.RegisterStatic("/assets", http.Dir(config.DrunsConfig.Paths.WebAssets))
+	handler.Mux.RegisterStatic("/assets", http.Dir(path.Join(config.DrunsConfig.Paths.Home,
+		config.DrunsConfig.Paths.WebAssets)))
 
 	if err := handler.Mux.ParseTemplates(); err != nil {
 		return core.NewError(err)

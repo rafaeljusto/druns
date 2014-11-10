@@ -52,7 +52,7 @@ func (c Config) HTMLTemplates(language, handlerName string) []string {
 	copy(templates, c.Files[handlerName])
 
 	for i, template := range templates {
-		templates[i] = path.Join(p, template)
+		templates[i] = path.Join(c.Paths.Home, p, template)
 	}
 
 	return templates

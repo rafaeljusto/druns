@@ -36,11 +36,35 @@ angular.module("druns", [])
 			},
 			setClient: function(c) {
 				client.data = c;
+			},
+			clear: function() {
+				client.data = {
+					name: "",
+					classes: []
+				};
 			}
 		}
 	})
 
-	.service("clientService", function($http, $q) {
+	.service("clients", function() {
+		var clients = {
+			data: []
+		};
+
+		return {
+			getClients: function() {
+				return clients;
+			},
+			setClients: function(c) {
+				clients.data = c;
+			},
+			addClient: function(c) {
+				client.data.push(c);
+			}
+		}
+	})
+
+	.service("clientService", function($http, $q, clients) {
 		return({
 			retrieveAll: retrieveAll,
 			save: save
@@ -52,7 +76,24 @@ angular.module("druns", [])
 				url: "/clients"
 			});
 
-			return request.then(handleSuccess, handleError);
+			request.then(
+				function(c) {
+					// Convert JSON string time to Date object
+					c.data.forEach(function(client) {
+						if (!client || !client.classes) {
+							return;
+						}
+
+						client.classes.forEach(function(cl) {
+							if (cl.time) {
+								cl.time = moment(cl.time).toDate();
+							}
+						});
+					});
+					clients.setClients(c.data);
+				},
+				handleError
+			);
 		}
 
 		function save(client) {
@@ -82,14 +123,10 @@ angular.module("druns", [])
 			}
 			return $q.reject(response.data.message);
 		}
-
-		function handleSuccess(response) {
-			return response.data;
-		}
 	})
 
-	.controller("scheduleCtrl", function($rootScope, $scope, client, clientService) {
-		$scope.clients = [];
+	.controller("scheduleCtrl", function($rootScope, $scope, client, clients, clientService) {
+		$scope.clients = clients.getClients();
 		$scope.times = [
 			"05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30",
 			"10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -99,10 +136,10 @@ angular.module("druns", [])
 
 		// Returns a list of client objects
 		$scope.clientsAt = function(time, weekday) {
-			var clients = [];
+			var filteredClients = [];
 			var current = moment("1970-01-01 " + time);
 
-			$scope.clients.forEach(function(client) {
+			$scope.clients.data.forEach(function(client) {
 				if (!client.classes) {
 					return;
 				}
@@ -117,39 +154,24 @@ angular.module("druns", [])
 					end.add(c.duration, "minutes");
 
 					if (begin <= current && current < end) {
-						clients.push(client);
+						filteredClients.push(client);
 						return true;
 					}
 
 					return false;
 				});
 			});
-			return clients;
+			return filteredClients;
 		};
 
-		$scope.retrieveClients = function() {
-			clientService.retrieveAll()
-				.then(
-					function(clients) {
-						// Convert JSON string time to Date object
-						clients.forEach(function(client) {
-							if (!client || !client.classes) {
-								return;
-							}
-
-							client.classes.forEach(function(c) {
-								if (c.time) {
-									c.time = moment(c.time).toDate();
-								}
-							});
-						});
-						$scope.clients = clients;
-					}
-				);
-		};
-
-		$scope.editClient = function(c) {
+		$scope.editClient = function(event, c) {
+			event.stopPropagation();
 			client.setClient(c);
+			$rootScope.clientFormMode = true;
+		};
+
+		$scope.newClient = function() {
+			client.clear();
 			$rootScope.clientFormMode = true;
 		};
 
@@ -164,10 +186,10 @@ angular.module("druns", [])
 	    return colour;
 		};
 
-		$scope.retrieveClients();
+		clientService.retrieveAll();
 	})
 
-	.controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client, clientService) {
+	.controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client, clients, clientService) {
 		$scope.client = client.getClient();
 
 		$scope.addClass = function() {
@@ -187,6 +209,7 @@ angular.module("druns", [])
 				.then(
 					function() {
 						// TODO: Success
+						clientService.retrieveAll();
 						$rootScope.clientFormMode = false;
 					}
 				);

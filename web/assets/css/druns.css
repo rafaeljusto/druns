@@ -148,6 +148,7 @@ footer {
 .client {
 	border-radius: 10px;
 	cursor: pointer;
+	margin-bottom: 5px;
 	padding: 1rem;
 	transition: all 0.3s ease-in-out;
 }

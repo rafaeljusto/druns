@@ -60,10 +60,10 @@
 			<tbody>
 				<tr data-ng-repeat="time in times">
 					<th>{{time}}</th>
-					<td colspan="7">
+					<td colspan="7" data-ng-click="newClient()">
 						<div class="client"
 							data-ng-repeat="client in clientsAt(time, weekday)"
-							data-ng-click="editClient(client)"
+							data-ng-click="editClient($event, client)"
 							data-ng-init="clientStyle[client.id] = {'background-color': clientColor(client)}"
 							data-ng-style="clientStyle[client.id]">
 							{{client.name}}
@@ -73,8 +73,6 @@
 			</tbody>
 		</table>
 		
-		<button data-ng-click="clientFormMode = true" data-ng-hide="clientFormMode">New Client</button>
-
 		<form data-ng-controller="clientFormCtrl" data-ng-show="$root.clientFormMode">
 			<fieldset>
 				<label for="name">Nome</label>
