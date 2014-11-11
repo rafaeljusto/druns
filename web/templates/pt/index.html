@@ -111,11 +111,11 @@
 				</select>
 
 				<label>Hor&aacute;rio</label>
-				<input type="time" min="05:00:00" max="23:30:00" step="30"
+				<input type="time" min="05:00:00" max="23:30:00" step="1800"
 					data-ng-model="client.data.classes[$index].time" required />
 
 				<label>Dura&ccedil;&atilde;o</label>
-				<input type="range" min="30" max="120" step="1800"
+				<input type="range" min="30" max="120" step="30"
 					data-ng-model="client.data.classes[$index].duration" required />
 				{{client.data.classes[$index].duration}} minutes
 			</fieldset>
