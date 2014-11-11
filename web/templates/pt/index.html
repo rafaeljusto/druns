@@ -8,13 +8,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<link rel="stylesheet" type="text/css" href="/assets/css/druns.css">
-		<link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css">
 
 		<title>Druns</title>
 	</head>
 	
 	<body data-ng-init="clientFormMode = false">
-		<table data-ng-controller="scheduleCtrl"
+		<h1>Druns</h1>
+
+		<table data-ng-cloak data-ng-controller="scheduleCtrl"
 			data-ng-hide="$root.clientFormMode"
 			data-ng-init="weekday = WEEKDAYS.sunday">
 			<thead>
@@ -60,7 +61,7 @@
 			<tbody>
 				<tr data-ng-repeat="time in times">
 					<th>{{time}}</th>
-					<td colspan="7" data-ng-click="newClient()">
+					<td colspan="7" data-ng-click="newClient(weekday, time)">
 						<div class="client"
 							data-ng-repeat="client in clientsAt(time, weekday)"
 							data-ng-click="editClient($event, client)"
@@ -73,7 +74,7 @@
 			</tbody>
 		</table>
 		
-		<form data-ng-controller="clientFormCtrl" data-ng-show="$root.clientFormMode">
+		<form data-ng-cloak data-ng-controller="clientFormCtrl" data-ng-show="$root.clientFormMode">
 			<fieldset>
 				<label for="name">Nome</label>
 				<input type="text" id="name" data-ng-model="client.data.name"/>
@@ -82,6 +83,8 @@
 			<button data-ng-click="addClass()">Adicionar Aula</button>
 
 			<fieldset data-ng-repeat="class in client.data.classes track by $index">
+				<button class="right general-button" data-ng-click="removeClass($index)">Remover</button>
+
 				<label>Dia da Semana</label>
 				<select data-ng-model="client.data.classes[$index].weekday">
 					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.sunday">
@@ -108,19 +111,17 @@
 				</select>
 
 				<label>Hor&aacute;rio</label>
-				<input type="time" min="05:00:00" max="23:30:00"
+				<input type="time" min="05:00:00" max="23:30:00" step="30"
 					data-ng-model="client.data.classes[$index].time" required />
 
 				<label>Dura&ccedil;&atilde;o</label>
-				<input type="range" min="30" max="120"
+				<input type="range" min="30" max="120" step="1800"
 					data-ng-model="client.data.classes[$index].duration" required />
 				{{client.data.classes[$index].duration}} minutes
-
-				<button data-ng-click="removeClass($index)">Remover</button>
 			</fieldset>
 
-			<button data-ng-click="$root.clientFormMode = false">Cancelar</button>
-			<button data-ng-click="save()">Salvar</button>
+			<button class="error-button" data-ng-click="$root.clientFormMode = false">Cancelar</button>
+			<button class="success-button" data-ng-click="save()">Salvar</button>
 		</form>
 		
 		<footer>

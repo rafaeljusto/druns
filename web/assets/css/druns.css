@@ -8,6 +8,15 @@
   box-sizing: border-box;
 }
 
+[ng\:cloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak {
+  display: none !important;
+}
+
 body {
   font-family: sans-serif;
   font-size: 1em;
@@ -18,13 +27,11 @@ body {
   width: 100%;
 }
 
-[ng\:cloak],
-[ng-cloak],
-[data-ng-cloak],
-[x-ng-cloak],
-.ng-cloak,
-.x-ng-cloak {
-  display: none !important;
+h1 {
+	color: #222;
+	font-size: 3em;
+	text-align: center;
+	text-shadow: 0px 2px 3px #555;
 }
 
 table {
@@ -64,18 +71,18 @@ table tr {
 	text-align: center;
 }
 
-table td:first-child {
-	border-left: 0;
-	padding-left: 1.2rem;
-	text-align: left;
-}
-
 table td {
 	background: #fafafa;
 	border-bottom: 1px solid #e0e0e0;
 	border-left: 1px solid #e0e0e0;
 	border-top: 1px solid #ffffff;
 	padding: 18px;
+}
+
+table td:first-child {
+	border-left: 0;
+	padding-left: 1.2rem;
+	text-align: left;
 }
 
 table tr.even td {
@@ -98,24 +105,22 @@ table tr:hover td {
 	background: #f2f2f2;
 }
 
-button {
-	background-color: #77b55a;
-	border-radius: 4px;
-	border: 1px solid #4b8f29;
-	box-shadow: 0px 10px 14px -7px #3e7327;
-	color: #ffffff;
-	cursor: pointer;
-	display: inline-block;
-	font-size: 1.4em;
-	font-weight: bold;
-	margin: 20px;
-	padding: 0.5rem 1rem;
-	text-decoration: none;
-	text-shadow: 0px 1px 0px #5b8a3c;
+form {
+	background: #fafafa;
+	margin: auto;
+	max-width: 90%;
 }
 
-button:hover {
-	background-color: #72b352;
+fieldset {
+	background: #ededed;
+	border-bottom: 1px solid #e0e0e0;
+	border-left: none;
+	border-right: none;
+	border-top: 1px solid #fafafa;
+	color: #666;
+	font-size: 1em;
+	margin: 10px 0px 10px 0px;
+	padding: 1rem;
 }
 
 button:active {
@@ -123,8 +128,9 @@ button:active {
 	top: 1px;
 }
 
-input, label {
+input, label, select {
 	display: block;
+	margin-bottom: 10px;
 }
 
 footer {
@@ -157,4 +163,68 @@ footer {
 	opacity: 0.7;
 	transform: scale(1.2);
 	transition: all 0.3s ease-in-out;
+}
+
+.right {
+	float: right;
+}
+
+.success-button {
+	background-color: #77b55a;
+	border-radius: 4px;
+	border: 1px solid #4b8f29;
+	box-shadow: 0px 10px 14px -7px #3e7327;
+	color: #ffffff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 1.4em;
+	font-weight: bold;
+	margin: 20px 2px 20px 2px;
+	padding: 0.5rem 1rem;
+	text-decoration: none;
+	text-shadow: 0px 1px 0px #5b8a3c;
+}
+
+.success-button:hover {
+	background-color: #537f3f;
+}
+
+.error-button {
+	background-color: #ff1519;
+	border-radius: 4px;
+	border: 1px solid #803a3a;
+	box-shadow: 0px 10px 14px -7px #ff7375;
+	color: #ffffff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 1.4em;
+	font-weight: bold;
+	margin: 20px 2px 20px 2px;
+	padding: 0.5rem 1rem;
+	text-decoration: none;
+	text-shadow: 0px 1px 0px #5b8a3c;
+}
+
+.error-button:hover {
+	background-color: #b20f12;
+}
+
+.general-button {
+	background-color: #0066ff;
+	border-radius: 4px;
+	border: 1px solid #003380;
+	box-shadow: 0px 10px 14px -7px #4d70a6;
+	color: #ffffff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 1.4em;
+	font-weight: bold;
+	margin: 20px 2px 20px 2px;
+	padding: 0.5rem 1rem;
+	text-decoration: none;
+	text-shadow: 0px 1px 0px #5b8a3c;
+}
+
+.general-button:hover {
+	background-color: #364e74;
 }

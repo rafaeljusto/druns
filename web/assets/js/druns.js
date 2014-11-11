@@ -37,11 +37,19 @@ angular.module("druns", [])
 			setClient: function(c) {
 				client.data = c;
 			},
-			clear: function() {
+			clear: function(weekday, time) {
 				client.data = {
 					name: "",
 					classes: []
 				};
+				
+				if (weekday && time) {
+					client.data.classes.push({
+						weekday: weekday,
+						time: time.toDate(),
+						duration: "30",
+					});
+				}
 			}
 		}
 	})
@@ -170,8 +178,8 @@ angular.module("druns", [])
 			$rootScope.clientFormMode = true;
 		};
 
-		$scope.newClient = function() {
-			client.clear();
+		$scope.newClient = function(weekday, time) {
+			client.clear(weekday, moment("1970-01-01 " + time));
 			$rootScope.clientFormMode = true;
 		};
 
