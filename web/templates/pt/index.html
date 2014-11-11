@@ -80,7 +80,7 @@
 				<input type="text" id="name" data-ng-model="client.data.name"/>
 			</fieldset>
 
-			<button data-ng-click="addClass()">Adicionar Aula</button>
+			<button class="general-button" data-ng-click="addClass()">Adicionar Aula</button>
 
 			<fieldset data-ng-repeat="class in client.data.classes track by $index">
 				<button class="right general-button" data-ng-click="removeClass($index)">Remover</button>
