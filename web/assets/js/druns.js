@@ -42,7 +42,7 @@ angular.module("druns", [])
 					name: "",
 					classes: []
 				};
-				
+
 				if (weekday && time) {
 					client.data.classes.push({
 						weekday: weekday,
@@ -123,6 +123,10 @@ angular.module("druns", [])
 			}
 
 			return request.then(handleSuccess, handleError);
+		}
+
+		function handleSuccess(response) {
+			return response.data;
 		}
 
 		function handleError(response) {
