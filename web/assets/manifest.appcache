@@ -1,5 +1,9 @@
 CACHE MANIFEST
-# rev 1
+# rev 5
+NETWORK:
+/client
+/clients
+CACHE:
 /
 /assets/css/druns.css
 /assets/js/angular.min.js

@@ -64,7 +64,7 @@ angular.module("druns", [])
 				return clients;
 			},
 			setClients: function(c) {
-				if Array.isArray(c) {
+				if (Array.isArray(c)) {
 					clients.data = c;
 				} else {
 					console.log("Trying to set a non-array in clients", c);
@@ -211,7 +211,7 @@ angular.module("druns", [])
 				return messages;
 			},
 			setMessages: function(m) {
-				if Array.isArray(m) {
+				if (Array.isArray(m)) {
 					messages.data = m;
 				} else {
 					console.log("Trying to set a non-array in messages", m);
@@ -271,6 +271,10 @@ angular.module("druns", [])
 		};
 
 		$scope.clientColor = function(c) {
+			if (!c.id) {
+				return "#fff";
+			}
+
 			var hash = 0;
 	    for (var i = 0; i < c.id.length; i++) {
 	       hash = c.id.charCodeAt(i) + ((hash << 5) - hash);
