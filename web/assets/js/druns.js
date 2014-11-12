@@ -64,7 +64,11 @@ angular.module("druns", [])
 				return clients;
 			},
 			setClients: function(c) {
-				clients.data = c;
+				if Array.isArray(c) {
+					clients.data = c;
+				} else {
+					console.log("Trying to set a non-array in clients", c);
+				}
 			},
 			addClient: function(c) {
 				var newClient = true;
@@ -98,23 +102,42 @@ angular.module("druns", [])
 			});
 
 			request.then(
-				function(c) {
+				function(r) {
+					if (r.status == 400) {
+						messages.setMessages(r.data);
+						clients.setClients(localStorage.getItem("clients"));
+						return;
+
+					} else if (r.status != 200) {
+						console.log("Error", r.status, "while retrieving clients.", r.data);
+						clients.setClients(localStorage.getItem("clients"));
+						return;
+					}
+
 					// Convert JSON string time to Date object
-					c.data.forEach(function(client) {
-						if (!client || !client.classes) {
+					r.data.forEach(function(c) {
+						if (!c || !c.classes) {
 							return;
 						}
 
-						client.classes.forEach(function(cl) {
+						c.classes.forEach(function(cl) {
 							if (cl.time) {
 								cl.time = moment(cl.time).toDate();
 							}
 						});
 					});
-					clients.setClients(c.data);
+					clients.setClients(r.data);
+					localStorage.setItem("clients", clients.data);
 				},
-				function(e) {
-					messages.setMessages(e.data);
+				function(r) {
+					if (r.status == 400) {
+						messages.setMessages(r.data);
+						clients.setClients(localStorage.getItem("clients"));
+
+					} else {
+						console.log("Error", r.status, "while retrieving clients.", r.data);
+						clients.setClients(localStorage.getItem("clients"));
+					}
 				}
 			);
 		}
@@ -146,8 +169,11 @@ angular.module("druns", [])
 						return false;
 
 					} else if (r.status != 204) {
+						// TODO: Save in a localStorage buffer to save later. We also need to set a unique
+						// temporary id for the client
+						clients.addClient(client);
 						console.log("Error", r.status, "while saving client.", r.data);
-						return false;
+						return true;
 					}
 
 					if (newClient) {
@@ -155,14 +181,20 @@ angular.module("druns", [])
 					}
 
 					clients.addClient(client);
+					localStorage.setItem("clients", clients.data);
 					return true;
 				},
 				function(r) {
 					if (r.status == 400) {
 						messages.setMessages(r.data);
+						return false;
 
 					} else {
+						// TODO: Save in a localStorage buffer to save later. We also need to set a unique
+						// temporary id for the client
+						clients.addClient(client);
 						console.log("Error", r.status, "while saving client.", r.data);
+						return true;
 					}
 				}
 			);
@@ -179,7 +211,11 @@ angular.module("druns", [])
 				return messages;
 			},
 			setMessages: function(m) {
-				messages.data = m;
+				if Array.isArray(m) {
+					messages.data = m;
+				} else {
+					console.log("Trying to set a non-array in messages", m);
+				}
 			}
 		}
 	})
@@ -269,6 +305,11 @@ angular.module("druns", [])
 		$scope.save = function() {
 			clientService.save($scope.client.data)
 				.then(
+					function(success) {
+						if (success) {
+							$rootScope.clientFormMode = false;
+						}
+					},
 					function(success) {
 						if (success) {
 							$rootScope.clientFormMode = false;
