@@ -14,6 +14,13 @@ func (c *ClientRequest) Normalize() {
 
 func (c *ClientRequest) Validate(checkMandatoryFields bool) Translator {
 	var messagesHolder MessagesHolder
+
+	if checkMandatoryFields {
+		if c.Name == nil || len(*c.Name) == 0 {
+			messagesHolder.Add(NewMessageWithField(MsgCodeNameMissing, "name", ""))
+		}
+	}
+
 	for _, class := range c.Classes {
 		messagesHolder.Add(class.Validate(checkMandatoryFields))
 	}

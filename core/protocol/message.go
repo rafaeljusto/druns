@@ -10,6 +10,7 @@ const (
 	MsgCodeInvalidClassTime     = "invalid-class-time"
 	MsgCodeInvalidClassDuration = "invalid-class-duration"
 	MsgCodeClassDataMissing     = "class-data-missing"
+	MsgCodeNameMissing          = "name-missing"
 )
 
 type msgCode string

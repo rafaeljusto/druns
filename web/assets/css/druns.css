@@ -228,3 +228,13 @@ footer {
 .general-button:hover {
 	background-color: #364e74;
 }
+
+.messages {
+	background-color: #ffbaba;
+	background-position: 10px center;
+	background-repeat: no-repeat;
+	border: 1px solid;
+	color: #d8000c;
+	margin: 10px 0px;
+	padding:1rem 0.5rem 1rem 3rem;
+}

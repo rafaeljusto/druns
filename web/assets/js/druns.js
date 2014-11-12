@@ -67,12 +67,25 @@ angular.module("druns", [])
 				clients.data = c;
 			},
 			addClient: function(c) {
-				client.data.push(c);
+				var newClient = true;
+				clients.data.some(function(client, index) {
+					if (client.id == c.id) {
+						clients.data[index] = c;
+						newClient = false;
+						return true;
+					}
+
+					return false;
+				});
+
+				if (newClient) {
+					clients.data.push(c);
+				}
 			}
 		}
 	})
 
-	.service("clientService", function($http, $q, clients) {
+	.service("clientService", function($http, $q, clients, messages) {
 		return({
 			retrieveAll: retrieveAll,
 			save: save
@@ -100,12 +113,15 @@ angular.module("druns", [])
 					});
 					clients.setClients(c.data);
 				},
-				handleError
+				function(e) {
+					messages.setMessages(e.data);
+				}
 			);
 		}
 
 		function save(client) {
 			var request;
+			var newClient = false;
 
 			if (client.id && client.id.length > 0) {
 				request = $http({
@@ -120,20 +136,51 @@ angular.module("druns", [])
 					url: "/client",
 					data: client
 				});
+				newClient = true;
 			}
 
-			return request.then(handleSuccess, handleError);
-		}
+			return request.then(
+				function(r) {
+					if (r.status == 400) {
+						messages.setMessages(r.data);
+						return false;
 
-		function handleSuccess(response) {
-			return response.data;
-		}
+					} else if (r.status != 204) {
+						console.log("Error", r.status, "while saving client.", r.data);
+						return false;
+					}
 
-		function handleError(response) {
-			if (!angular.isObject(response.data)) {
-				return $q.reject("An unknown error occurred.");
+					if (newClient) {
+						client.id = r.headers("Location").slice(8);
+					}
+
+					clients.addClient(client);
+					return true;
+				},
+				function(r) {
+					if (r.status == 400) {
+						messages.setMessages(r.data);
+
+					} else {
+						console.log("Error", r.status, "while saving client.", r.data);
+					}
+				}
+			);
+		}
+	})
+
+	.service("messages", function() {
+		var messages = {
+			data: []
+		};
+
+		return {
+			getMessages: function() {
+				return messages;
+			},
+			setMessages: function(m) {
+				messages.data = m;
 			}
-			return $q.reject(response.data.message);
 		}
 	})
 
@@ -201,8 +248,11 @@ angular.module("druns", [])
 		clientService.retrieveAll();
 	})
 
-	.controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client, clients, clientService) {
+	.controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client, 
+		clients, clientService, messages) {
+
 		$scope.client = client.getClient();
+		$scope.messages = messages.getMessages();
 
 		$scope.addClass = function() {
 			$scope.client.data.classes.push({
@@ -219,10 +269,10 @@ angular.module("druns", [])
 		$scope.save = function() {
 			clientService.save($scope.client.data)
 				.then(
-					function() {
-						// TODO: Success
-						clientService.retrieveAll();
-						$rootScope.clientFormMode = false;
+					function(success) {
+						if (success) {
+							$rootScope.clientFormMode = false;
+						}
 					}
 				);
 		};

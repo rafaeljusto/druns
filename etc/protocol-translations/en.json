@@ -3,5 +3,6 @@
 	"corrupted-data": "Invalid request format",
 	"invalid-class-duration": "Invalid class duration, should be a number from 30 to 120",
 	"invalid-class-time": "Invalid class time, should be in the format of RFC 3339",
-	"invalid-class-weekday": "Invalid class weekday, possible values are: 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday' and 'saturday'"
+	"invalid-class-weekday": "Invalid class weekday, possible values are: 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday' and 'saturday'",
+	"name-missing": "Client name was not informed"
 }

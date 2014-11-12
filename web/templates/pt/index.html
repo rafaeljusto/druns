@@ -75,6 +75,12 @@
 		</table>
 		
 		<form data-ng-cloak data-ng-controller="clientFormCtrl" data-ng-show="$root.clientFormMode">
+			<ul class="messages" data-ng-show="messages.data.length > 0">
+				<li data-ng-repeat="m in messages.data">
+					Campo "{{m.field}}" com valor "{{m.value}}": {{m.message}}
+				</li>
+			</ul>
+
 			<fieldset>
 				<label for="name">Nome</label>
 				<input type="text" id="name" data-ng-model="client.data.name"/>
@@ -119,6 +125,12 @@
 					data-ng-model="client.data.classes[$index].duration" required />
 				{{client.data.classes[$index].duration}} minutes
 			</fieldset>
+
+			<ul class="messages" data-ng-show="messages.data.length > 0">
+				<li data-ng-repeat="m in messages.data">
+					Campo "{{m.field}}" com valor "{{m.value}}": {{m.message}}
+				</li>
+			</ul>
 
 			<button class="error-button" data-ng-click="$root.clientFormMode = false">Cancelar</button>
 			<button class="success-button" data-ng-click="save()">Salvar</button>
