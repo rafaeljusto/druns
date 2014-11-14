@@ -115,30 +115,20 @@ angular.module("druns", [])
 
 			request.then(
 				function(r) {
-					// Convert JSON string time to Date object
-					r.data.forEach(function(c) {
-						if (!c || !c.classes) {
-							return;
-						}
-
-						c.classes.forEach(function(cl) {
-							if (cl.time) {
-								cl.time = moment(cl.time).toDate();
-							}
-						});
-					});
+					convertJSONDate(r.data);
 					clients.setClients(r.data);
-					localStorage.setItem("clients", clients.data);
+					localStorage.setItem("clients", angular.toJson(clients.getClients().data));
 				},
 				function(r) {
 					if (r.status == 400) {
 						messages.setMessages(r.data);
-						clients.setClients(localStorage.getItem("clients"));
-
 					} else {
 						console.log("Error", r.status, "while retrieving clients.", r.data);
-						clients.setClients(localStorage.getItem("clients"));
 					}
+
+					var c = angular.fromJson(localStorage.getItem("clients"));
+					convertJSONDate(c);
+					clients.setClients(c);
 				}
 			);
 		}
@@ -170,7 +160,7 @@ angular.module("druns", [])
 					}
 
 					clients.addClient(client);
-					localStorage.setItem("clients", clients.data);
+					localStorage.setItem("clients", angular.toJson(clients.getClients().data));
 
 					return {
 						success: true,
@@ -193,7 +183,7 @@ angular.module("druns", [])
 
 						clients.addClient(client);
 						saveLater(client);
-						localStorage.setItem("clients", clients.data);
+						localStorage.setItem("clients", angular.toJson(clients.getClients().data));
 
 						console.log("Error", r.status, "while saving client.", r.data);
 
@@ -204,6 +194,20 @@ angular.module("druns", [])
 					}
 				}
 			);
+		}
+
+		function convertJSONDate(clients) {
+			clients.forEach(function(c) {
+				if (!c || !c.classes) {
+					return;
+				}
+
+				c.classes.forEach(function(cl) {
+					if (cl.time) {
+						cl.time = moment(cl.time).toDate();
+					}
+				});
+			});
 		}
 
 		function saveLater(c) {
