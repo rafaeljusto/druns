@@ -37,7 +37,7 @@ angular.module("druns", [])
         return client;
       },
       setClient: function(c) {
-        client.data = c;
+        client.data = angular.copy(c);
       },
       clear: function(weekday, time) {
         client.data = {
