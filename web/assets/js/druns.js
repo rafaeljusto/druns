@@ -9,7 +9,7 @@ angular.module("druns", [])
 		saturday: "Saturday"
 	})
 
-	.run(function($rootScope, WEEKDAYS) {
+	.run(function($rootScope, WEEKDAYS, clientService) {
 		$rootScope.WEEKDAYS = WEEKDAYS
 		$rootScope.WEEKDAYS_LIST = [
 			WEEKDAYS.sunday,
@@ -20,6 +20,8 @@ angular.module("druns", [])
 			WEEKDAYS.friday,
 			WEEKDAYS.saturday
 		];
+
+		clientService.start();
    })
 
 	.service("client", function() {
@@ -51,7 +53,7 @@ angular.module("druns", [])
 					});
 				}
 			}
-		}
+		};
 	})
 
 	.service("clients", function() {
@@ -73,7 +75,12 @@ angular.module("druns", [])
 			addClient: function(c) {
 				var newClient = true;
 				clients.data.some(function(client, index) {
-					if (client.id == c.id) {
+					if (c.id && client.id == c.id) {
+						clients.data[index] = c;
+						newClient = false;
+						return true;
+
+					} else if (c.temporaryId && client.temporaryId == c.temporaryId) {
 						clients.data[index] = c;
 						newClient = false;
 						return true;
@@ -86,14 +93,19 @@ angular.module("druns", [])
 					clients.data.push(c);
 				}
 			}
-		}
+		};
 	})
 
-	.service("clientService", function($http, $q, clients, messages) {
+	.service("clientService", function($http, $q, $timeout, clients, messages) {
+		var saveLaterClients = [];
+
 		return({
 			retrieveAll: retrieveAll,
-			save: save
-		})
+			save: save,
+			start: function() {
+				$timeout(start, 5000);
+			}
+		});
 
 		function retrieveAll() {
 			var request = $http({
@@ -103,17 +115,6 @@ angular.module("druns", [])
 
 			request.then(
 				function(r) {
-					if (r.status == 400) {
-						messages.setMessages(r.data);
-						clients.setClients(localStorage.getItem("clients"));
-						return;
-
-					} else if (r.status != 200) {
-						console.log("Error", r.status, "while retrieving clients.", r.data);
-						clients.setClients(localStorage.getItem("clients"));
-						return;
-					}
-
 					// Convert JSON string time to Date object
 					r.data.forEach(function(c) {
 						if (!c || !c.classes) {
@@ -164,40 +165,83 @@ angular.module("druns", [])
 
 			return request.then(
 				function(r) {
-					if (r.status == 400) {
-						messages.setMessages(r.data);
-						return false;
-
-					} else if (r.status != 204) {
-						// TODO: Save in a localStorage buffer to save later. We also need to set a unique
-						// temporary id for the client
-						clients.addClient(client);
-						console.log("Error", r.status, "while saving client.", r.data);
-						return true;
-					}
-
 					if (newClient) {
 						client.id = r.headers("Location").slice(8);
 					}
 
 					clients.addClient(client);
 					localStorage.setItem("clients", clients.data);
-					return true;
+
+					return {
+						success: true,
+						saveLater: false
+					};
 				},
 				function(r) {
 					if (r.status == 400) {
 						messages.setMessages(r.data);
-						return false;
+
+						return {
+							success: false,
+							saveLater: false
+						};
 
 					} else {
-						// TODO: Save in a localStorage buffer to save later. We also need to set a unique
-						// temporary id for the client
+						if (!client.id && !client.temporaryId) {
+							client.temporaryId = (Math.random() + 1).toString(36).substring(7);
+						}
+
 						clients.addClient(client);
+						saveLater(client);
+						localStorage.setItem("clients", clients.data);
+
 						console.log("Error", r.status, "while saving client.", r.data);
-						return true;
+
+						return {
+							success: false,
+							saveLater: true
+						};
 					}
 				}
 			);
+		}
+
+		function saveLater(c) {
+			var newClient = true;
+			saveLaterClients.some(function(client, index) {
+				if (c.id && client.id == c.id) {
+					saveLaterClients[index] = c;
+					newClient = false;
+					return true;
+
+				} else if (c.temporaryId && client.temporaryId == c.temporaryId) {
+					saveLaterClients[index] = c;
+					newClient = false;
+					return true;
+				}
+
+				return false;
+			});
+
+			if (newClient) {
+				saveLaterClients.push(c);
+			}
+		}
+
+		function start() {
+			var savingClients = angular.copy(saveLaterClients);
+			savingClients.forEach(function(client, index) {
+				save(client)
+					.then(
+						function(r) {
+							if (r.success) {
+								saveLaterClients.splice(index, 1);
+							}
+						},
+						function() {}
+					);
+			});
+			$timeout(start, 5000);
 		}
 	})
 
@@ -271,13 +315,18 @@ angular.module("druns", [])
 		};
 
 		$scope.clientColor = function(c) {
-			if (!c.id) {
+			if (!c.id && !c.temporaryId) {
 				return "#fff";
 			}
 
+			var id = c.id;
+			if (!c.id) {
+				id = c.temporaryId;
+			}
+
 			var hash = 0;
-	    for (var i = 0; i < c.id.length; i++) {
-	       hash = c.id.charCodeAt(i) + ((hash << 5) - hash);
+	    for (var i = 0; i < id.length; i++) {
+	       hash = id.charCodeAt(i) + ((hash << 5) - hash);
 	    }
 
 	    var colour = "#";
@@ -309,13 +358,13 @@ angular.module("druns", [])
 		$scope.save = function() {
 			clientService.save($scope.client.data)
 				.then(
-					function(success) {
-						if (success) {
+					function(r) {
+						if (r.success || r.saveLater) {
 							$rootScope.clientFormMode = false;
 						}
 					},
-					function(success) {
-						if (success) {
+					function(r) {
+						if (r.success || r.saveLater) {
 							$rootScope.clientFormMode = false;
 						}
 					}
