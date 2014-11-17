@@ -63,7 +63,7 @@
 					<th>{{time}}</th>
 					<td colspan="7" data-ng-click="newClient(weekday, time)">
 						<div class="client"
-							data-ng-repeat="client in clientsAt(time, weekday)"
+							data-ng-repeat="client in clients.data | clientsAt:weekday:time"
 							data-ng-click="editClient($event, client)"
 							data-ng-init="clientStyle[client.id] = {'background-color': clientColor(client)}"
 							data-ng-style="clientStyle[client.id]">

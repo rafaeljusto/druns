@@ -115,9 +115,14 @@ angular.module("druns", [])
 
       request.then(
         function(r) {
-          convertJSONDate(r.data);
-          clients.setClients(r.data);
-          localStorage.setItem("clients", angular.toJson(clients.getClients().data));
+          if (r.data) {
+            convertJSONDate(r.data);
+            clients.setClients(r.data);
+            localStorage.setItem("clients", angular.toJson(clients.getClients().data));
+
+          } else {
+            console.log("Undefined response from webserver");
+          }
         },
         function(r) {
           if (r.status == 400) {
@@ -127,8 +132,10 @@ angular.module("druns", [])
           }
 
           var c = angular.fromJson(localStorage.getItem("clients"));
-          convertJSONDate(c);
-          clients.setClients(c);
+          if (c) {
+            convertJSONDate(c);
+            clients.setClients(c);
+          }
         }
       );
     }
@@ -277,36 +284,6 @@ angular.module("druns", [])
       "20:00", "20:30", "21:00", "21:30", "22:00", "22:30", "23:00", "23:30"
     ];
 
-    // Returns a list of client objects
-    $scope.clientsAt = function(time, weekday) {
-      var filteredClients = [];
-      var current = moment("1970-01-01 " + time);
-
-      $scope.clients.data.forEach(function(client) {
-        if (!client.classes) {
-          return;
-        }
-
-        client.classes.some(function(c) {
-          if (c.weekday != weekday) {
-            return false;
-          }
-
-          var begin = moment(c.time);
-          var end = angular.copy(begin);
-          end.add(c.duration, "minutes");
-
-          if (begin <= current && current < end) {
-            filteredClients.push(client);
-            return true;
-          }
-
-          return false;
-        });
-      });
-      return filteredClients;
-    };
-
     $scope.editClient = function(event, c) {
       event.stopPropagation();
       client.setClient(c);
@@ -339,6 +316,41 @@ angular.module("druns", [])
     };
 
     clientService.retrieveAll();
+  })
+
+  .filter("clientsAt", function() {
+    return function(clients, weekday, time) {
+      if (!clients) {
+        return clients;
+      }
+
+      var filtered = [];
+      var current = moment("1970-01-01 " + time);
+
+      clients.forEach(function(client) {
+        if (!client.classes) {
+          return false;
+        }
+
+        client.classes.some(function(c) {
+          if (c.weekday != weekday) {
+            return false;
+          }
+
+          var begin = moment(c.time);
+          var end = angular.copy(begin);
+          end.add(c.duration, "minutes");
+
+          if (begin <= current && current < end) {
+            filtered.push(client);
+            return true;
+          }
+
+          return false;
+        });
+      });
+      return filtered;
+    };
   })
 
   .controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client, 
