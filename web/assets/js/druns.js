@@ -24,76 +24,91 @@ angular.module("druns", [])
     clientService.start();
    })
 
-  .service("client", function() {
-    var client = {
-      data: {
-        name: "",
-        classes: []
-      }
+  .service("client", function(WEEKDAYS) {
+    var data = {
+      name: "",
+      classes: []
     };
 
     return {
-      getClient: function() {
-        return client;
+      get: function() {
+        return data;
       },
-      setClient: function(c) {
-        client.data = angular.copy(c);
+      set: function(c) {
+        data = angular.copy(c);
       },
       clear: function(weekday, time) {
-        client.data = {
+        data = {
           name: "",
           classes: []
         };
 
         if (weekday && time) {
-          client.data.classes.push({
+          data.classes.push({
             weekday: weekday,
             time: time.toDate(),
             duration: "30",
           });
         }
-      }
+      },
+      addClass: addClass,
+      removeClass: removeClass
+    };
+
+    function addClass() {
+      data.classes.push({
+        weekday: WEEKDAYS.sunday,
+        time: new Date(1970, 0, 1, 5, 0, 0),
+        duration: "30",
+      });
+    };
+
+    function removeClass(index) {
+      data.classes.splice(index, 1);
     };
   })
 
   .service("clients", function() {
-    var clients = {
-      data: []
-    };
+    var data = [];
 
     return {
       get: function() {
-        return clients;
+        return data;
       },
-      set: function(c) {
-        if (Array.isArray(c)) {
-          clients.data = c;
+      set: function(clients) {
+        if (Array.isArray(clients)) {
+          clients.forEach(function(client) {
+            add(client);
+          });
+
         } else {
-          console.log("Trying to set a non-array in clients", c);
+          console.log("Trying to set a non-array in clients", clients);
         }
       },
-      add: function(c) {
-        var newClient = true;
-        clients.data.some(function(client, index) {
-          if (c.id && client.id == c.id) {
-            clients.data[index] = c;
-            newClient = false;
-            return true;
-
-          } else if (c.temporaryId && client.temporaryId == c.temporaryId) {
-            clients.data[index] = c;
-            newClient = false;
-            return true;
-          }
-
-          return false;
-        });
-
-        if (newClient) {
-          clients.data.push(c);
-        }
-      }
+      add: add
     };
+
+    function add(newClient) {
+      var found = false;
+      data.some(function(client, index) {
+        if (newClient.id && client.id == newClient.id) {
+          data[index] = newClient;
+          found = true;
+          return true;
+
+        } else if (newClient.temporaryId && client.temporaryId == newClient.temporaryId) {
+          data[index] = newClient;
+          found = true;
+          return true;
+        }
+
+        return false;
+      });
+
+      if (!found) {
+        data.push(newClient);
+      }
+    }
   })
 
   .service("clientService", function($http, $q, $timeout, clients, messages) {
@@ -118,7 +133,7 @@ angular.module("druns", [])
           if (r.data) {
             convertJSONDate(r.data);
             clients.set(r.data);
-            localStorage.setItem("clients", angular.toJson(clients.get().data));
+            localStorage.setItem("clients", angular.toJson(clients.get()));
 
           } else {
             console.log("Undefined response from webserver");
@@ -126,7 +141,7 @@ angular.module("druns", [])
         },
         function(r) {
           if (r.status == 400) {
-            messages.setMessages(r.data);
+            messages.set(r.data);
           } else {
             console.log("Error", r.status, "while retrieving clients.", r.data);
           }
@@ -167,7 +182,7 @@ angular.module("druns", [])
           }
 
           clients.add(client);
-          localStorage.setItem("clients", angular.toJson(clients.get().data));
+          localStorage.setItem("clients", angular.toJson(clients.get()));
 
           return {
             success: true,
@@ -176,7 +191,7 @@ angular.module("druns", [])
         },
         function(r) {
           if (r.status == 400) {
-            messages.setMessages(r.data);
+            messages.set(r.data);
 
             return {
               success: false,
@@ -190,7 +205,7 @@ angular.module("druns", [])
 
             clients.add(client);
             saveLater(client);
-            localStorage.setItem("clients", angular.toJson(clients.get().data));
+            localStorage.setItem("clients", angular.toJson(clients.get()));
 
             console.log("Error", r.status, "while saving client.", r.data);
 
@@ -257,17 +272,15 @@ angular.module("druns", [])
   })
 
   .service("messages", function() {
-    var messages = {
-      data: []
-    };
+    var data = [];
 
     return {
-      getMessages: function() {
-        return messages;
+      get: function() {
+        return data;
       },
-      setMessages: function(m) {
-        if (Array.isArray(m)) {
-          messages.data = m;
+      set: function(messages) {
+        if (Array.isArray(messages)) {
+          data = messages;
         } else {
           console.log("Trying to set a non-array in messages", m);
         }
@@ -276,7 +289,7 @@ angular.module("druns", [])
   })
 
   .controller("scheduleCtrl", function($rootScope, $scope, client, clients, clientService) {
-    $scope.clients = clients.get();
+    $scope.clients = clients;
     $scope.times = [
       "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30",
       "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
@@ -286,7 +299,7 @@ angular.module("druns", [])
 
     $scope.editClient = function(event, c) {
       event.stopPropagation();
-      client.setClient(c);
+      client.set(c);
       $rootScope.clientFormMode = true;
     };
 
@@ -353,26 +366,14 @@ angular.module("druns", [])
     };
   })
 
-  .controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client, 
-    clients, clientService, messages) {
+  .controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client,
+    clientService, messages) {
 
-    $scope.client = client.getClient();
-    $scope.messages = messages.getMessages();
-
-    $scope.addClass = function() {
-      $scope.client.data.classes.push({
-        weekday: WEEKDAYS.sunday,
-        time: new Date(1970, 0, 1, 5, 0, 0),
-        duration: "30",
-      });
-    };
-
-    $scope.removeClass = function(index) {
-      $scope.client.data.classes.splice(index, 1);
-    };
+    $scope.client = client;
+    $scope.messages = messages.get();
 
     $scope.save = function() {
-      clientService.save($scope.client.data)
+      clientService.save($scope.client.get())
         .then(
           function(r) {
             if (r.success || r.saveLater) {

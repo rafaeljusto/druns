@@ -63,7 +63,7 @@
 					<th>{{time}}</th>
 					<td colspan="7" data-ng-click="newClient(weekday, time)">
 						<div class="client"
-							data-ng-repeat="client in clients.data | clientsAt:weekday:time"
+							data-ng-repeat="client in clients.get() | clientsAt:weekday:time"
 							data-ng-click="editClient($event, client)"
 							data-ng-init="clientStyle[client.id] = {'background-color': clientColor(client)}"
 							data-ng-style="clientStyle[client.id]">
@@ -75,59 +75,60 @@
 		</table>
 		
 		<form data-ng-cloak data-ng-controller="clientFormCtrl" data-ng-show="$root.clientFormMode">
-			<ul class="messages" data-ng-show="messages.data.length > 0">
-				<li data-ng-repeat="m in messages.data">
+			<ul class="messages" data-ng-show="messages.get().length > 0">
+				<li data-ng-repeat="m in messages.get()">
 					Field "{{m.field}}" with value "{{m.value}}": {{m.message}}
 				</li>
 			</ul>
 
 			<fieldset>
 				<label for="name">Name</label>
-				<input type="text" id="name" data-ng-model="client.data.name"/>
+				<input type="text" id="name" data-ng-model="client.get().name"/>
 			</fieldset>
 
-			<button class="general-button" data-ng-click="addClass()">Add Class</button>
+			<button class="general-button" data-ng-click="client.addClass()">Add Class</button>
 
-			<fieldset data-ng-repeat="class in client.data.classes track by $index">
-				<button class="right general-button" data-ng-click="removeClass($index)">Remove</button>
+			<fieldset data-ng-repeat="class in client.get().classes track by $index">
+				<button class="right general-button"
+					data-ng-click="client.removeClass($index)">Remove</button>
 
 				<label>Weekday</label>
-				<select data-ng-model="client.data.classes[$index].weekday">
-					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.sunday">
+				<select data-ng-model="client.get().classes[$index].weekday">
+					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.sunday">
 						Sunday
 					</option>
-					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.monday">
+					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.monday">
 						Monday
 					</option>
-					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.tuesday">
+					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.tuesday">
 						Tuesday
 					</option>
-					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.wednesday">
+					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.wednesday">
 						Wednesday
 					</option>
-					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.thursday">
+					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.thursday">
 						Thursday
 					</option>
-					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.friday">
+					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.friday">
 						Friday
 					</option>
-					<option data-ng-selected="client.data.classes[$index].weekday == $root.WEEKDAYS.saturday">
+					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.saturday">
 						Saturday
 					</option>
 				</select>
 
 				<label>Time</label>
 				<input type="time" min="05:00:00" max="23:30:00" step="1800"
-					data-ng-model="client.data.classes[$index].time" required />
+					data-ng-model="client.get().classes[$index].time" required />
 
 				<label>Duration</label>
 				<input type="range" min="30" max="120" step="30"
-					data-ng-model="client.data.classes[$index].duration" required />
-				{{client.data.classes[$index].duration}} minutes
+					data-ng-model="client.get().classes[$index].duration" required />
+				{{client.get().classes[$index].duration}} minutes
 			</fieldset>
 
-			<ul class="messages" data-ng-show="messages.data.length > 0">
-				<li data-ng-repeat="m in messages.data">
+			<ul class="messages" data-ng-show="messages.get().length > 0">
+				<li data-ng-repeat="m in messages.get()">
 					Field "{{m.field}}" with value "{{m.value}}": {{m.message}}
 				</li>
 			</ul>
