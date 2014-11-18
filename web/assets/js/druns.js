@@ -62,17 +62,17 @@ angular.module("druns", [])
     };
 
     return {
-      getClients: function() {
+      get: function() {
         return clients;
       },
-      setClients: function(c) {
+      set: function(c) {
         if (Array.isArray(c)) {
           clients.data = c;
         } else {
           console.log("Trying to set a non-array in clients", c);
         }
       },
-      addClient: function(c) {
+      add: function(c) {
         var newClient = true;
         clients.data.some(function(client, index) {
           if (c.id && client.id == c.id) {
@@ -117,8 +117,8 @@ angular.module("druns", [])
         function(r) {
           if (r.data) {
             convertJSONDate(r.data);
-            clients.setClients(r.data);
-            localStorage.setItem("clients", angular.toJson(clients.getClients().data));
+            clients.set(r.data);
+            localStorage.setItem("clients", angular.toJson(clients.get().data));
 
           } else {
             console.log("Undefined response from webserver");
@@ -134,7 +134,7 @@ angular.module("druns", [])
           var c = angular.fromJson(localStorage.getItem("clients"));
           if (c) {
             convertJSONDate(c);
-            clients.setClients(c);
+            clients.set(c);
           }
         }
       );
@@ -166,8 +166,8 @@ angular.module("druns", [])
             client.id = r.headers("Location").slice(8);
           }
 
-          clients.addClient(client);
-          localStorage.setItem("clients", angular.toJson(clients.getClients().data));
+          clients.add(client);
+          localStorage.setItem("clients", angular.toJson(clients.get().data));
 
           return {
             success: true,
@@ -188,9 +188,9 @@ angular.module("druns", [])
               client.temporaryId = (Math.random() + 1).toString(36).substring(7);
             }
 
-            clients.addClient(client);
+            clients.add(client);
             saveLater(client);
-            localStorage.setItem("clients", angular.toJson(clients.getClients().data));
+            localStorage.setItem("clients", angular.toJson(clients.get().data));
 
             console.log("Error", r.status, "while saving client.", r.data);
 
@@ -276,7 +276,7 @@ angular.module("druns", [])
   })
 
   .controller("scheduleCtrl", function($rootScope, $scope, client, clients, clientService) {
-    $scope.clients = clients.getClients();
+    $scope.clients = clients.get();
     $scope.times = [
       "05:00", "05:30", "06:00", "06:30", "07:00", "07:30", "08:00", "08:30", "09:00", "09:30",
       "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
