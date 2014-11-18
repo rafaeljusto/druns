@@ -7,27 +7,6 @@ import (
 	"github.com/rafaeljusto/druns/core/protocol"
 )
 
-func parseWeekday(weekday string) (time.Weekday, bool) {
-	switch weekday {
-	case "sunday":
-		return time.Sunday, true
-	case "monday":
-		return time.Monday, true
-	case "tuesday":
-		return time.Tuesday, true
-	case "wednesday":
-		return time.Wednesday, true
-	case "thursday":
-		return time.Thursday, true
-	case "friday":
-		return time.Friday, true
-	case "saturday":
-		return time.Saturday, true
-	default:
-		return time.Sunday, false
-	}
-}
-
 type Class struct {
 	Weekday  time.Weekday
 	Time     time.Time
@@ -39,7 +18,7 @@ func (c *Class) Apply(request *protocol.ClassRequest) protocol.Translator {
 
 	if request.Weekday != nil {
 		var ok bool
-		c.Weekday, ok = parseWeekday(*request.Weekday)
+		c.Weekday, ok = protocol.ParseWeekday(*request.Weekday)
 		if !ok {
 			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeInvalidClassWeekday,
 				"weekday", *request.Weekday))
@@ -90,7 +69,7 @@ func (c Classes) Apply(requests []protocol.ClassRequest) (Classes, protocol.Tran
 			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeClassDataMissing, "", ""))
 		}
 
-		weekday, ok := parseWeekday(*request.Weekday)
+		weekday, ok := protocol.ParseWeekday(*request.Weekday)
 		if !ok {
 			messageHolder.Add(protocol.NewMessageWithField(protocol.MsgCodeInvalidClassWeekday,
 				"weekday", *request.Weekday))
