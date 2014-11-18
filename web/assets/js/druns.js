@@ -284,7 +284,10 @@ angular.module("druns", [])
         } else {
           console.log("Trying to set a non-array in messages", m);
         }
-      }
+      },
+      clear: function() {
+        data = [];
+      };
     }
   })
 
@@ -366,22 +369,22 @@ angular.module("druns", [])
     };
   })
 
-  .controller("clientFormCtrl", function($rootScope, $scope, WEEKDAYS, client,
-    clientService, messages) {
-
+  .controller("clientFormCtrl", function($rootScope, $scope, client, clientService, messages) {
     $scope.client = client;
-    $scope.messages = messages.get();
+    $scope.messages = messages;
 
     $scope.save = function() {
       clientService.save($scope.client.get())
         .then(
           function(r) {
             if (r.success || r.saveLater) {
+              messages.clear();
               $rootScope.clientFormMode = false;
             }
           },
           function(r) {
             if (r.success || r.saveLater) {
+              messages.clear();
               $rootScope.clientFormMode = false;
             }
           }
