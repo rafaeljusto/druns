@@ -287,8 +287,8 @@ angular.module("druns", [])
       },
       clear: function() {
         data = [];
-      };
-    }
+      }
+    };
   })
 
   .controller("scheduleCtrl", function($rootScope, $scope, client, clients, clientService) {
