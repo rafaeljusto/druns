@@ -54,7 +54,6 @@ table th {
 }
 
 table th:first-child {
-	padding-left: 1.2rem;
 	text-align: left;
 }
 
@@ -67,7 +66,6 @@ table tr:first-child th:last-child {
 }
 
 table tr {
-	padding-left: 1.2rem;
 	text-align: center;
 }
 
@@ -76,7 +74,7 @@ table td {
 	border-bottom: 1px solid #e0e0e0;
 	border-left: 1px solid #e0e0e0;
 	border-top: 1px solid #ffffff;
-	padding: 18px;
+	padding: 1.2rem;
 }
 
 table td:first-child {
