@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# rev 85
+# rev 87
 NETWORK:
 /client
 /clients
@@ -10,3 +10,4 @@ CACHE:
 /assets/js/angular.min.js.map
 /assets/js/druns.js
 /assets/js/moment.min.js
+/assets/img/gym.jpg
