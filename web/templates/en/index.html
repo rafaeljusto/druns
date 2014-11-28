@@ -94,37 +94,44 @@
 				<button class="right general-button"
 					data-ng-click="client.removeClass($index)">Remove</button>
 
-				<label>Weekday</label>
-				<select data-ng-model="client.get().classes[$index].weekday">
-					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.sunday">
+				<label for="weekday">Weekday</label>
+				<select id="weekday" data-ng-model="client.get().classes[$index].weekday">
+					<option value="{{$root.WEEKDAYS.sunday}}"
+						data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.sunday">
 						Sunday
 					</option>
-					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.monday">
+					<option value="{{$root.WEEKDAYS.monday}}"
+						data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.monday">
 						Monday
 					</option>
-					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.tuesday">
+					<option value="{{$root.WEEKDAYS.tuesday}}"
+						data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.tuesday">
 						Tuesday
 					</option>
-					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.wednesday">
+					<option value="{{$root.WEEKDAYS.wednesday}}"
+						data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.wednesday">
 						Wednesday
 					</option>
-					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.thursday">
+					<option value="{{$root.WEEKDAYS.thursday}}"
+						data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.thursday">
 						Thursday
 					</option>
-					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.friday">
+					<option value="{{$root.WEEKDAYS.friday}}"
+						data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.friday">
 						Friday
 					</option>
-					<option data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.saturday">
+					<option value="{{$root.WEEKDAYS.saturday}}"
+						data-ng-selected="client.get().classes[$index].weekday == $root.WEEKDAYS.saturday">
 						Saturday
 					</option>
 				</select>
 
-				<label>Time</label>
-				<input type="time" min="05:00:00" max="23:30:00" step="1800"
+				<label for="time">Time</label>
+				<input id="time" type="time" min="05:00:00" max="23:30:00" step="1800"
 					data-ng-model="client.get().classes[$index].time" required />
 
-				<label>Duration</label>
-				<input type="range" min="30" max="120" step="30"
+				<label for="duration">Duration</label>
+				<input id="duration" type="range" min="30" max="120" step="30"
 					data-ng-model="client.get().classes[$index].duration" required />
 				{{client.get().classes[$index].duration}} minutes
 			</fieldset>
