@@ -18,20 +18,20 @@
 }
 
 body {
-	background-color: hsl(34, 53%, 82%);
-	background-image: repeating-linear-gradient(45deg, transparent 5px, hsla(197, 62%, 11%, 0.5) 5px, hsla(197, 62%, 11%, 0.5) 10px, hsla(5, 53%, 63%, 0) 10px, hsla(5, 53%, 63%, 0) 35px, hsla(5, 53%, 63%, 0.5) 35px, hsla(5, 53%, 63%, 0.5) 40px, hsla(197, 62%, 11%, 0.5) 40px, hsla(197, 62%, 11%, 0.5) 50px, hsla(197, 62%, 11%, 0) 50px, hsla(197, 62%, 11%, 0) 60px, hsla(5, 53%, 63%, 0.5) 60px, hsla(5, 53%, 63%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 80px, hsla(35, 91%, 65%, 0) 80px, hsla(35, 91%, 65%, 0) 90px, hsla(5, 53%, 63%, 0.5) 90px, hsla(5, 53%, 63%, 0.5) 110px, hsla(5, 53%, 63%, 0) 110px, hsla(5, 53%, 63%, 0) 120px, hsla(197, 62%, 11%, 0.5) 120px, hsla(197, 62%, 11%, 0.5) 140px), repeating-linear-gradient(135deg, transparent 5px, hsla(197, 62%, 11%, 0.5) 5px, hsla(197, 62%, 11%, 0.5) 10px, hsla(5, 53%, 63%, 0) 10px, hsla(5, 53%, 63%, 0) 35px, hsla(5, 53%, 63%, 0.5) 35px, hsla(5, 53%, 63%, 0.5) 40px, hsla(197, 62%, 11%, 0.5) 40px, hsla(197, 62%, 11%, 0.5) 50px, hsla(197, 62%, 11%, 0) 50px, hsla(197, 62%, 11%, 0) 60px, hsla(5, 53%, 63%, 0.5) 60px, hsla(5, 53%, 63%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 70px, hsla(35, 91%, 65%, 0.5) 80px, hsla(35, 91%, 65%, 0) 80px, hsla(35, 91%, 65%, 0) 90px, hsla(5, 53%, 63%, 0.5) 90px, hsla(5, 53%, 63%, 0.5) 110px, hsla(5, 53%, 63%, 0) 110px, hsla(5, 53%, 63%, 0) 140px, hsla(197, 62%, 11%, 0.5) 140px, hsla(197, 62%, 11%, 0.5) 160px);
+  background: url(/assets/img/gym.jpg) no-repeat center center fixed;
+  background-size: cover;
   font-family: sans-serif;
   font-size: 1em;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0px auto auto auto;
   max-width: 2000px;
   min-width: 320px;
   width: 100%;
 }
 
 h1 {
-	color: #222;
+	background: linear-gradient(to bottom, rgba(136,144,153,1) 0%,rgba(125,185,232,0) 100%);
 	font-size: 4em;
+	margin-top: 0px;
 	text-align: center;
 	text-shadow: 4px 4px 1px rgba(0, 0, 0, 0.5);
 }
@@ -106,6 +106,7 @@ table tr:hover td {
 
 form {
 	background: #fafafa;
+	border-radius: 10px;
 	margin: auto;
 	max-width: 90%;
 }
@@ -114,6 +115,7 @@ fieldset {
 	background: #ededed;
 	border-bottom: 1px solid #e0e0e0;
 	border-left: none;
+	border-radius: 10px;
 	border-right: none;
 	border-top: 1px solid #fafafa;
 	color: #666;
@@ -154,7 +156,7 @@ footer {
 	border-radius: 10px;
 	cursor: pointer;
 	margin-bottom: 5px;
-	padding: 1rem;
+	padding: 0.5rem;
 	transition: all 0.3s ease-in-out;
 }
 
@@ -186,6 +188,10 @@ footer {
 
 .success-button:hover {
 	background-color: #537f3f;
+}
+
+.buttons {
+	text-align: center;
 }
 
 .error-button {

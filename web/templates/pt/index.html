@@ -86,7 +86,9 @@
 				<input type="text" id="name" data-ng-model="client.get().name"/>
 			</fieldset>
 
-			<button class="general-button" data-ng-click="client.addClass()">Adicionar Aula</button>
+			<div class="buttons">
+				<button class="general-button" data-ng-click="client.addClass()">Adicionar Aula</button>
+			</div>
 
 			<fieldset data-ng-repeat="class in client.get().classes track by $index">
 				<button class="right general-button"
@@ -133,8 +135,10 @@
 				</li>
 			</ul>
 
-			<button class="error-button" data-ng-click="$root.clientFormMode = false">Cancelar</button>
-			<button class="success-button" data-ng-click="save()">Salvar</button>
+			<div class="buttons">
+				<button class="error-button" data-ng-click="$root.clientFormMode = false">Cancelar</button>
+				<button class="success-button" data-ng-click="save()">Salvar</button>
+			</div>
 		</form>
 		
 		<footer>
