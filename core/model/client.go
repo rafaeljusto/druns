@@ -1,44 +1,21 @@
 package model
 
 import (
+	"time"
+
 	"github.com/rafaeljusto/druns/core/protocol"
-	"gopkg.in/mgo.v2/bson"
 )
 
 type Client struct {
-	Id      bson.ObjectId `bson:"_id"`
-	Name    string
-	Classes Classes
+	Id       int
+	Name     string
+	Birthday time.Time
 }
 
 func (c *Client) Apply(request *protocol.ClientRequest) protocol.Translator {
-	if request.Name != nil {
-		c.Name = *request.Name
-	}
-
-	classes, msg := c.Classes.Apply(request.Classes)
-	c.Classes = classes
-	return msg
+	return nil
 }
 
 func (c *Client) Protocol() *protocol.ClientResponse {
-	return &protocol.ClientResponse{
-		Id:      c.Id.Hex(),
-		Name:    c.Name,
-		Classes: c.Classes.Protocol(),
-	}
-}
-
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////
-
-type Clients []Client
-
-func (c Clients) Protocol() []protocol.ClientResponse {
-	var response []protocol.ClientResponse
-	for _, client := range c {
-		response = append(response, *client.Protocol())
-	}
-	return response
+	return nil
 }
