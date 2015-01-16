@@ -23,11 +23,21 @@ type clients struct {
 	interceptor.RemoteAddressCompliant
 	interceptor.LogCompliant
 
+	handle   string
 	Response []protocol.ClientResponse `response:"get"`
 }
 
+func (h *clients) SetHandle(handle string) {
+	h.handle = handle
+}
+
+func (h *clients) AuthSecret(secretId string) (string, error) {
+	// TODO!
+	return "abc123", nil
+}
+
 func (h *clients) Get(w http.ResponseWriter, r *http.Request) {
-	clientDAO := dao.NewClient(h.DB())
+	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.handle)
 
 	clients, err := clientDAO.FindAll()
 	if err != nil {
@@ -46,6 +56,7 @@ func (h *clients) Interceptors() trama.AJAXInterceptorChain {
 		interceptor.NewRemoteAddress(h),
 		interceptor.NewLog(h),
 		interceptor.NewJSON(h),
+		interceptor.NewAuth(h),
 		interceptor.NewDatabase(h),
 	)
 }

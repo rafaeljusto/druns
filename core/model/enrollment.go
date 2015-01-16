@@ -6,6 +6,8 @@ const (
 	EnrollmentTypeReplacement EnrollmentType = iota
 )
 
+type EnrollmentType int
+
 type Enrollment struct {
 	Type   EnrollmentType
 	Client Client

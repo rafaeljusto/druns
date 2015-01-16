@@ -34,7 +34,17 @@ type newClient struct {
 	interceptor.RemoteAddressCompliant
 	interceptor.LogCompliant
 
+	handle  string
 	Request *protocol.ClientRequest `request:"post"`
+}
+
+func (h *newClient) SetHandle(handle string) {
+	h.handle = handle
+}
+
+func (h *newClient) AuthSecret(secretId string) (string, error) {
+	// TODO!
+	return "abc123", nil
 }
 
 func (h *newClient) Post(w http.ResponseWriter, r *http.Request) {
@@ -45,14 +55,14 @@ func (h *newClient) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	clientDAO := dao.NewClient(h.DB())
+	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.handle)
 	if err := clientDAO.Save(&client); err != nil {
 		h.Logger().Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Location", fmt.Sprintf("/client/%s", client.Id.String()))
+	w.Header().Set("Location", fmt.Sprintf("/client/%d", client.Id))
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -63,6 +73,7 @@ func (h *newClient) Interceptors() trama.AJAXInterceptorChain {
 		interceptor.NewLog(h),
 		interceptor.NewJSON(h),
 		interceptor.NewValidate(h),
+		interceptor.NewAuth(h),
 		interceptor.NewDatabase(h),
 	)
 }
@@ -79,13 +90,23 @@ type client struct {
 	interceptor.RemoteAddressCompliant
 	interceptor.LogCompliant
 
-	Id       string                   `param:"id"`
+	handle   string
+	Id       int                      `param:"id"`
 	Request  *protocol.ClientRequest  `request:"put"`
 	Response *protocol.ClientResponse `response:"get"`
 }
 
+func (h *client) SetHandle(handle string) {
+	h.handle = handle
+}
+
+func (h *client) AuthSecret(secretId string) (string, error) {
+	// TODO!
+	return "abc123", nil
+}
+
 func (h *client) Get(w http.ResponseWriter, r *http.Request) {
-	clientDAO := dao.NewClient(h.DB())
+	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.handle)
 
 	client, err := clientDAO.FindById(h.Id)
 	if err == core.ErrNotFound {
@@ -103,7 +124,7 @@ func (h *client) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *client) Put(w http.ResponseWriter, r *http.Request) {
-	clientDAO := dao.NewClient(h.DB())
+	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.handle)
 
 	client, err := clientDAO.FindById(h.Id)
 	if err == core.ErrNotFound {
@@ -131,29 +152,6 @@ func (h *client) Put(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (h *client) Delete(w http.ResponseWriter, r *http.Request) {
-	clientDAO := dao.NewClient(h.DB())
-
-	client, err := clientDAO.FindById(h.Id)
-	if err == core.ErrNotFound {
-		w.WriteHeader(http.StatusNotFound)
-		return
-
-	} else if err != nil {
-		h.Logger().Error(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if err := clientDAO.Delete(&client); err != nil {
-		h.Logger().Error(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusNoContent)
-}
-
 func (h *client) Interceptors() trama.AJAXInterceptorChain {
 	return trama.NewAJAXInterceptorChain(
 		interceptor.NewAcceptLanguage(h),
@@ -161,6 +159,7 @@ func (h *client) Interceptors() trama.AJAXInterceptorChain {
 		interceptor.NewLog(h),
 		interceptor.NewJSON(h),
 		interceptor.NewValidate(h),
+		interceptor.NewAuth(h),
 		interceptor.NewDatabase(h),
 	)
 }

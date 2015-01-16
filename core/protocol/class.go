@@ -1,10 +1,5 @@
 package protocol
 
-import (
-	"strings"
-	"time"
-)
-
 type ClassRequest struct {
 }
 

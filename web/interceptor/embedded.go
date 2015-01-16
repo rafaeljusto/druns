@@ -4,31 +4,22 @@ import (
 	"net"
 	"reflect"
 
+	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/protocol"
 	"github.com/rafaeljusto/druns/web/tr"
-	"gopkg.in/mgo.v2"
 )
 
 type DatabaseCompliant struct {
-	db      *mgo.Database
-	session *mgo.Session
+	tx db.Transaction
 }
 
-func (d *DatabaseCompliant) SetDBSession(s *mgo.Session) {
-	d.session = s
+func (d *DatabaseCompliant) Tx() db.Transaction {
+	return d.tx
 }
 
-func (d *DatabaseCompliant) DBSession() *mgo.Session {
-	return d.session
-}
-
-func (d *DatabaseCompliant) SetDB(db *mgo.Database) {
-	d.db = db
-}
-
-func (d *DatabaseCompliant) DB() *mgo.Database {
-	return d.db
+func (d *DatabaseCompliant) SetTx(tx db.Transaction) {
+	d.tx = tx
 }
 
 ////////////////////////////////////////////////////////////////

@@ -1,8 +1,10 @@
 package model
 
+import "time"
+
 const (
 	GroupTypeWeekley GroupType = iota
-	GroupTypeOnce    GroupType
+	GroupTypeOnce    GroupType = iota
 )
 
 type GroupType int
