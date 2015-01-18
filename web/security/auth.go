@@ -1,7 +1,6 @@
 package security
 
 import (
-	"br/core/protocol"
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
@@ -9,6 +8,8 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+
+	"github.com/rafaeljusto/druns/core/protocol"
 )
 
 const (
