@@ -10,7 +10,7 @@ import (
 	"github.com/rafaeljusto/druns/core/model"
 )
 
-type ClientLog struct {
+type UserLog struct {
 	SQLer       SQLer
 	IP          net.IP
 	Handle      string
@@ -18,22 +18,22 @@ type ClientLog struct {
 	tableFields []string
 }
 
-func NewClientLog(sqler SQLer, ip net.IP, handle string) ClientLog {
-	return ClientLog{
+func NewUserLog(sqler SQLer, ip net.IP, handle string) UserLog {
+	return UserLog{
 		SQLer:     sqler,
 		IP:        ip,
 		Handle:    handle,
-		tableName: "client_log",
+		tableName: "user",
 		tableFields: []string{
 			"id",
 			"name",
-			"birthday",
+			"email",
 			"log_id",
 		},
 	}
 }
 
-func (dao *ClientLog) save(c *model.Client, operation model.LogOperation) error {
+func (dao *UserLog) save(u *model.User, operation model.LogOperation) error {
 	log := model.Log{
 		Handle:    dao.Handle,
 		IPAddress: dao.IP,
@@ -55,9 +55,9 @@ func (dao *ClientLog) save(c *model.Client, operation model.LogOperation) error 
 
 	_, err := dao.SQLer.Exec(
 		query,
-		c.Id,
-		c.Name,
-		c.Birthday,
+		u.Id,
+		u.Name,
+		u.Email,
 		log.Id,
 	)
 
