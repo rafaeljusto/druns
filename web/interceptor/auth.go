@@ -3,10 +3,10 @@ package interceptor
 import (
 	"net/http"
 
+	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/protocol"
 	"github.com/rafaeljusto/druns/web/security"
-	"github.com/trajber/handy/interceptor"
 )
 
 type authSecreter interface {
@@ -17,7 +17,7 @@ type authSecreter interface {
 }
 
 type Auth struct {
-	interceptor.NopInterceptor
+	trama.NopAJAXInterceptor
 	handler authSecreter
 }
 

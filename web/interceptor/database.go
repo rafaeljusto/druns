@@ -3,9 +3,9 @@ package interceptor
 import (
 	"net/http"
 
+	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
-	"github.com/trajber/handy"
 )
 
 type sqler interface {
@@ -39,7 +39,7 @@ func (i *Database) After(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if responseWriter, ok := w.(*handy.BufferedResponseWriter); ok {
+	if responseWriter, ok := w.(*trama.BufferedResponseWriter); ok {
 		if responseWriter.Status() >= 200 && responseWriter.Status() < 400 {
 			if err := i.handler.Tx().Commit(); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
