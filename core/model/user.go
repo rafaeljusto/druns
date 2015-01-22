@@ -1,9 +1,13 @@
 package model
 
+import (
+	"net/mail"
+)
+
 type User struct {
 	Id       int
 	Name     string
-	Email    string
+	Email    mail.Address
 	Password string
 }
 

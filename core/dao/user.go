@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net"
+	"net/mail"
 	"strings"
 
 	"github.com/rafaeljusto/druns/core"
@@ -127,13 +128,13 @@ func (dao *User) FindById(id int) (model.User, error) {
 	row := dao.SQLer.QueryRow(query, id)
 
 	var u model.User
-	var password string
+	var hashedPassword string
 
 	err := row.Scan(
 		&u.Id,
 		&u.Name,
 		&u.Email,
-		&password,
+		&hashedPassword,
 	)
 
 	if err == sql.ErrNoRows {
@@ -144,4 +145,32 @@ func (dao *User) FindById(id int) (model.User, error) {
 	}
 
 	return u, nil
+}
+
+func (dao *User) VerifyPassword(email mail.Address, password string) (bool, error) {
+	query := fmt.Sprintf(
+		"SELECT password FROM %s WHERE email = ?",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	row := dao.SQLer.QueryRow(query, email.Address)
+
+	var hashedPassword string
+	err := row.Scan(
+		&hashedPassword,
+	)
+
+	if err == sql.ErrNoRows {
+		return false, core.ErrNotFound
+
+	} else if err != nil {
+		return false, core.NewError(err)
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

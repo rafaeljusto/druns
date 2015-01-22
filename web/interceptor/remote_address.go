@@ -7,6 +7,7 @@ import (
 
 	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/log"
+	"github.com/rafaeljusto/druns/web/templates/data"
 )
 
 type remoteAddresser interface {
@@ -14,16 +15,59 @@ type remoteAddresser interface {
 	SetRemoteAddress(net.IP)
 }
 
-type RemoteAddress struct {
+////////////////////////////////////////////////////////////
+/////////////////////// AJAX ///////////////////////////////
+////////////////////////////////////////////////////////////
+
+type RemoteAddressAJAX struct {
 	trama.NopAJAXInterceptor
 	handler remoteAddresser
 }
 
-func NewRemoteAddress(h remoteAddresser) *RemoteAddress {
-	return &RemoteAddress{handler: h}
+func NewRemoteAddressAJAX(h remoteAddresser) *RemoteAddressAJAX {
+	return &RemoteAddressAJAX{handler: h}
 }
 
-func (i *RemoteAddress) Before(w http.ResponseWriter, r *http.Request) {
+func (i *RemoteAddressAJAX) Before(w http.ResponseWriter, r *http.Request) {
+	clientAddress, err := remoteAddress(r)
+	if err != nil {
+		log.Notice(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	i.handler.SetRemoteAddress(clientAddress)
+}
+
+////////////////////////////////////////////////////////////
+/////////////////////// WEB ////////////////////////////////
+////////////////////////////////////////////////////////////
+
+type RemoteAddressWeb struct {
+	trama.NopWebInterceptor
+	handler remoteAddresser
+}
+
+func NewRemoteAddressWeb(h remoteAddresser) *RemoteAddressWeb {
+	return &RemoteAddressWeb{handler: h}
+}
+
+func (i *RemoteAddressWeb) Before(response trama.Response, r *http.Request) {
+	clientAddress, err := remoteAddress(r)
+	if err != nil {
+		log.Notice(err.Error())
+		response.ExecuteTemplate("500.html", data.NewInternalServerErrorData("N/A"))
+		return
+	}
+
+	i.handler.SetRemoteAddress(clientAddress)
+}
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+func remoteAddress(r *http.Request) (net.IP, error) {
 	var clientAddress string
 
 	xff := r.Header.Get("X-Forwarded-For")
@@ -43,18 +87,10 @@ func (i *RemoteAddress) Before(w http.ResponseWriter, r *http.Request) {
 
 	if len(clientAddress) > 0 {
 		if address := net.ParseIP(clientAddress); address != nil {
-			i.handler.SetRemoteAddress(net.ParseIP(clientAddress))
-			return
+			return net.ParseIP(clientAddress), nil
 		}
 	}
 
 	clientAddress, _, err := net.SplitHostPort(r.RemoteAddr)
-
-	if err != nil {
-		log.Notice(err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	i.handler.SetRemoteAddress(net.ParseIP(clientAddress))
+	return net.ParseIP(clientAddress), err
 }

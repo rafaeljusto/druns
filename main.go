@@ -12,6 +12,7 @@ import (
 
 	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/protocol"
 	"github.com/rafaeljusto/druns/web/config"
@@ -58,6 +59,13 @@ func main() {
 		Logger.Critf("Error initializing trama framework. Details: %s", err)
 		return
 	}
+
+	if err := initializeDatabase(); err != nil {
+		fmt.Printf("Error initializing database. Details: %s\n", err)
+		Logger.Critf("Error initializing database. Details: %s", err)
+		return
+	}
+	defer db.DB.Close()
 
 	serverConfig := config.DrunsConfig.Server
 	server := http.Server{
@@ -119,4 +127,14 @@ func initializeTrama() error {
 	}
 
 	return nil
+}
+
+func initializeDatabase() error {
+	return db.Start(
+		config.DrunsConfig.Database.Host,
+		config.DrunsConfig.Database.Port,
+		config.DrunsConfig.Database.User,
+		config.DrunsConfig.Database.Password,
+		config.DrunsConfig.Database.Name,
+	)
 }

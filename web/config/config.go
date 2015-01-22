@@ -24,8 +24,11 @@ type Config struct {
 	}
 
 	Database struct {
-		Name string
-		URI  string
+		Host     string
+		Port     int
+		User     string
+		Password string
+		Name     string
 	}
 
 	Log struct {

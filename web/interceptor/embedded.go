@@ -101,14 +101,23 @@ func (r *RemoteAddressCompliant) RemoteAddress() net.IP {
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-type LogCompliant struct {
+type HTTPTransactionCompliant struct {
 	logger log.Logger
+	id     string
 }
 
-func (l *LogCompliant) SetLogger(logger log.Logger) {
-	l.logger = logger
+func (h *HTTPTransactionCompliant) SetLogger(logger log.Logger) {
+	h.logger = logger
 }
 
-func (l *LogCompliant) Logger() *log.Logger {
-	return &l.logger
+func (h *HTTPTransactionCompliant) Logger() *log.Logger {
+	return &h.logger
+}
+
+func (h *HTTPTransactionCompliant) SetHTTPId(id string) {
+	h.id = id
+}
+
+func (h *HTTPTransactionCompliant) HTTPId() string {
+	return h.id
 }

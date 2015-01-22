@@ -46,7 +46,7 @@ func (db *database) Begin() (Transaction, error) {
 var (
 	DB     Database
 	dbLock sync.Mutex
-	Driver = "mysql"
+	Driver = "postgres"
 )
 
 func Start(host string, port int, user, password, name string) error {
@@ -60,9 +60,7 @@ func Start(host string, port int, user, password, name string) error {
 		}
 	}
 
-	// Collation specifies the charset used in our system. The mysql server is responsable for
-	// converting between UTF-8 and ISO-8859-1
-	connParams := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?collation=utf8_general_ci&parseTime=true&loc=UTC",
+	connParams := fmt.Sprintf("user=%s password=%s host=%s port=%d dbname=%s sslmode=disable",
 		user,
 		password,
 		host,

@@ -15,16 +15,50 @@ type languageMessager interface {
 	SetMessages(messageHolder tr.MessageHolder)
 }
 
-type AcceptLanguage struct {
+////////////////////////////////////////////////////////////
+/////////////////////// AJAX ///////////////////////////////
+////////////////////////////////////////////////////////////
+
+type AcceptLanguageAJAX struct {
 	trama.NopAJAXInterceptor
 	handler languageMessager
 }
 
-func NewAcceptLanguage(h languageMessager) *AcceptLanguage {
-	return &AcceptLanguage{handler: h}
+func NewAcceptLanguageAJAX(h languageMessager) *AcceptLanguageAJAX {
+	return &AcceptLanguageAJAX{handler: h}
 }
 
-func (i AcceptLanguage) Before(w http.ResponseWriter, r *http.Request) {
+func (i AcceptLanguageAJAX) Before(w http.ResponseWriter, r *http.Request) {
+	selectedLanguage := acceptLanguage(r)
+	i.handler.SetLanguage(selectedLanguage)
+	i.handler.SetMessages(tr.NewMessageHolder(selectedLanguage))
+}
+
+////////////////////////////////////////////////////////////
+/////////////////////// WEB ////////////////////////////////
+////////////////////////////////////////////////////////////
+
+type AcceptLanguageWeb struct {
+	trama.NopWebInterceptor
+	handler languageMessager
+}
+
+func NewAcceptLanguageWeb(h languageMessager) *AcceptLanguageWeb {
+	return &AcceptLanguageWeb{handler: h}
+}
+
+func (i AcceptLanguageWeb) Before(response trama.Response, r *http.Request) {
+	selectedLanguage := acceptLanguage(r)
+	response.SetTemplateGroup(selectedLanguage)
+	i.handler.SetLanguage(selectedLanguage)
+	i.handler.SetMessages(tr.NewMessageHolder(selectedLanguage))
+}
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+func acceptLanguage(r *http.Request) string {
 	acceptLanguage := r.Header.Get("Accept-Language")
 	acceptLanguageParts := strings.Split(acceptLanguage, ",")
 
@@ -73,6 +107,5 @@ func (i AcceptLanguage) Before(w http.ResponseWriter, r *http.Request) {
 		selectedLanguage = config.DrunsConfig.Languages[0]
 	}
 
-	i.handler.SetLanguage(selectedLanguage)
-	i.handler.SetMessages(tr.NewMessageHolder(selectedLanguage))
+	return selectedLanguage
 }
