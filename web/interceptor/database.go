@@ -90,11 +90,6 @@ func (i *DatabaseWeb) Before(response trama.Response, r *http.Request) {
 }
 
 func (i *DatabaseWeb) After(response trama.Response, r *http.Request) {
-	if i.handler.Tx() == nil {
-		i.handler.Logger().Warning("Nil transaction found")
-		return
-	}
-
 	if response.TemplateName() == "500.html" {
 		if err := i.handler.Tx().Rollback(); err != nil {
 			i.handler.Logger().Error(err)
