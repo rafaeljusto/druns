@@ -27,7 +27,7 @@
     			<form action="/login" method="post">
     				<div class="form-group">
     					<label for="email">E-mail</label>
-    					<input type="email" class="form-control" id="email" 
+    					<input type="email" class="form-control" id="email" value="[[.Email]]"
     						placeholder="exemplo@dominio.com.br" required>
     				</div>
     				<div class="form-group">
@@ -40,6 +40,10 @@
   			</div>
 			</div>
 			
+			[[if ne .Message ""]]
+			<div class="alert alert-danger" role="alert">[[.Message]]</div>
+			[[end]]
+
 			<footer>
 	      <small>© Copyright 2015 Rafael Dantas Justo. Todos os direitos reservados.</small>
 	    </footer>

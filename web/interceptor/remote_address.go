@@ -56,7 +56,7 @@ func (i *RemoteAddressWeb) Before(response trama.Response, r *http.Request) {
 	clientAddress, err := remoteAddress(r)
 	if err != nil {
 		log.Notice(err.Error())
-		response.ExecuteTemplate("500.html", data.NewInternalServerErrorData("N/A"))
+		response.ExecuteTemplate("500.html", data.NewInternalServerError("N/A"))
 		return
 	}
 

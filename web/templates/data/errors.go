@@ -1,11 +1,11 @@
 package data
 
-type InternalServerErrorData struct {
+type InternalServerError struct {
 	Ticket string
 }
 
-func NewInternalServerErrorData(ticket string) InternalServerErrorData {
-	return InternalServerErrorData{
+func NewInternalServerError(ticket string) InternalServerError {
+	return InternalServerError{
 		Ticket: ticket,
 	}
 }

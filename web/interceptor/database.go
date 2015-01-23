@@ -82,7 +82,7 @@ func (i *DatabaseWeb) Before(response trama.Response, r *http.Request) {
 	tx, err := db.DB.Begin()
 	if err != nil {
 		i.handler.Logger().Error(err)
-		response.ExecuteTemplate("500.html", data.NewInternalServerErrorData(i.handler.HTTPId()))
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
 		return
 	}
 
@@ -98,7 +98,7 @@ func (i *DatabaseWeb) After(response trama.Response, r *http.Request) {
 	} else {
 		if err := i.handler.Tx().Commit(); err != nil {
 			i.handler.Logger().Error(err)
-			response.ExecuteTemplate("500.html", data.NewInternalServerErrorData(i.handler.HTTPId()))
+			response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
 		}
 	}
 }

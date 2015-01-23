@@ -14,6 +14,7 @@ var (
 )
 
 func init() {
+	DrunsConfig.URLs = make(map[string]string)
 	DrunsConfig.Files = make(map[string][]string)
 }
 
@@ -44,6 +45,7 @@ type Config struct {
 		WebAssets            string
 	}
 
+	URLs      URLs
 	Files     map[string][]string
 	Languages []string
 }
@@ -60,6 +62,24 @@ func (c Config) HTMLTemplates(language, handlerName string) []string {
 
 	return templates
 }
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+type URLs map[string]string
+
+func (u URLs) GetHTTPS(name string) string {
+	return u["baseHTTPS"] + u[name]
+}
+
+func (u URLs) GetHTTP(name string) string {
+	return u["base"] + u[name]
+}
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
 
 func LoadConfig(path string) error {
 	bytes, err := ioutil.ReadFile(path)
