@@ -57,7 +57,7 @@ func (dao *UserLog) save(u *model.User, operation model.LogOperation) error {
 		query,
 		u.Id,
 		u.Name,
-		u.Email.String(),
+		u.Email,
 		log.Id,
 	)
 

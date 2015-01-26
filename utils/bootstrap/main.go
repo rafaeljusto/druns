@@ -46,15 +46,9 @@ func main() {
 	}
 	defer db.DB.Close()
 
-	e, err := mail.ParseAddress(email)
-	if err != nil {
-		fmt.Printf("Invalid e-mail. Details: %s\n", err)
-		os.Exit(4)
-	}
-
 	user := model.User{
 		Name:     name,
-		Email:    e,
+		Email:    email,
 		Password: password,
 	}
 
@@ -119,6 +113,11 @@ func checkInputs() bool {
 	if len(email) == 0 {
 		fmt.Println("E-mail not informed!")
 		ok = false
+	}
+
+	if _, err := mail.ParseAddress(email); err != nil {
+		fmt.Printf("Invalid e-mail. Details: %s\n", err)
+		os.Exit(4)
 	}
 
 	if len(password) == 0 {

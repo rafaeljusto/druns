@@ -78,7 +78,7 @@ func (dao *User) insert(u *model.User) error {
 	row := dao.SQLer.QueryRow(
 		query,
 		u.Name,
-		u.Email.String(),
+		u.Email,
 		base64.StdEncoding.EncodeToString(hashedPassword),
 	)
 
@@ -100,15 +100,15 @@ func (dao *User) update(u *model.User) error {
 
 	query := `
 		UPDATE adm_user
-		SET name = ?,
-			email = ?
-		WHERE id = ?
+		SET name = $1,
+			email = $2
+		WHERE id = $3
 	`
 
 	_, err := dao.SQLer.Exec(
 		query,
 		u.Name,
-		u.Email.String(),
+		u.Email,
 	)
 
 	if err != nil {
@@ -120,7 +120,7 @@ func (dao *User) update(u *model.User) error {
 
 func (dao *User) FindById(id int) (model.User, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE id = ?",
+		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
@@ -128,13 +128,12 @@ func (dao *User) FindById(id int) (model.User, error) {
 	row := dao.SQLer.QueryRow(query, id)
 
 	var u model.User
-	var email string
 	var hashedPassword string
 
 	err := row.Scan(
 		&u.Id,
 		&u.Name,
-		&email,
+		&u.Email,
 		&hashedPassword,
 	)
 
@@ -143,11 +142,6 @@ func (dao *User) FindById(id int) (model.User, error) {
 
 	} else if err != nil {
 		return u, core.NewError(err)
-	}
-
-	u.Email, err = mail.ParseAddress(email)
-	if err != nil {
-		return u, err
 	}
 
 	return u, nil
@@ -169,21 +163,15 @@ func (dao *User) FindAll() ([]model.User, error) {
 
 	for rows.Next() {
 		var u model.User
-		var email string
 		var hashedPassword string
 
 		err := rows.Scan(
 			&u.Id,
 			&u.Name,
-			&email,
+			&u.Email,
 			&hashedPassword,
 		)
 
-		if err != nil {
-			return nil, err
-		}
-
-		u.Email, err = mail.ParseAddress(email)
 		if err != nil {
 			return nil, err
 		}
@@ -196,16 +184,15 @@ func (dao *User) FindAll() ([]model.User, error) {
 
 func (dao *User) VerifyPassword(email mail.Address, password string) (bool, error) {
 	query := fmt.Sprintf(
-		"SELECT password FROM %s WHERE email = ?",
-		strings.Join(dao.tableFields, ", "),
+		"SELECT password FROM %s WHERE email = $1",
 		dao.tableName,
 	)
 
 	row := dao.SQLer.QueryRow(query, email.Address)
 
-	var hashedPassword string
+	var base64Password string
 	err := row.Scan(
-		&hashedPassword,
+		&base64Password,
 	)
 
 	if err == sql.ErrNoRows {
@@ -215,7 +202,12 @@ func (dao *User) VerifyPassword(email mail.Address, password string) (bool, erro
 		return false, core.NewError(err)
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password)); err != nil {
+	hashedPassword, err := base64.StdEncoding.DecodeString(base64Password)
+	if err != nil {
+		return false, err
+	}
+
+	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
 		return false, err
 	}
 
