@@ -26,7 +26,7 @@ func NewUser(sqler SQLer, ip net.IP, handle string) User {
 		SQLer:     sqler,
 		IP:        ip,
 		Handle:    handle,
-		tableName: "user",
+		tableName: "adm_user",
 		tableFields: []string{
 			"id",
 			"name",
@@ -43,7 +43,7 @@ func (dao *User) Save(u *model.User) error {
 
 	var operation model.LogOperation
 
-	if u.Id > 0 {
+	if u.Id == 0 {
 		if err := dao.insert(u); err != nil {
 			return err
 		}
@@ -70,7 +70,7 @@ func (dao *User) insert(u *model.User) error {
 		placeholders(dao.tableFields[1:]),
 	)
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.MaxCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.MinCost)
 	if err != nil {
 		return core.NewError(err)
 	}
@@ -78,7 +78,7 @@ func (dao *User) insert(u *model.User) error {
 	row := dao.SQLer.QueryRow(
 		query,
 		u.Name,
-		u.Email,
+		u.Email.String(),
 		base64.StdEncoding.EncodeToString(hashedPassword),
 	)
 
@@ -99,7 +99,7 @@ func (dao *User) update(u *model.User) error {
 	}
 
 	query := `
-		UPDATE user
+		UPDATE adm_user
 		SET name = ?,
 			email = ?
 		WHERE id = ?
@@ -108,7 +108,7 @@ func (dao *User) update(u *model.User) error {
 	_, err := dao.SQLer.Exec(
 		query,
 		u.Name,
-		u.Email,
+		u.Email.String(),
 	)
 
 	if err != nil {
@@ -128,12 +128,13 @@ func (dao *User) FindById(id int) (model.User, error) {
 	row := dao.SQLer.QueryRow(query, id)
 
 	var u model.User
+	var email string
 	var hashedPassword string
 
 	err := row.Scan(
 		&u.Id,
 		&u.Name,
-		&u.Email,
+		&email,
 		&hashedPassword,
 	)
 
@@ -144,7 +145,53 @@ func (dao *User) FindById(id int) (model.User, error) {
 		return u, core.NewError(err)
 	}
 
+	u.Email, err = mail.ParseAddress(email)
+	if err != nil {
+		return u, err
+	}
+
 	return u, nil
+}
+
+func (dao *User) FindAll() ([]model.User, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	rows, err := dao.SQLer.Query(query)
+	if err != nil {
+		return nil, core.NewError(err)
+	}
+
+	var users []model.User
+
+	for rows.Next() {
+		var u model.User
+		var email string
+		var hashedPassword string
+
+		err := rows.Scan(
+			&u.Id,
+			&u.Name,
+			&email,
+			&hashedPassword,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		u.Email, err = mail.ParseAddress(email)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, u)
+	}
+
+	return users, nil
 }
 
 func (dao *User) VerifyPassword(email mail.Address, password string) (bool, error) {

@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	LogOperationUpdate   LogOperation = iota
-	LogOperationRemoval  LogOperation = iota
-	LogOperationCreation LogOperation = iota
+	LogOperationCreation LogOperation = "CREATE"
+	LogOperationUpdate   LogOperation = "UPDATE"
+	LogOperationRemoval  LogOperation = "DELETE"
 )
 
-type LogOperation int
+type LogOperation string
 
 type Log struct {
 	Id        int64

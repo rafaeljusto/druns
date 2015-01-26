@@ -7,14 +7,14 @@ import (
 type User struct {
 	Id       int
 	Name     string
-	Email    mail.Address
+	Email    *mail.Address
 	Password string
 }
 
 func (u *User) Equal(other User) bool {
 	if u.Id != other.Id ||
 		u.Name != other.Name ||
-		u.Email != other.Email ||
+		u.Email.String() != other.Email.String() ||
 		u.Password != other.Password {
 
 		return false

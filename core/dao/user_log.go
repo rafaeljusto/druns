@@ -23,7 +23,7 @@ func NewUserLog(sqler SQLer, ip net.IP, handle string) UserLog {
 		SQLer:     sqler,
 		IP:        ip,
 		Handle:    handle,
-		tableName: "user",
+		tableName: "adm_user_log",
 		tableFields: []string{
 			"id",
 			"name",
@@ -57,7 +57,7 @@ func (dao *UserLog) save(u *model.User, operation model.LogOperation) error {
 		query,
 		u.Id,
 		u.Name,
-		u.Email,
+		u.Email.String(),
 		log.Id,
 	)
 

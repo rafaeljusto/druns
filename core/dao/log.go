@@ -43,7 +43,6 @@ func (dao Log) Save(log *model.Log) error {
 
 	row := dao.SQLer.QueryRow(
 		query,
-		nil,
 		log.Handle,
 		log.IPAddress.String(),
 		log.ChangedAt,
