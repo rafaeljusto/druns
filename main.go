@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
@@ -67,14 +68,31 @@ func main() {
 	}
 	defer db.DB.Close()
 
+	certPath, privKeyPath := config.DrunsConfig.TLS()
+	cert, err := tls.LoadX509KeyPair(certPath, privKeyPath)
+	if err != nil {
+		fmt.Printf("Error on TLS setup. Details: %s\n", err)
+		Logger.Critf("Error on TLS setup. Details: %s", err)
+		return
+	}
+
 	serverConfig := config.DrunsConfig.Server
+	ipAndPort := net.JoinHostPort(serverConfig.IP, strconv.Itoa(serverConfig.Port))
+	tlsConfig := tls.Config{Certificates: []tls.Certificate{cert}}
+
+	ln, err := tls.Listen("tcp", ipAndPort, &tlsConfig)
+	if err != nil {
+		fmt.Printf("Error listening to interface. Details: %s\n", err)
+		Logger.Critf("Error listening to interface. Details: %s", err)
+		return
+	}
+
 	server := http.Server{
-		Addr:        fmt.Sprintf("%s:%d", serverConfig.IP, serverConfig.Port),
 		Handler:     handler.Mux,
 		ReadTimeout: 5 * time.Second,
 	}
 
-	panic(server.ListenAndServe())
+	panic(server.Serve(ln))
 }
 
 func initializeLogger() error {
@@ -86,14 +104,14 @@ func initializeLogger() error {
 }
 
 func initializeProtocolTranslations() error {
-	translationsPath := path.Join(config.DrunsConfig.Paths.Home,
+	translationsPath := path.Join(config.DrunsConfig.Home,
 		config.DrunsConfig.Paths.ProtocolTranslations)
 
 	return protocol.LoadTranslations(translationsPath)
 }
 
 func initializeWebTranslations() error {
-	translationsPath := path.Join(config.DrunsConfig.Paths.Home,
+	translationsPath := path.Join(config.DrunsConfig.Home,
 		config.DrunsConfig.Paths.WebTranslations)
 
 	return tr.LoadTranslations(translationsPath)
@@ -119,7 +137,7 @@ func initializeTrama() error {
 	}
 	handler.Mux.GlobalTemplates = groupSet
 
-	handler.Mux.RegisterStatic("/assets", http.Dir(path.Join(config.DrunsConfig.Paths.Home,
+	handler.Mux.RegisterStatic("/assets", http.Dir(path.Join(config.DrunsConfig.Home,
 		config.DrunsConfig.Paths.WebAssets)))
 
 	if err := handler.Mux.ParseTemplates(); err != nil {

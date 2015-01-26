@@ -19,9 +19,15 @@ func init() {
 }
 
 type Config struct {
+	Home string
+
 	Server struct {
 		IP   string
 		Port int
+		TLS  struct {
+			PrivKey string
+			Cert    string
+		}
 	}
 
 	Database struct {
@@ -38,7 +44,6 @@ type Config struct {
 	}
 
 	Paths struct {
-		Home                 string
 		ProtocolTranslations string
 		WebTranslations      string
 		HTMLTemplates        string
@@ -50,6 +55,11 @@ type Config struct {
 	Languages []string
 }
 
+func (c Config) TLS() (string, string) {
+	return path.Join(c.Home, c.Server.TLS.Cert),
+		path.Join(c.Home, c.Server.TLS.PrivKey)
+}
+
 func (c Config) HTMLTemplates(language, handlerName string) []string {
 	p := fmt.Sprintf(c.Paths.HTMLTemplates, language)
 
@@ -57,7 +67,7 @@ func (c Config) HTMLTemplates(language, handlerName string) []string {
 	copy(templates, c.Files[handlerName])
 
 	for i, template := range templates {
-		templates[i] = path.Join(c.Paths.Home, p, template)
+		templates[i] = path.Join(c.Home, p, template)
 	}
 
 	return templates
