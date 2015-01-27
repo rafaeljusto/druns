@@ -98,17 +98,16 @@ func (dao *User) update(u *model.User) error {
 		return err
 	}
 
-	query := `
-		UPDATE adm_user
-		SET name = $1,
-			email = $2
-		WHERE id = $3
-	`
+	query := fmt.Sprintf(
+		"UPDATE %s SET name = $1, email = $2 WHERE id = $3",
+		dao.tableName,
+	)
 
 	_, err := dao.SQLer.Exec(
 		query,
 		u.Name,
 		u.Email,
+		u.Id,
 	)
 
 	if err != nil {

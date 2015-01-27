@@ -88,17 +88,16 @@ func (dao *Client) update(c *model.Client) error {
 		return err
 	}
 
-	query := `
-		UPDATE client
-		SET name = ?,
-			birthday = ?
-		WHERE id = ?
-	`
+	query := fmt.Sprintf(
+		"UPDATE %s SET name = $1, birthday = $2 WHERE id = $3",
+		dao.tableName,
+	)
 
 	_, err := dao.SQLer.Exec(
 		query,
 		c.Name,
 		c.Birthday,
+		c.Id,
 	)
 
 	if err != nil {
@@ -110,7 +109,7 @@ func (dao *Client) update(c *model.Client) error {
 
 func (dao *Client) FindById(id int) (model.Client, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE id = ?",
+		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
