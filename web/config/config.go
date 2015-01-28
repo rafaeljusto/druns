@@ -132,17 +132,3 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 	d.Duration = duration
 	return nil
 }
-
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-func EncryptPassword(password string) string {
-	// TODO
-	return password
-}
-
-func DecryptPassword(encryptedPassword string) string {
-	// TODO
-	return encryptedPassword
-}

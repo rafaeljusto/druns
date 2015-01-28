@@ -7,6 +7,7 @@ import (
 
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/web/config"
 )
 
@@ -24,7 +25,10 @@ func NewSession(sqler dao.SQLer, email string, ipAddress net.IP) (*http.Cookie, 
 		return nil, err
 	}
 
-	secret := config.DecryptPassword(config.DrunsConfig.Session.Secret)
+	secret, err := password.Decrypt(config.DrunsConfig.Session.Secret)
+	if err != nil {
+		return nil, err
+	}
 
 	return &http.Cookie{
 		Name:   "session",
@@ -46,7 +50,11 @@ func CheckSession(sqler dao.SQLer, cookie *http.Cookie) (bool, error) {
 		return false, err
 	}
 
-	secret := config.DecryptPassword(config.DrunsConfig.Session.Secret)
+	secret, err := password.Decrypt(config.DrunsConfig.Session.Secret)
+	if err != nil {
+		return false, err
+	}
+
 	if !session.CheckFingerprint(cookie.Value, secret) {
 		return false, nil
 	}

@@ -15,6 +15,7 @@ import (
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
+	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/core/protocol"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/handler"
@@ -148,11 +149,16 @@ func initializeTrama() error {
 }
 
 func initializeDatabase() error {
+	dbPassword, err := password.Decrypt(config.DrunsConfig.Database.Password)
+	if err != nil {
+		return err
+	}
+
 	return db.Start(
 		config.DrunsConfig.Database.Host,
 		config.DrunsConfig.Database.Port,
 		config.DrunsConfig.Database.User,
-		config.DecryptPassword(config.DrunsConfig.Database.Password),
+		dbPassword,
 		config.DrunsConfig.Database.Name,
 	)
 }
