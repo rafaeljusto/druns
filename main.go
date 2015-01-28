@@ -152,7 +152,7 @@ func initializeDatabase() error {
 		config.DrunsConfig.Database.Host,
 		config.DrunsConfig.Database.Port,
 		config.DrunsConfig.Database.User,
-		config.DrunsConfig.Database.Password,
+		config.DecryptPassword(config.DrunsConfig.Database.Password),
 		config.DrunsConfig.Database.Name,
 	)
 }

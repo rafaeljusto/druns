@@ -6,45 +6,57 @@ import (
 	"time"
 
 	"github.com/rafaeljusto/druns/core/dao"
-	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/web/config"
 )
 
-func NewSession(sqler db.SQLer, user model.User, ipAddress net.IP) (*http.Cookie, error) {
-	session := model.NewSession(user, ipAddress)
-	sessionDAO := dao.NewSession(sqler)
-
-	if err := sessionDAO.Save(session); err != nil {
+func NewSession(sqler dao.SQLer, email string, ipAddress net.IP) (*http.Cookie, error) {
+	userDAO := dao.NewUser(sqler, nil, "")
+	user, err := userDAO.FindByEmail(email)
+	if err != nil {
 		return nil, err
 	}
 
+	session := model.NewSession(user, ipAddress)
+	sessionDAO := dao.NewSession(sqler)
+
+	if err := sessionDAO.Save(&session); err != nil {
+		return nil, err
+	}
+
+	secret := config.DecryptPassword(config.DrunsConfig.Session.Secret)
+
 	return &http.Cookie{
 		Name:   "session",
-		Value:  session.Fingerprint(),
+		Value:  session.Fingerprint(secret),
 		Path:   "/",
 		Secure: true,
 	}, nil
 }
 
-func CheckSession(sqler db.SQLer, cookie *http.Cookie) (bool, error) {
-	sessionId := model.SessionFingerprintId(cookie.Value)
-	sessionDAO := dao.NewSession(sqler)
+func CheckSession(sqler dao.SQLer, cookie *http.Cookie) (bool, error) {
+	sessionId, err := model.SessionFingerprintId(cookie.Value)
+	if err != nil {
+		return false, err
+	}
 
+	sessionDAO := dao.NewSession(sqler)
 	session, err := sessionDAO.FindById(sessionId)
 	if err != nil {
 		return false, err
 	}
 
-	secret := "" // TODO!
-
+	secret := config.DecryptPassword(config.DrunsConfig.Session.Secret)
 	if !session.CheckFingerprint(cookie.Value, secret) {
 		return false, nil
 	}
 
-	// TODO: Check session timeout!
+	if time.Now().Sub(session.LastAccessAt) > config.DrunsConfig.Session.Timeout.Duration {
+		return false, nil
+	}
 
 	session.LastAccessAt = time.Now()
-	if err := sessionDAO.Save(session); err != nil {
+	if err := sessionDAO.Save(&session); err != nil {
 		return false, err
 	}
 

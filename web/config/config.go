@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
+	"strings"
+	"time"
 
 	"github.com/rafaeljusto/druns/core"
 )
@@ -53,6 +55,11 @@ type Config struct {
 	URLs      URLs
 	Files     map[string][]string
 	Languages []string
+
+	Session struct {
+		Secret  string
+		Timeout Duration
+	}
 }
 
 func (c Config) TLS() (string, string) {
@@ -102,4 +109,40 @@ func LoadConfig(path string) error {
 	}
 
 	return nil
+}
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+type Duration struct {
+	time.Duration
+}
+
+func (d *Duration) MarshalJSON() ([]byte, error) {
+	return []byte(d.String()), nil
+}
+
+func (d *Duration) UnmarshalJSON(data []byte) error {
+	duration, err := time.ParseDuration(strings.Trim(string(data), "\""))
+	if err != nil {
+		return err
+	}
+
+	d.Duration = duration
+	return nil
+}
+
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+func EncryptPassword(password string) string {
+	// TODO
+	return password
+}
+
+func DecryptPassword(encryptedPassword string) string {
+	// TODO
+	return encryptedPassword
 }

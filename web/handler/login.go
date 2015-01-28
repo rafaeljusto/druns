@@ -9,6 +9,7 @@ import (
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
+	"github.com/rafaeljusto/druns/web/session"
 	"github.com/rafaeljusto/druns/web/templates/data"
 	"github.com/rafaeljusto/druns/web/tr"
 )
@@ -53,7 +54,14 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 		return
 	}
 
-	// TODO: Set cookie!
+	cookie, err := session.NewSession(h.Tx(), email, h.RemoteAddress())
+	if err != nil {
+		h.Logger().Error(err)
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
+	response.SetCookie(cookie)
 	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("home"), http.StatusFound)
 }
 
