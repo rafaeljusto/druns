@@ -116,19 +116,9 @@ func (dao *Client) FindById(id int) (model.Client, error) {
 
 	row := dao.SQLer.QueryRow(query, id)
 
-	var c model.Client
-
-	err := row.Scan(
-		&c.Id,
-		&c.Name,
-		&c.Birthday,
-	)
-
-	if err == sql.ErrNoRows {
-		return c, core.ErrNotFound
-
-	} else if err != nil {
-		return c, core.NewError(err)
+	c, err := dao.load(row)
+	if err != nil {
+		return c, err
 	}
 
 	return c, nil
@@ -149,20 +139,32 @@ func (dao *Client) FindAll() (model.Clients, error) {
 	var clients model.Clients
 
 	for rows.Next() {
-		var c model.Client
-
-		err := rows.Scan(
-			&c.Id,
-			&c.Name,
-			&c.Birthday,
-		)
-
+		c, err := dao.load(rows)
 		if err != nil {
-			return nil, core.NewError(err)
+			return nil, err
 		}
 
 		clients = append(clients, c)
 	}
 
 	return clients, nil
+}
+
+func (dao *Client) load(row row) (model.Client, error) {
+	var c model.Client
+
+	err := row.Scan(
+		&c.Id,
+		&c.Name,
+		&c.Birthday,
+	)
+
+	if err == sql.ErrNoRows {
+		return c, core.ErrNotFound
+
+	} else if err != nil {
+		return c, core.NewError(err)
+	}
+
+	return c, nil
 }

@@ -126,21 +126,26 @@ func (dao *User) FindById(id int) (model.User, error) {
 
 	row := dao.SQLer.QueryRow(query, id)
 
-	var u model.User
-	var hashedPassword string
+	u, err := dao.load(row)
+	if err != nil {
+		return u, err
+	}
 
-	err := row.Scan(
-		&u.Id,
-		&u.Name,
-		&u.Email,
-		&hashedPassword,
+	return u, nil
+}
+
+func (dao *User) FindByEmail(email string) (model.User, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s WHERE email = $1",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
 	)
 
-	if err == sql.ErrNoRows {
-		return u, core.ErrNotFound
+	row := dao.SQLer.QueryRow(query, email)
 
-	} else if err != nil {
-		return u, core.NewError(err)
+	u, err := dao.load(row)
+	if err != nil {
+		return u, err
 	}
 
 	return u, nil
@@ -161,16 +166,7 @@ func (dao *User) FindAll() ([]model.User, error) {
 	var users []model.User
 
 	for rows.Next() {
-		var u model.User
-		var hashedPassword string
-
-		err := rows.Scan(
-			&u.Id,
-			&u.Name,
-			&u.Email,
-			&hashedPassword,
-		)
-
+		u, err := dao.load(rows)
 		if err != nil {
 			return nil, err
 		}
@@ -179,6 +175,27 @@ func (dao *User) FindAll() ([]model.User, error) {
 	}
 
 	return users, nil
+}
+
+func (dao *User) load(row row) (model.User, error) {
+	var u model.User
+	var hashedPassword string
+
+	err := row.Scan(
+		&u.Id,
+		&u.Name,
+		&u.Email,
+		&hashedPassword,
+	)
+
+	if err == sql.ErrNoRows {
+		return u, core.ErrNotFound
+
+	} else if err != nil {
+		return u, core.NewError(err)
+	}
+
+	return u, nil
 }
 
 func (dao *User) VerifyPassword(email mail.Address, password string) (bool, error) {

@@ -14,3 +14,7 @@ func placeholders(tableFields []string) string {
 
 	return strings.Join(placeholders, ", ")
 }
+
+type row interface {
+	Scan(dest ...interface{}) error
+}
