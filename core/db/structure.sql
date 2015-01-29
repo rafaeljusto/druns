@@ -15,7 +15,7 @@ CREATE TABLE log (
 	id SERIAL PRIMARY KEY,
 	agent VARCHAR,
 	ip_address INET,
-	changed_at TIMESTAMP,
+	changed_at TIMESTAMPTZ,
 	operation LOG_OPERATION 
 );
 
@@ -26,8 +26,8 @@ CREATE TABLE session (
 	id SERIAL PRIMARY KEY,
 	adm_user_id INT REFERENCES adm_user(id),
 	ip_address INET,
-	created_at TIMESTAMP,
-	last_access_at TIMESTAMP
+	created_at TIMESTAMPTZ,
+	last_access_at TIMESTAMPTZ
 );
 
 /****************************************/

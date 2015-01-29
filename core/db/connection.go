@@ -73,6 +73,10 @@ func Start(host string, port int, user, password, name string) error {
 		return core.NewError(err)
 	}
 
+	if err := sqlDB.Ping(); err != nil {
+		return core.NewError(err)
+	}
+
 	// sql.Open returns a concrete type and not an interface, so we must set the global variable only
 	// after to make sure that it is initialized
 	DB = &database{sqlDB}

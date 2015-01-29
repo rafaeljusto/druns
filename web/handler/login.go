@@ -29,6 +29,14 @@ type login struct {
 }
 
 func (h *login) Get(response trama.Response, r *http.Request) {
+	if cookie, err := r.Cookie("session"); err == nil {
+		ok, err := session.CheckSession(h.Tx(), cookie, h.RemoteAddress())
+		if err == nil && ok {
+			response.Redirect(config.DrunsConfig.URLs.GetHTTPS("home"), http.StatusFound)
+			return
+		}
+	}
+
 	response.ExecuteTemplate("login.html", data.NewLogin("", ""))
 }
 

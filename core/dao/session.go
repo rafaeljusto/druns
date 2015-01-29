@@ -3,6 +3,7 @@ package dao
 import (
 	"database/sql"
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/rafaeljusto/druns/core"
@@ -98,11 +99,12 @@ func (dao *Session) FindById(id int) (model.Session, error) {
 
 	var s model.Session
 	var userId int
+	var ipAddress string
 
 	err := row.Scan(
 		&s.Id,
 		&userId,
-		&s.IPAddress,
+		&ipAddress,
 		&s.CreatedAt,
 		&s.LastAccessAt,
 	)
@@ -113,6 +115,8 @@ func (dao *Session) FindById(id int) (model.Session, error) {
 	} else if err != nil {
 		return s, core.NewError(err)
 	}
+
+	s.IPAddress = net.ParseIP(ipAddress)
 
 	userDAO := NewUser(dao.SQLer, nil, "")
 	if s.User, err = userDAO.FindById(userId); err != nil {

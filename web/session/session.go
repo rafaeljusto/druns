@@ -38,7 +38,7 @@ func NewSession(sqler dao.SQLer, email string, ipAddress net.IP) (*http.Cookie, 
 	}, nil
 }
 
-func CheckSession(sqler dao.SQLer, cookie *http.Cookie) (bool, error) {
+func CheckSession(sqler dao.SQLer, cookie *http.Cookie, ipAddress net.IP) (bool, error) {
 	sessionId, err := model.SessionFingerprintId(cookie.Value)
 	if err != nil {
 		return false, err
@@ -60,6 +60,10 @@ func CheckSession(sqler dao.SQLer, cookie *http.Cookie) (bool, error) {
 	}
 
 	if time.Now().Sub(session.LastAccessAt) > config.DrunsConfig.Session.Timeout.Duration {
+		return false, nil
+	}
+
+	if !session.IPAddress.Equal(ipAddress) {
 		return false, nil
 	}
 

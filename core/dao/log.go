@@ -65,13 +65,13 @@ func (dao Log) FindById(id int64) (model.Log, error) {
 
 	row := dao.SQLer.QueryRow(query, id)
 
-	log := model.Log{}
-	ip := ""
+	var log model.Log
+	var ipAddress string
 
 	err := row.Scan(
 		&log.Id,
 		&log.Handle,
-		&ip,
+		&ipAddress,
 		&log.ChangedAt,
 		&log.Operation,
 	)
@@ -83,7 +83,7 @@ func (dao Log) FindById(id int64) (model.Log, error) {
 		return log, core.NewError(err)
 	}
 
-	log.IPAddress = net.ParseIP(ip)
+	log.IPAddress = net.ParseIP(ipAddress)
 
 	return log, nil
 }

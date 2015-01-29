@@ -10,6 +10,7 @@ import (
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/web/config"
 )
 
@@ -17,14 +18,14 @@ var (
 	configPath string
 	name       string
 	email      string
-	password   string
+	pwd        string
 )
 
 func init() {
 	flag.StringVar(&configPath, "config", "", "configuration file path of the web server")
 	flag.StringVar(&name, "name", "", "administrator's name")
 	flag.StringVar(&email, "email", "", "administrator's e-mail")
-	flag.StringVar(&password, "password", "", "administrator's password")
+	flag.StringVar(&pwd, "password", "", "administrator's password")
 }
 
 func main() {
@@ -49,7 +50,7 @@ func main() {
 	user := model.User{
 		Name:     name,
 		Email:    email,
-		Password: password,
+		Password: pwd,
 	}
 
 	addr, err := localAddress()
@@ -120,7 +121,7 @@ func checkInputs() bool {
 		os.Exit(4)
 	}
 
-	if len(password) == 0 {
+	if len(pwd) == 0 {
 		fmt.Println("Password not informed!")
 		ok = false
 	}
@@ -129,11 +130,16 @@ func checkInputs() bool {
 }
 
 func initializeDatabase() error {
+	dbPassword, err := password.Decrypt(config.DrunsConfig.Database.Password)
+	if err != nil {
+		return err
+	}
+
 	return db.Start(
 		config.DrunsConfig.Database.Host,
 		config.DrunsConfig.Database.Port,
 		config.DrunsConfig.Database.User,
-		config.DrunsConfig.Database.Password,
+		dbPassword,
 		config.DrunsConfig.Database.Name,
 	)
 }
