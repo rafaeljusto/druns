@@ -50,6 +50,10 @@ func CheckSession(sqler dao.SQLer, cookie *http.Cookie, ipAddress net.IP) (bool,
 		return false, err
 	}
 
+	if !session.IPAddress.Equal(ipAddress) {
+		return false, nil
+	}
+
 	secret, err := password.Decrypt(config.DrunsConfig.Session.Secret)
 	if err != nil {
 		return false, err
@@ -60,10 +64,6 @@ func CheckSession(sqler dao.SQLer, cookie *http.Cookie, ipAddress net.IP) (bool,
 	}
 
 	if time.Now().Sub(session.LastAccessAt) > config.DrunsConfig.Session.Timeout.Duration {
-		return false, nil
-	}
-
-	if !session.IPAddress.Equal(ipAddress) {
 		return false, nil
 	}
 
