@@ -24,7 +24,7 @@ CREATE TABLE log (
 DROP TABLE IF EXISTS session CASCADE;
 CREATE TABLE session (
 	id SERIAL PRIMARY KEY,
-	user_id INT REFERENCES user(id),
+	adm_user_id INT REFERENCES adm_user(id),
 	ip_address INET,
 	created_at TIMESTAMP,
 	last_access_at TIMESTAMP

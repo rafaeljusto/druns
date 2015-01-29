@@ -21,7 +21,7 @@ func NewSession(sqler SQLer) Session {
 		tableName: "session",
 		tableFields: []string{
 			"id",
-			"user_id",
+			"adm_user_id",
 			"ip_address",
 			"created_at",
 			"last_access_at",
@@ -48,7 +48,7 @@ func (dao *Session) insert(s *model.Session) error {
 	row := dao.SQLer.QueryRow(
 		query,
 		s.User.Id,
-		s.IPAddress,
+		s.IPAddress.String(),
 		s.CreatedAt,
 		s.LastAccessAt,
 	)
