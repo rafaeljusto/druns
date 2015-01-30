@@ -1,0 +1,55 @@
+package handler
+
+import (
+	"net/http"
+
+	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/web/config"
+	"github.com/rafaeljusto/druns/web/interceptor"
+	"github.com/rafaeljusto/druns/web/templates/data"
+)
+
+func init() {
+	Mux.RegisterPage("/administrators", func() trama.WebHandler {
+		return new(administrators)
+	})
+}
+
+type administrators struct {
+	trama.DefaultWebHandler
+	interceptor.DatabaseCompliant
+	interceptor.RemoteAddressCompliant
+	interceptor.LanguageCompliant
+	interceptor.HTTPTransactionCompliant
+	interceptor.SessionCompliant
+}
+
+func (h *administrators) Get(response trama.Response, r *http.Request) {
+	response.ExecuteTemplate("administrators.html",
+		data.NewAdministrators(h.Session().User.Name, data.MenuAdministrators))
+}
+
+func (h *administrators) Templates() trama.TemplateGroupSet {
+	groupSet := trama.NewTemplateGroupSet(nil)
+
+	for _, language := range config.DrunsConfig.Languages {
+		templates := config.DrunsConfig.HTMLTemplates(language, "administrators")
+
+		groupSet.Insert(trama.TemplateGroup{
+			Name:  language,
+			Files: templates,
+		})
+	}
+
+	return groupSet
+}
+
+func (h *administrators) Interceptors() trama.WebInterceptorChain {
+	return trama.NewWebInterceptorChain(
+		interceptor.NewRemoteAddressWeb(h),
+		interceptor.NewAcceptLanguageWeb(h),
+		interceptor.NewHTTPTransactionWeb(h),
+		interceptor.NewDatabaseWeb(h),
+		interceptor.NewAuthWeb(h),
+	)
+}

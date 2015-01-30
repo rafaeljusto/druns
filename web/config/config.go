@@ -86,12 +86,24 @@ func (c Config) HTMLTemplates(language, handlerName string) []string {
 
 type URLs map[string]string
 
-func (u URLs) GetHTTPS(name string) string {
-	return u["baseHTTPS"] + u[name]
+func (u URLs) GetHTTPS(name string, params ...string) string {
+	path := u["baseHTTPS"] + u[name]
+
+	if len(params) > 0 {
+		path += "?" + strings.Join(params, "&")
+	}
+
+	return path
 }
 
-func (u URLs) GetHTTP(name string) string {
-	return u["base"] + u[name]
+func (u URLs) GetHTTP(name string, params ...string) string {
+	path := u["base"] + u[name]
+
+	if len(params) > 0 {
+		path += "?" + strings.Join(params, "&")
+	}
+
+	return path
 }
 
 ////////////////////////////////////////////////

@@ -15,7 +15,7 @@ import (
 )
 
 func init() {
-	Mux.RegisterPage("/login", func() trama.WebHandler {
+	Mux.RegisterPage("/", func() trama.WebHandler {
 		return new(login)
 	})
 }
@@ -30,14 +30,19 @@ type login struct {
 
 func (h *login) Get(response trama.Response, r *http.Request) {
 	if cookie, err := r.Cookie("session"); err == nil {
-		ok, err := session.CheckSession(h.Tx(), cookie, h.RemoteAddress())
-		if err == nil && ok {
-			response.Redirect(config.DrunsConfig.URLs.GetHTTPS("home"), http.StatusFound)
+		_, err := session.LoadSession(h.Tx(), cookie, h.RemoteAddress())
+		if err == nil {
+			response.Redirect(config.DrunsConfig.URLs.GetHTTPS("schedule"), http.StatusFound)
 			return
 		}
 	}
 
-	response.ExecuteTemplate("login.html", data.NewLogin("", ""))
+	var message string
+	if message = r.FormValue("m"); len(message) > 0 {
+		message = h.Msg(tr.Code(message))
+	}
+
+	response.ExecuteTemplate("login.html", data.NewLogin("", message))
 }
 
 func (h *login) Post(response trama.Response, r *http.Request) {
@@ -70,7 +75,22 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 	}
 
 	response.SetCookie(cookie)
-	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("home"), http.StatusFound)
+	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("schedule"), http.StatusFound)
+}
+
+func (h *login) Templates() trama.TemplateGroupSet {
+	groupSet := trama.NewTemplateGroupSet(nil)
+
+	for _, language := range config.DrunsConfig.Languages {
+		templates := config.DrunsConfig.HTMLTemplates(language, "login")
+
+		groupSet.Insert(trama.TemplateGroup{
+			Name:  language,
+			Files: templates,
+		})
+	}
+
+	return groupSet
 }
 
 func (h *login) Interceptors() trama.WebInterceptorChain {

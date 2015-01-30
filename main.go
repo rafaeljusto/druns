@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"html/template"
 	"net"
 	"net/http"
 	"os"
@@ -136,6 +137,18 @@ func initializeTrama() error {
 			Files: templates,
 		})
 	}
+
+	groupSet.FuncMap = template.FuncMap{
+		"url": func(name string) string {
+			url, ok := config.DrunsConfig.URLs[name]
+			if ok {
+				return url
+			} else {
+				return "#"
+			}
+		},
+	}
+
 	handler.Mux.GlobalTemplates = groupSet
 
 	handler.Mux.RegisterStatic("/assets", http.Dir(path.Join(config.DrunsConfig.Home,

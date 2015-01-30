@@ -6,6 +6,7 @@ import (
 
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
+	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/core/protocol"
 	"github.com/rafaeljusto/druns/web/tr"
 )
@@ -120,4 +121,20 @@ func (h *HTTPTransactionCompliant) SetHTTPId(id string) {
 
 func (h *HTTPTransactionCompliant) HTTPId() string {
 	return h.id
+}
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+type SessionCompliant struct {
+	session model.Session
+}
+
+func (h *SessionCompliant) SetSession(session model.Session) {
+	h.session = session
+}
+
+func (h *SessionCompliant) Session() model.Session {
+	return h.session
 }

@@ -8,14 +8,18 @@ import (
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
+	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/session"
+	"github.com/rafaeljusto/druns/web/tr"
 )
 
 type auther interface {
 	Tx() db.Transaction
 	RemoteAddress() net.IP
 	Logger() *log.Logger
+	SetSession(session model.Session)
+	Session() model.Session
 }
 
 ////////////////////////////////////////////////////////////
@@ -32,8 +36,9 @@ func NewAuthAJAX(h auther) *AuthAJAX {
 }
 
 func (i AuthAJAX) Before(w http.ResponseWriter, r *http.Request) {
-	ok, err := auth(r, i.handler.Tx(), i.handler.RemoteAddress())
-	if err == nil && ok {
+	session, err := auth(r, i.handler.Tx(), i.handler.RemoteAddress())
+	if err == nil {
+		i.handler.SetSession(session)
 		return
 	}
 
@@ -58,8 +63,9 @@ func NewAuthWeb(h auther) *AuthWeb {
 }
 
 func (i AuthWeb) Before(response trama.Response, r *http.Request) {
-	ok, err := auth(r, i.handler.Tx(), i.handler.RemoteAddress())
-	if err == nil && ok {
+	session, err := auth(r, i.handler.Tx(), i.handler.RemoteAddress())
+	if err == nil {
+		i.handler.SetSession(session)
 		return
 	}
 
@@ -67,18 +73,19 @@ func (i AuthWeb) Before(response trama.Response, r *http.Request) {
 		i.handler.Logger().Error(err)
 	}
 
-	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("login"), http.StatusFound)
+	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("login", "m="+string(tr.CodeSessionExpired)),
+		http.StatusFound)
 }
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-func auth(r *http.Request, tx db.Transaction, remoteAddress net.IP) (bool, error) {
+func auth(r *http.Request, tx db.Transaction, remoteAddress net.IP) (model.Session, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
-		return false, core.NewError(err)
+		return model.Session{}, core.NewError(err)
 	}
 
-	return session.CheckSession(tx, cookie, remoteAddress)
+	return session.LoadSession(tx, cookie, remoteAddress)
 }
