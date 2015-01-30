@@ -14,7 +14,7 @@ import (
 	"github.com/rafaeljusto/druns/web/tr"
 )
 
-type auther interface {
+type sessioner interface {
 	Tx() db.Transaction
 	RemoteAddress() net.IP
 	Logger() *log.Logger
@@ -26,16 +26,16 @@ type auther interface {
 /////////////////////// AJAX ///////////////////////////////
 ////////////////////////////////////////////////////////////
 
-type AuthAJAX struct {
+type SessionAJAX struct {
 	trama.NopAJAXInterceptor
-	handler auther
+	handler sessioner
 }
 
-func NewAuthAJAX(h auther) *AuthAJAX {
-	return &AuthAJAX{handler: h}
+func NewSessionAJAX(h sessioner) *SessionAJAX {
+	return &SessionAJAX{handler: h}
 }
 
-func (i AuthAJAX) Before(w http.ResponseWriter, r *http.Request) {
+func (i SessionAJAX) Before(w http.ResponseWriter, r *http.Request) {
 	session, err := auth(r, i.handler.Tx(), i.handler.RemoteAddress())
 	if err == nil {
 		i.handler.SetSession(session)
@@ -53,16 +53,16 @@ func (i AuthAJAX) Before(w http.ResponseWriter, r *http.Request) {
 /////////////////////// WEB ////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-type AuthWeb struct {
+type SessionWeb struct {
 	trama.NopWebInterceptor
-	handler auther
+	handler sessioner
 }
 
-func NewAuthWeb(h auther) *AuthWeb {
-	return &AuthWeb{handler: h}
+func NewSessionWeb(h sessioner) *SessionWeb {
+	return &SessionWeb{handler: h}
 }
 
-func (i AuthWeb) Before(response trama.Response, r *http.Request) {
+func (i SessionWeb) Before(response trama.Response, r *http.Request) {
 	session, err := auth(r, i.handler.Tx(), i.handler.RemoteAddress())
 	if err == nil {
 		i.handler.SetSession(session)
@@ -87,5 +87,5 @@ func auth(r *http.Request, tx db.Transaction, remoteAddress net.IP) (model.Sessi
 		return model.Session{}, core.NewError(err)
 	}
 
-	return session.LoadSession(tx, cookie, remoteAddress)
+	return session.LoadAndCheckSession(tx, cookie, remoteAddress)
 }

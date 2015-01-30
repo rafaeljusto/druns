@@ -40,7 +40,9 @@ func NewSession(sqler dao.SQLer, email string, ipAddress net.IP) (*http.Cookie, 
 	}, nil
 }
 
-func LoadSession(sqler dao.SQLer, cookie *http.Cookie, ipAddress net.IP) (model.Session, error) {
+func LoadAndCheckSession(sqler dao.SQLer, cookie *http.Cookie,
+	ipAddress net.IP) (model.Session, error) {
+
 	var session model.Session
 	var err error
 

@@ -50,6 +50,6 @@ func (h *administrators) Interceptors() trama.WebInterceptorChain {
 		interceptor.NewAcceptLanguageWeb(h),
 		interceptor.NewHTTPTransactionWeb(h),
 		interceptor.NewDatabaseWeb(h),
-		interceptor.NewAuthWeb(h),
+		interceptor.NewSessionWeb(h),
 	)
 }

@@ -30,7 +30,7 @@ type login struct {
 
 func (h *login) Get(response trama.Response, r *http.Request) {
 	if cookie, err := r.Cookie("session"); err == nil {
-		_, err := session.LoadSession(h.Tx(), cookie, h.RemoteAddress())
+		_, err := session.LoadAndCheckSession(h.Tx(), cookie, h.RemoteAddress())
 		if err == nil {
 			response.Redirect(config.DrunsConfig.URLs.GetHTTPS("schedule"), http.StatusFound)
 			return
