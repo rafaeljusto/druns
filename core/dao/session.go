@@ -118,7 +118,7 @@ func (dao *Session) FindById(id int) (model.Session, error) {
 
 	s.IPAddress = net.ParseIP(ipAddress)
 
-	userDAO := NewUser(dao.SQLer, nil, "")
+	userDAO := NewUser(dao.SQLer, nil, 0)
 	if s.User, err = userDAO.FindById(userId); err != nil {
 		return s, err
 	}

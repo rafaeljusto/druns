@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"strings"
-	"time"
 
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/model"
@@ -13,16 +12,16 @@ import (
 type UserLog struct {
 	SQLer       SQLer
 	IP          net.IP
-	Handle      string
+	Agent       int
 	tableName   string
 	tableFields []string
 }
 
-func NewUserLog(sqler SQLer, ip net.IP, handle string) UserLog {
+func NewUserLog(sqler SQLer, ip net.IP, agent int) UserLog {
 	return UserLog{
 		SQLer:     sqler,
 		IP:        ip,
-		Handle:    handle,
+		Agent:     agent,
 		tableName: "adm_user_log",
 		tableFields: []string{
 			"id",
@@ -34,12 +33,7 @@ func NewUserLog(sqler SQLer, ip net.IP, handle string) UserLog {
 }
 
 func (dao *UserLog) save(u *model.User, operation model.LogOperation) error {
-	log := model.Log{
-		Handle:    dao.Handle,
-		IPAddress: dao.IP,
-		ChangedAt: time.Now(),
-		Operation: operation,
-	}
+	log := model.NewLog(dao.Agent, dao.IP, operation)
 
 	logDAO := NewLog(dao.SQLer)
 	if err := logDAO.Save(&log); err != nil {

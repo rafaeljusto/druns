@@ -13,15 +13,15 @@ const (
 type Menu string
 
 type Logged struct {
-	User string
-	Menu string
-	Time string
+	Username string
+	Menu     string
+	Time     string
 }
 
-func NewLogged(user string, menu Menu) Logged {
+func NewLogged(username string, menu Menu) Logged {
 	return Logged{
-		User: user,
-		Menu: string(menu),
-		Time: time.Now().Format(time.RFC822),
+		Username: username,
+		Menu:     string(menu),
+		Time:     time.Now().Format(time.RFC822),
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -25,8 +26,17 @@ type administrators struct {
 }
 
 func (h *administrators) Get(response trama.Response, r *http.Request) {
+	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
+	users, err := userDAO.FindAll()
+
+	if err != nil {
+		h.Logger().Error(err)
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
 	response.ExecuteTemplate("administrators.html",
-		data.NewAdministrators(h.Session().User.Name, data.MenuAdministrators))
+		data.NewAdministrators(h.Session().User.Name, data.MenuAdministrators, users))
 }
 
 func (h *administrators) Templates() trama.TemplateGroupSet {

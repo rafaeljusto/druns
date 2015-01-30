@@ -69,10 +69,20 @@ func main() {
 		os.Exit(7)
 	}
 
-	userDAO := dao.NewUser(db.DB, addr, "BOOTSTRAP")
+	// Bootstrap user doesn't have password to avoid using it in running enviroment
+	row := tx.QueryRow("INSERT INTO adm_user(id, name) " +
+		"VALUES (DEFAULT, 'BOOTSTRAP') RETURNING id")
+
+	var id int
+	if err := row.Scan(&id); err != nil {
+		fmt.Printf("Error inserting bootstrap user. Details: %s\n", err)
+		os.Exit(8)
+	}
+
+	userDAO := dao.NewUser(db.DB, addr, id)
 	if users, err := userDAO.FindAll(); err != nil {
 		fmt.Printf("Error retrieving users. Details: %s\n", err)
-		os.Exit(8)
+		os.Exit(9)
 
 	} else if len(users) > 0 {
 		fmt.Println("Database already initialized")
@@ -81,12 +91,12 @@ func main() {
 
 	if err := userDAO.Save(&user); err != nil {
 		fmt.Printf("Error saving the user. Details: %s\n", err)
-		os.Exit(9)
+		os.Exit(10)
 	}
 
 	if err := tx.Commit(); err != nil {
 		fmt.Printf("Error commiting database transaction. Details: %s\n", err)
-		os.Exit(10)
+		os.Exit(11)
 	}
 
 	fmt.Println("Administrator created successfully")

@@ -2,4 +2,21 @@
 
 			[[template "menu" .]]
 
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>E-mail</th>
+					</tr>
+				</thead>
+				<tbody>
+			[[range $user := .Users]]
+					<tr>
+						<td>[[$user.Name]]</td>
+						<td>[[$user.Email]]</td>
+					</tr>
+			[[end]]
+				</tbody>
+			</table>
+
 [[template "posfix" .]]

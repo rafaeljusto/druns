@@ -14,7 +14,7 @@ import (
 )
 
 func NewSession(sqler dao.SQLer, email string, ipAddress net.IP) (*http.Cookie, error) {
-	userDAO := dao.NewUser(sqler, nil, "")
+	userDAO := dao.NewUser(sqler, nil, 0)
 	user, err := userDAO.FindByEmail(email)
 	if err != nil {
 		return nil, err

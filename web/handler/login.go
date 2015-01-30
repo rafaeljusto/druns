@@ -58,7 +58,7 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 		return
 	}
 
-	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), "")
+	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), 0)
 	if ok, err := userDAO.VerifyPassword(*address, password); !ok || err != nil {
 		if err != nil {
 			h.Logger().Error(err)

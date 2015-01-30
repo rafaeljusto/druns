@@ -4,8 +4,8 @@ type Schedule struct {
 	Logged
 }
 
-func NewSchedule(user string, menu Menu) Schedule {
+func NewSchedule(username string, menu Menu) Schedule {
 	return Schedule{
-		Logged: NewLogged(user, menu),
+		Logged: NewLogged(username, menu),
 	}
 }

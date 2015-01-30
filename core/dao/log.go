@@ -43,7 +43,7 @@ func (dao Log) Save(log *model.Log) error {
 
 	row := dao.SQLer.QueryRow(
 		query,
-		log.Handle,
+		log.Agent,
 		log.IPAddress.String(),
 		log.ChangedAt,
 		string(log.Operation),
@@ -70,7 +70,7 @@ func (dao Log) FindById(id int64) (model.Log, error) {
 
 	err := row.Scan(
 		&log.Id,
-		&log.Handle,
+		&log.Agent,
 		&ipAddress,
 		&log.ChangedAt,
 		&log.Operation,

@@ -15,15 +15,17 @@ type LogOperation string
 
 type Log struct {
 	Id        int64
-	Handle    string
+	Agent     int
 	IPAddress net.IP
 	ChangedAt time.Time
 	Operation LogOperation
 }
 
-func NewLog() Log {
+func NewLog(agent int, ipAddress net.IP, opeation LogOperation) Log {
 	return Log{
+		Agent:     agent,
+		IPAddress: ipAddress,
 		ChangedAt: time.Now(),
-		Operation: LogOperationUpdate,
+		Operation: opeation,
 	}
 }

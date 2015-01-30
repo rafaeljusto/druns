@@ -13,16 +13,16 @@ import (
 type Client struct {
 	SQLer       SQLer
 	IP          net.IP
-	Handle      string
+	Agent       int
 	tableName   string
 	tableFields []string
 }
 
-func NewClient(sqler SQLer, ip net.IP, handle string) Client {
+func NewClient(sqler SQLer, ip net.IP, agent int) Client {
 	return Client{
 		SQLer:     sqler,
 		IP:        ip,
-		Handle:    handle,
+		Agent:     agent,
 		tableName: "client",
 		tableFields: []string{
 			"id",
@@ -33,7 +33,7 @@ func NewClient(sqler SQLer, ip net.IP, handle string) Client {
 }
 
 func (dao *Client) Save(c *model.Client) error {
-	if len(dao.Handle) == 0 || dao.IP == nil {
+	if dao.Agent == 0 || dao.IP == nil {
 		return core.NewError(fmt.Errorf("No log information defined to persist information"))
 	}
 
@@ -54,7 +54,7 @@ func (dao *Client) Save(c *model.Client) error {
 		operation = model.LogOperationUpdate
 	}
 
-	clientLogDAO := NewClientLog(dao.SQLer, dao.IP, dao.Handle)
+	clientLogDAO := NewClientLog(dao.SQLer, dao.IP, dao.Agent)
 	return clientLogDAO.save(c, operation)
 }
 
