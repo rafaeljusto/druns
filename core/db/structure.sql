@@ -54,6 +54,25 @@ CREATE TABLE adm_user_log (
 
 /****************************************/
 
+DROP TABLE IF EXISTS client CASCADE;
+CREATE TABLE client (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR,
+	birthday TIMESTAMPTZ
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS client_log CASCADE;
+CREATE TABLE client_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	name VARCHAR,
+	birthday TIMESTAMPTZ
+);
+
+/****************************************/
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO druns;
 GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO druns;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO druns;

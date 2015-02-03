@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/web/config"
@@ -34,11 +35,12 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
 		response.ExecuteTemplate("administrator.html",
 			data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators, model.User{}))
+		return
 	}
 
 	id, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
-		h.Logger().Error(err)
+		h.Logger().Error(core.NewError(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
 	}
@@ -63,7 +65,7 @@ func (h *administrator) Post(response trama.Response, r *http.Request) {
 		var err error
 		user.Id, err = strconv.Atoi(r.FormValue("id"))
 		if err != nil {
-			h.Logger().Error(err)
+			h.Logger().Error(core.NewError(err))
 			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 			return
 		}
