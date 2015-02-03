@@ -59,6 +59,16 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 func (h *administrator) Post(response trama.Response, r *http.Request) {
 	user := model.User{}
 
+	if len(r.FormValue("id")) > 0 {
+		var err error
+		user.Id, err = strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			h.Logger().Error(err)
+			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+			return
+		}
+	}
+
 	user.Name = r.FormValue("name")
 	user.Name = strings.TrimSpace(user.Name)
 	user.Name = strings.Title(user.Name)
@@ -74,7 +84,15 @@ func (h *administrator) Post(response trama.Response, r *http.Request) {
 		return
 	}
 
-	// TODO!
+	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
+	if err := userDAO.Save(&user); err != nil {
+		h.Logger().Error(err)
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
+	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("administrators"), http.StatusFound)
+	return
 }
 
 func (h *administrator) Templates() trama.TemplateGroupSet {
