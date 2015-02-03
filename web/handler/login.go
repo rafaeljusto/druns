@@ -37,12 +37,12 @@ func (h *login) Get(response trama.Response, r *http.Request) {
 		}
 	}
 
-	var message string
-	if message = r.FormValue("m"); len(message) > 0 {
-		message = h.Msg(tr.Code(message))
+	data := data.NewLogin("")
+	if message := r.FormValue("m"); len(message) > 0 {
+		data.Message = h.Msg(tr.Code(message))
 	}
 
-	response.ExecuteTemplate("login.html", data.NewLogin("", message))
+	response.ExecuteTemplate("login.html", data)
 }
 
 func (h *login) Post(response trama.Response, r *http.Request) {
@@ -54,7 +54,9 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 
 	address, err := mail.ParseAddress(email)
 	if err != nil {
-		response.ExecuteTemplate("login.html", data.NewLogin(email, h.Msg(tr.CodeInvalidEmail)))
+		data := data.NewLogin(email)
+		data.FieldMessage["email"] = h.Msg(tr.CodeInvalidEmail)
+		response.ExecuteTemplate("login.html", data)
 		return
 	}
 
@@ -63,7 +65,9 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 		if err != nil {
 			h.Logger().Error(err)
 		}
-		response.ExecuteTemplate("login.html", data.NewLogin(email, h.Msg(tr.CodeAuthenticationError)))
+		data := data.NewLogin(email)
+		data.Message = h.Msg(tr.CodeAuthenticationError)
+		response.ExecuteTemplate("login.html", data)
 		return
 	}
 

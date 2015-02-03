@@ -2,4 +2,23 @@
 
 			[[template "menu" .]]
 
+			<div class="table-responsive">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>Nome</th>
+							<th>E-mail</th>
+						</tr>
+					</thead>
+					<tbody>
+				[[range $user := .Users]]
+						<tr>
+							<td><a href="[[url "administrator"]]?id=[[$user.Id]]">[[$user.Name]]</a></td>
+							<td>[[$user.Email]]</td>
+						</tr>
+				[[end]]
+					</tbody>
+				</table>
+			</div>
+
 [[template "posfix" .]]

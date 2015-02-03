@@ -1,0 +1,34 @@
+[[template "prefix" .]]
+
+			[[template "menu" .]]
+			
+			<form action="[[url "administrator"]]" method="post">
+				<input type="hidden" name="id" value="[[.User.Id]]">
+			
+				[[$msg := index .FieldMessage "name"]]
+				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
+					<label for="name" class="control-label">Name</label>
+					<input type="name" class="form-control" id="name" name="name"
+						value="[[.User.Name]]" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+				</div>
+        [[$msg := index .FieldMessage "email"]]
+				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
+					<label for="email" class="control-label">E-mail</label>
+					<input type="email" class="form-control" id="email" name="email"
+						value="[[.User.Email]]" placeholder="example@domain.com.br" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+				</div>
+				
+				<button type="submit" class="btn btn-success">Save</button>
+			</form>
+			
+			[[if ne .Message ""]]
+			<div class="alert alert-danger" role="alert">[[.Message]]</div>
+			[[end]]
+
+[[template "posfix" .]]

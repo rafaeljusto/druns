@@ -5,16 +5,24 @@
 					<h3 class="panel-title">Login</h3>
 				</div>
   			<div class="panel-body">
-    			<form action="[[.Action]]" method="post">
-    				<div class="form-group">
-    					<label for="email">E-mail</label>
+    			<form action="[[url "login"]]" method="post">
+            [[$msg := index .FieldMessage "email"]]
+    				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
+    					<label for="email" class="control-label">E-mail</label>
     					<input type="email" class="form-control" id="email" name="email"
-    						value="[[.Email]]" placeholder="exemplo@dominio.com.br" required>
+    						value="[[.Email]]" placeholder="example@domain.com.br" required>
+              [[if ne $msg ""]]
+              <p class="help-block">[[$msg]]</p>
+              [[end]]
     				</div>
-    				<div class="form-group">
-    					<label for="password">Password</label>
+            [[$msg := index .FieldMessage "password"]]
+    				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
+    					<label for="password" class="control-label">Password</label>
     					<input type="password" class="form-control" id="password"
     						name="password" required>
+              [[if ne $msg ""]]
+              <p class="help-block">[[$msg]]</p>
+              [[end]]
   					</div>
   					
   					<button type="submit" class="btn btn-default">Submit</button>
