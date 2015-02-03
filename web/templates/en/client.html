@@ -2,29 +2,29 @@
 
 			[[template "menu" .]]
 			
-			<form action="[[url "administrator"]]" method="post">
-				<input type="hidden" name="id" value="[[.User.Id]]">
+			<form action="[[url "client"]]" method="post">
+				<input type="hidden" name="id" value="[[.Client.Id]]">
 			
 				[[$msg := index .FieldMessage "name"]]
 				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
-					<label for="name" class="control-label">Nome</label>
+					<label for="name" class="control-label">Name</label>
 					<input type="text" class="form-control" id="name" name="name"
-						value="[[.User.Name]]" required>
+						value="[[.Client.Name]]" required>
           [[if ne $msg ""]]
           <p class="help-block">[[$msg]]</p>
           [[end]]
 				</div>
-        [[$msg := index .FieldMessage "email"]]
+        [[$msg := index .FieldMessage "birthday"]]
 				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
-					<label for="email" class="control-label">E-mail</label>
-					<input type="email" class="form-control" id="email" name="email"
-						value="[[.User.Email]]" placeholder="exemplo@dominio.com.br" required>
+					<label for="birthday" class="control-label">Birthday</label>
+					<input type="date" class="form-control" id="birthday" name="birthday"
+						value="[[.Client.Birthday]]" required>
           [[if ne $msg ""]]
           <p class="help-block">[[$msg]]</p>
           [[end]]
 				</div>
 				
-				<button type="submit" class="btn btn-success">Salvar</button>
+				<button type="submit" class="btn btn-success">Save</button>
 			</form>
 			
 			[[if ne .Message ""]]

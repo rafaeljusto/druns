@@ -1,5 +1,6 @@
 {
-	"session-expired": "Sessão expirada",
 	"authentication-error": "Erro de autenticação",
-	"invalid-email": "Formato de e-mail inválido"
+	"invalid-date": "Formato da data inválido",
+	"invalid-email": "Formato de e-mail inválido",
+	"session-expired": "Sessão expirada"
 }

@@ -8,7 +8,7 @@
 				[[$msg := index .FieldMessage "name"]]
 				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
 					<label for="name" class="control-label">Name</label>
-					<input type="name" class="form-control" id="name" name="name"
+					<input type="text" class="form-control" id="name" name="name"
 						value="[[.User.Name]]" required>
           [[if ne $msg ""]]
           <p class="help-block">[[$msg]]</p>

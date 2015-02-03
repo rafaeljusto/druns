@@ -1,5 +1,6 @@
 {
-	"session-expired": "Session expired",
 	"authentication-error": "Authentication error",
-	"invalid-email": "Invalid e-mail format"
+	"invalid-date": "Invalid date format",
+	"invalid-email": "Invalid e-mail format",
+	"session-expired": "Session expired"
 }

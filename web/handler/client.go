@@ -1,0 +1,125 @@
+package handler
+
+import (
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/dao"
+	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/web/config"
+	"github.com/rafaeljusto/druns/web/interceptor"
+	"github.com/rafaeljusto/druns/web/templates/data"
+	"github.com/rafaeljusto/druns/web/tr"
+)
+
+func init() {
+	Mux.RegisterPage("/client", func() trama.WebHandler {
+		return new(client)
+	})
+}
+
+type client struct {
+	trama.DefaultWebHandler
+	interceptor.DatabaseCompliant
+	interceptor.RemoteAddressCompliant
+	interceptor.LanguageCompliant
+	interceptor.HTTPTransactionCompliant
+	interceptor.SessionCompliant
+}
+
+func (h *client) Get(response trama.Response, r *http.Request) {
+	if len(r.FormValue("id")) == 0 {
+		response.ExecuteTemplate("client.html",
+			data.NewClient(h.Session().User.Name, data.MenuClients))
+		return
+	}
+
+	id, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		h.Logger().Error(core.NewError(err))
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
+	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
+	client, err := clientDAO.FindById(id)
+
+	if err != nil {
+		h.Logger().Error(err)
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
+	data := data.NewClient(h.Session().User.Name, data.MenuClients)
+	data.Client = client
+	response.ExecuteTemplate("client.html", data)
+}
+
+func (h *client) Post(response trama.Response, r *http.Request) {
+	client := model.Client{}
+
+	if len(r.FormValue("id")) > 0 {
+		var err error
+		client.Id, err = strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			h.Logger().Error(core.NewError(err))
+			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+			return
+		}
+	}
+
+	client.Name = r.FormValue("name")
+	client.Name = strings.TrimSpace(client.Name)
+	client.Name = strings.Title(client.Name)
+
+	birthday := r.FormValue("birthday")
+	birthday = strings.TrimSpace(birthday)
+
+	var err error
+	if client.Birthday, err = time.Parse(birthday, time.RFC3339); err != nil {
+		data := data.NewClient(h.Session().User.Name, data.MenuClients)
+		data.FieldMessage["birthday"] = h.Msg(tr.CodeInvalidDate)
+		data.Client = client
+		response.ExecuteTemplate("client.html", data)
+		return
+	}
+
+	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
+	if err := clientDAO.Save(&client); err != nil {
+		h.Logger().Error(err)
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
+	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("clients"), http.StatusFound)
+	return
+}
+
+func (h *client) Templates() trama.TemplateGroupSet {
+	groupSet := trama.NewTemplateGroupSet(nil)
+
+	for _, language := range config.DrunsConfig.Languages {
+		templates := config.DrunsConfig.HTMLTemplates(language, "client")
+
+		groupSet.Insert(trama.TemplateGroup{
+			Name:  language,
+			Files: templates,
+		})
+	}
+
+	return groupSet
+}
+
+func (h *client) Interceptors() trama.WebInterceptorChain {
+	return trama.NewWebInterceptorChain(
+		interceptor.NewRemoteAddressWeb(h),
+		interceptor.NewAcceptLanguageWeb(h),
+		interceptor.NewHTTPTransactionWeb(h),
+		interceptor.NewDatabaseWeb(h),
+		interceptor.NewSessionWeb(h),
+	)
+}
