@@ -8,10 +8,9 @@ type Administrator struct {
 	User model.User
 }
 
-func NewAdministrator(username string, menu Menu, user model.User) Administrator {
+func NewAdministrator(username string, menu Menu) Administrator {
 	return Administrator{
 		Logged: NewLogged(username, menu),
 		Form:   NewForm(),
-		User:   user,
 	}
 }

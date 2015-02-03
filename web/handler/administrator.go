@@ -34,7 +34,7 @@ type administrator struct {
 func (h *administrator) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
 		response.ExecuteTemplate("administrator.html",
-			data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators, model.User{}))
+			data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators))
 		return
 	}
 
@@ -54,8 +54,9 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	response.ExecuteTemplate("administrator.html",
-		data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators, user))
+	data := data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators)
+	data.User = user
+	response.ExecuteTemplate("administrator.html", data)
 }
 
 func (h *administrator) Post(response trama.Response, r *http.Request) {
@@ -80,8 +81,9 @@ func (h *administrator) Post(response trama.Response, r *http.Request) {
 	user.Email = strings.ToLower(user.Email)
 
 	if _, err := mail.ParseAddress(user.Email); err != nil {
-		data := data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators, user)
+		data := data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators)
 		data.FieldMessage["email"] = h.Msg(tr.CodeInvalidEmail)
+		data.User = user
 		response.ExecuteTemplate("administrator.html", data)
 		return
 	}
