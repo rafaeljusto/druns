@@ -3,8 +3,6 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
@@ -13,7 +11,6 @@ import (
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
-	"github.com/rafaeljusto/druns/web/tr"
 )
 
 func init() {
@@ -29,6 +26,9 @@ type client struct {
 	interceptor.LanguageCompliant
 	interceptor.HTTPTransactionCompliant
 	interceptor.SessionCompliant
+	interceptor.POSTCompliant
+
+	Client model.Client `request:"post"`
 }
 
 func (h *client) Get(response trama.Response, r *http.Request) {
@@ -60,11 +60,9 @@ func (h *client) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *client) Post(response trama.Response, r *http.Request) {
-	client := model.Client{}
-
 	if len(r.FormValue("id")) > 0 {
 		var err error
-		client.Id, err = strconv.Atoi(r.FormValue("id"))
+		h.Client.Id, err = strconv.Atoi(r.FormValue("id"))
 		if err != nil {
 			h.Logger().Error(core.NewError(err))
 			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
@@ -72,24 +70,24 @@ func (h *client) Post(response trama.Response, r *http.Request) {
 		}
 	}
 
-	client.Name = r.FormValue("name")
-	client.Name = strings.TrimSpace(client.Name)
-	client.Name = strings.Title(client.Name)
+	// client.Name = r.FormValue("name")
+	// client.Name = strings.TrimSpace(client.Name)
+	// client.Name = strings.Title(client.Name)
 
-	birthday := r.FormValue("birthday")
-	birthday = strings.TrimSpace(birthday)
+	// birthday := r.FormValue("birthday")
+	// birthday = strings.TrimSpace(birthday)
 
-	var err error
-	if client.Birthday, err = time.Parse(birthday, time.RFC3339); err != nil {
-		data := data.NewClient(h.Session().User.Name, data.MenuClients)
-		data.FieldMessage["birthday"] = h.Msg(tr.CodeInvalidDate)
-		data.Client = client
-		response.ExecuteTemplate("client.html", data)
-		return
-	}
+	// var err error
+	// if client.Birthday, err = time.Parse(birthday, time.RFC3339); err != nil {
+	// 	data := data.NewClient(h.Session().User.Name, data.MenuClients)
+	// 	data.FieldMessage["birthday"] = h.Msg(tr.CodeInvalidDate)
+	// 	data.Client = client
+	// 	response.ExecuteTemplate("client.html", data)
+	// 	return
+	// }
 
 	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	if err := clientDAO.Save(&client); err != nil {
+	if err := clientDAO.Save(&h.Client); err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
@@ -121,5 +119,6 @@ func (h *client) Interceptors() trama.WebInterceptorChain {
 		interceptor.NewHTTPTransactionWeb(h),
 		interceptor.NewDatabaseWeb(h),
 		interceptor.NewSessionWeb(h),
+		interceptor.NewPOST(h),
 	)
 }

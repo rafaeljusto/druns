@@ -1,12 +1,14 @@
 package interceptor
 
 import (
+	"br/core"
 	"net/http"
 	"reflect"
 	"strings"
 
 	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/log"
+	"github.com/rafaeljusto/druns/web/templates/data"
 	"github.com/rafaeljusto/schema"
 )
 
@@ -14,18 +16,19 @@ type requester interface {
 	RequestValue() reflect.Value
 	SetRequestValue(reflect.Value)
 	Logger() *log.Logger
+	HTTPId() string
 }
 
-type Poster struct {
-	trama.NopAJAXInterceptor
+type POST struct {
+	trama.NopWebInterceptor
 	handler requester
 }
 
-func NewPoster(h requester) *Poster {
-	return &Poster{handler: h}
+func NewPOST(h requester) *POST {
+	return &POST{handler: h}
 }
 
-func (i *Poster) Before(w http.ResponseWriter, r *http.Request) {
+func (i *POST) Before(response trama.Response, r *http.Request) {
 	if r.Method != "POST" {
 		return
 	}
@@ -36,20 +39,28 @@ func (i *Poster) Before(w http.ResponseWriter, r *http.Request) {
 		decoder := schema.NewDecoder()
 
 		if err := r.ParseForm(); err != nil {
-			i.handler.Logger().Error(err)
-			// TODO
+			i.handler.Logger().Error(core.NewError(err))
+			response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
 			return
 		}
 
-		if err := decoder.Decode(request.Addr().Interface(), r.Form); err != nil {
-			i.handler.Logger().Error(err)
-			// TODO
+		if request.CanAddr() {
+			request = request.Addr()
+		}
+
+		if err := decoder.Decode(request.Interface(), r.Form); err != nil {
+			i.handler.Logger().Error(core.NewError(err))
+			response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
+
+			// TODO: The decode could found a validation problem in the certificate, so we should return
+			// the form with the specific error instead of a "Internal Server Error"
+
 			return
 		}
 	}
 }
 
-func (i *Poster) parse() {
+func (i *POST) parse() {
 	st := reflect.ValueOf(i.handler).Elem()
 
 	for j := 0; j < st.NumField(); j++ {

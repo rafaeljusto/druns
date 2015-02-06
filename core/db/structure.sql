@@ -58,7 +58,7 @@ DROP TABLE IF EXISTS client CASCADE;
 CREATE TABLE client (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR,
-	birthday TIMESTAMPTZ
+	birthday DATE
 );
 
 /****************************************/
@@ -68,7 +68,7 @@ CREATE TABLE client_log (
 	log_id INT REFERENCES log(id),
 	id INT,
 	name VARCHAR,
-	birthday TIMESTAMPTZ
+	birthday DATE
 );
 
 /****************************************/

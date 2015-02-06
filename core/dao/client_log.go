@@ -51,7 +51,7 @@ func (dao *ClientLog) save(c *model.Client, operation model.LogOperation) error 
 		query,
 		c.Id,
 		c.Name,
-		c.Birthday,
+		c.Birthday.String(),
 		log.Id,
 	)
 

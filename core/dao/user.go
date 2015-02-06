@@ -190,7 +190,7 @@ func (dao *User) load(row row) (model.User, error) {
 	)
 
 	if err == sql.ErrNoRows {
-		return u, core.ErrNotFound
+		return u, core.NewError(core.ErrNotFound)
 
 	} else if err != nil {
 		return u, core.NewError(err)
@@ -213,7 +213,7 @@ func (dao *User) VerifyPassword(email mail.Address, password string) (bool, erro
 	)
 
 	if err == sql.ErrNoRows {
-		return false, core.ErrNotFound
+		return false, core.NewError(core.ErrNotFound)
 
 	} else if err != nil {
 		return false, core.NewError(err)

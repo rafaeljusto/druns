@@ -77,7 +77,7 @@ func (dao Log) FindById(id int64) (model.Log, error) {
 	)
 
 	if err == sql.ErrNoRows {
-		return log, core.ErrNotFound
+		return log, core.NewError(core.ErrNotFound)
 
 	} else if err != nil {
 		return log, core.NewError(err)

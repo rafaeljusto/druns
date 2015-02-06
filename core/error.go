@@ -9,9 +9,7 @@ import (
 )
 
 var (
-	ErrNotFound = Error{
-		Err: errors.New("Object not found"),
-	}
+	ErrNotFound = errors.New("Object not found")
 )
 
 type Error struct {

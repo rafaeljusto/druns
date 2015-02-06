@@ -39,7 +39,7 @@ func (dao *Client) Save(c *model.Client) error {
 
 	var operation model.LogOperation
 
-	if c.Id > 0 {
+	if c.Id == 0 {
 		if err := dao.insert(c); err != nil {
 			return err
 		}
@@ -69,7 +69,7 @@ func (dao *Client) insert(c *model.Client) error {
 	row := dao.SQLer.QueryRow(
 		query,
 		c.Name,
-		c.Birthday,
+		c.Birthday.String(),
 	)
 
 	if err := row.Scan(&c.Id); err != nil {
@@ -96,7 +96,7 @@ func (dao *Client) update(c *model.Client) error {
 	_, err := dao.SQLer.Exec(
 		query,
 		c.Name,
-		c.Birthday,
+		c.Birthday.String(),
 		c.Id,
 	)
 
@@ -156,11 +156,11 @@ func (dao *Client) load(row row) (model.Client, error) {
 	err := row.Scan(
 		&c.Id,
 		&c.Name,
-		&c.Birthday,
+		&c.Birthday.Time,
 	)
 
 	if err == sql.ErrNoRows {
-		return c, core.ErrNotFound
+		return c, core.NewError(core.ErrNotFound)
 
 	} else if err != nil {
 		return c, core.NewError(err)
