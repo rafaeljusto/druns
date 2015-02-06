@@ -18,7 +18,7 @@ type requester interface {
 
 type Poster struct {
 	trama.NopAJAXInterceptor
-	handler requestResponser
+	handler requester
 }
 
 func NewPoster(h requester) *Poster {
