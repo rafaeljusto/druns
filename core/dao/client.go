@@ -68,7 +68,7 @@ func (dao *Client) insert(c *model.Client) error {
 
 	row := dao.SQLer.QueryRow(
 		query,
-		c.Name,
+		c.Name.String(),
 		c.Birthday.String(),
 	)
 
@@ -95,7 +95,7 @@ func (dao *Client) update(c *model.Client) error {
 
 	_, err := dao.SQLer.Exec(
 		query,
-		c.Name,
+		c.Name.String(),
 		c.Birthday.String(),
 		c.Id,
 	)
@@ -152,10 +152,11 @@ func (dao *Client) FindAll() (model.Clients, error) {
 
 func (dao *Client) load(row row) (model.Client, error) {
 	var c model.Client
+	var name string
 
 	err := row.Scan(
 		&c.Id,
-		&c.Name,
+		&name,
 		&c.Birthday.Time,
 	)
 
@@ -166,5 +167,6 @@ func (dao *Client) load(row row) (model.Client, error) {
 		return c, core.NewError(err)
 	}
 
+	c.Name.Set(name)
 	return c, nil
 }

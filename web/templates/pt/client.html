@@ -7,7 +7,7 @@
 			
 				[[$msg := index .FieldMessage "name"]]
 				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
-					<label for="name" class="control-label">Name</label>
+					<label for="name" class="control-label">Nome</label>
 					<input type="text" class="form-control" id="name" name="name"
 						value="[[.Client.Name]]" required>
           [[if ne $msg ""]]
@@ -16,7 +16,7 @@
 				</div>
         [[$msg := index .FieldMessage "birthday"]]
 				<div class="form-group [[if ne $msg ""]]has-error[[end]]">
-					<label for="birthday" class="control-label">Birthday</label>
+					<label for="birthday" class="control-label">Data de nascimento</label>
 					<input type="date" class="form-control" id="birthday" name="birthday"
 						value="[[.Client.Birthday]]" required>
           [[if ne $msg ""]]
@@ -24,7 +24,7 @@
           [[end]]
 				</div>
 				
-				<button type="submit" class="btn btn-success">Save</button>
+				<button type="submit" class="btn btn-success">Salvar</button>
 			</form>
 			
 			[[if ne .Message ""]]

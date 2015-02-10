@@ -2,7 +2,7 @@ package model
 
 type Client struct {
 	Id       int
-	Name     string
+	Name     Name
 	Birthday Date
 }
 

@@ -1,6 +1,10 @@
 package data
 
-import "time"
+import (
+	"time"
+
+	"github.com/rafaeljusto/druns/core/model"
+)
 
 const (
 	MenuSchedule       Menu = "schedule"
@@ -18,9 +22,9 @@ type Logged struct {
 	Time     string
 }
 
-func NewLogged(username string, menu Menu) Logged {
+func NewLogged(username model.Name, menu Menu) Logged {
 	return Logged{
-		Username: username,
+		Username: username.String(),
 		Menu:     string(menu),
 		Time:     time.Now().Format(time.RFC822),
 	}

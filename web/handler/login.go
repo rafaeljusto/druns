@@ -7,11 +7,11 @@ import (
 
 	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/dao"
+	"github.com/rafaeljusto/druns/core/tr"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/session"
 	"github.com/rafaeljusto/druns/web/templates/data"
-	"github.com/rafaeljusto/druns/web/tr"
 )
 
 func init() {

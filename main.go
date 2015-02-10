@@ -18,9 +18,9 @@ import (
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/core/protocol"
+	"github.com/rafaeljusto/druns/core/tr"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/handler"
-	"github.com/rafaeljusto/druns/web/tr"
 )
 
 var (

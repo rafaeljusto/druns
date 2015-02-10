@@ -8,7 +8,7 @@ import (
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/core/protocol"
-	"github.com/rafaeljusto/druns/web/tr"
+	"github.com/rafaeljusto/druns/core/tr"
 )
 
 type DatabaseCompliant struct {

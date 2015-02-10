@@ -2,9 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"net/mail"
 	"strconv"
-	"strings"
 
 	"github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
@@ -13,7 +11,6 @@ import (
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
-	"github.com/rafaeljusto/druns/web/tr"
 )
 
 func init() {
@@ -29,6 +26,15 @@ type administrator struct {
 	interceptor.LanguageCompliant
 	interceptor.HTTPTransactionCompliant
 	interceptor.SessionCompliant
+	interceptor.POSTCompliant
+
+	User model.User `request:"post"`
+}
+
+func (h administrator) Response() (string, data.Former) {
+	data := data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators)
+	data.User = h.User
+	return "administrator.html", &data
 }
 
 func (h *administrator) Get(response trama.Response, r *http.Request) {
@@ -60,36 +66,8 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *administrator) Post(response trama.Response, r *http.Request) {
-	user := model.User{}
-
-	if len(r.FormValue("id")) > 0 {
-		var err error
-		user.Id, err = strconv.Atoi(r.FormValue("id"))
-		if err != nil {
-			h.Logger().Error(core.NewError(err))
-			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
-			return
-		}
-	}
-
-	user.Name = r.FormValue("name")
-	user.Name = strings.TrimSpace(user.Name)
-	user.Name = strings.Title(user.Name)
-
-	user.Email = r.FormValue("email")
-	user.Email = strings.TrimSpace(user.Email)
-	user.Email = strings.ToLower(user.Email)
-
-	if _, err := mail.ParseAddress(user.Email); err != nil {
-		data := data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators)
-		data.FieldMessage["email"] = h.Msg(tr.CodeInvalidEmail)
-		data.User = user
-		response.ExecuteTemplate("administrator.html", data)
-		return
-	}
-
 	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	if err := userDAO.Save(&user); err != nil {
+	if err := userDAO.Save(&h.User); err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
@@ -121,5 +99,6 @@ func (h *administrator) Interceptors() trama.WebInterceptorChain {
 		interceptor.NewHTTPTransactionWeb(h),
 		interceptor.NewDatabaseWeb(h),
 		interceptor.NewSessionWeb(h),
+		interceptor.NewPOST(h),
 	)
 }

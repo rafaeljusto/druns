@@ -31,6 +31,12 @@ type client struct {
 	Client model.Client `request:"post"`
 }
 
+func (h client) Response() (string, data.Former) {
+	data := data.NewClient(h.Session().User.Name, data.MenuClients)
+	data.Client = h.Client
+	return "client.html", &data
+}
+
 func (h *client) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
 		response.ExecuteTemplate("client.html",
@@ -60,32 +66,6 @@ func (h *client) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *client) Post(response trama.Response, r *http.Request) {
-	if len(r.FormValue("id")) > 0 {
-		var err error
-		h.Client.Id, err = strconv.Atoi(r.FormValue("id"))
-		if err != nil {
-			h.Logger().Error(core.NewError(err))
-			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
-			return
-		}
-	}
-
-	// client.Name = r.FormValue("name")
-	// client.Name = strings.TrimSpace(client.Name)
-	// client.Name = strings.Title(client.Name)
-
-	// birthday := r.FormValue("birthday")
-	// birthday = strings.TrimSpace(birthday)
-
-	// var err error
-	// if client.Birthday, err = time.Parse(birthday, time.RFC3339); err != nil {
-	// 	data := data.NewClient(h.Session().User.Name, data.MenuClients)
-	// 	data.FieldMessage["birthday"] = h.Msg(tr.CodeInvalidDate)
-	// 	data.Client = client
-	// 	response.ExecuteTemplate("client.html", data)
-	// 	return
-	// }
-
 	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
 	if err := clientDAO.Save(&h.Client); err != nil {
 		h.Logger().Error(err)

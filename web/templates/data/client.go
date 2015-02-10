@@ -8,7 +8,7 @@ type Client struct {
 	Client model.Client
 }
 
-func NewClient(username string, menu Menu) Client {
+func NewClient(username model.Name, menu Menu) Client {
 	return Client{
 		Logged: NewLogged(username, menu),
 		Form:   NewForm(),

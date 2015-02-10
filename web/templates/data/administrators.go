@@ -7,7 +7,7 @@ type Administrators struct {
 	Users []model.User
 }
 
-func NewAdministrators(username string, menu Menu, users []model.User) Administrators {
+func NewAdministrators(username model.Name, menu Menu, users []model.User) Administrators {
 	return Administrators{
 		Logged: NewLogged(username, menu),
 		Users:  users,

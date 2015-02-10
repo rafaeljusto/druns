@@ -9,9 +9,9 @@ import (
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/core/tr"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/session"
-	"github.com/rafaeljusto/druns/web/tr"
 )
 
 type sessioner interface {

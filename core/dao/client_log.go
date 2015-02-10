@@ -50,7 +50,7 @@ func (dao *ClientLog) save(c *model.Client, operation model.LogOperation) error 
 	_, err := dao.SQLer.Exec(
 		query,
 		c.Id,
-		c.Name,
+		c.Name.String(),
 		c.Birthday.String(),
 		log.Id,
 	)
