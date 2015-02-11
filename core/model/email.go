@@ -12,6 +12,12 @@ type Email struct {
 	value string
 }
 
+func NewEmail(value string) (Email, error) {
+	var email Email
+	err := email.Set(value)
+	return email, err
+}
+
 func (e *Email) Set(value string) error {
 	e.value = strings.TrimSpace(value)
 	e.value = strings.ToLower(e.value)

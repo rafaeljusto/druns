@@ -36,6 +36,10 @@ workspace=$workspace/src/github.com/rafaeljusto/druns
 current_dir=`pwd`
 cd $workspace
 go build
+cd $workspace/utils/bootstrap
+go build
+cd $workspace/utils/password
+go build
 cd $current_dir
 
 if [ -f $pack_name*.deb ]; then
@@ -47,11 +51,12 @@ if [ -d $tmp_dir ]; then
   rm -rf $tmp_dir
 fi
 
-mkdir -p $tmp_dir$install_path/bin $tmp_dir$install_path/web
-mv $workspace/druns $project_root/bin/
+mkdir -p $tmp_dir$install_path/bin $tmp_dir$install_path/web $tmp_dir$install_path/db
+mv $workspace/druns $workspace/utils/bootstrap/bootstrap $workspace/utils/password/password $project_root/bin/
 cp -r $workspace/web/templates $project_root/web/
 cp -r $workspace/web/assets $project_root/web/
 cp -r $workspace/etc $project_root/
+cp $workspace/core/db/structure.sql $tmp_dir$install_path/db/
 
 fpm -s dir -t deb \
   --exclude=.git -n $pack_name -v "$version" --iteration "$release" --vendor "$vendor" \

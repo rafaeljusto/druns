@@ -6,6 +6,12 @@ type Name struct {
 	value string
 }
 
+func NewName(value string) Name {
+	var name Name
+	name.Set(value)
+	return name
+}
+
 func (n *Name) Set(value string) {
 	n.value = strings.TrimSpace(value)
 	n.value = strings.Title(n.value)

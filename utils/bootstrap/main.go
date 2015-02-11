@@ -47,9 +47,15 @@ func main() {
 	}
 	defer db.DB.Close()
 
+	e, err := model.NewEmail(email)
+	if err != nil {
+		fmt.Printf("Invalid e-mail. Details: %s\n", err)
+		os.Exit(4)
+	}
+
 	user := model.User{
-		Name:     name,
-		Email:    email,
+		Name:     model.NewName(name),
+		Email:    e,
 		Password: pwd,
 	}
 

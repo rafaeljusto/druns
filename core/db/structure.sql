@@ -7,6 +7,18 @@ CREATE USER druns WITH PASSWORD 'abc123';
 
 /****************************************/
 
+DROP TABLE IF EXISTS adm_user CASCADE;
+CREATE TABLE adm_user (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR,
+	email VARCHAR NOT NULL DEFAULT '',
+	password VARCHAR NOT NULL DEFAULT ''
+);
+
+CREATE UNIQUE INDEX ON adm_user(email);
+
+/****************************************/
+
 DROP TYPE IF EXISTS LOG_OPERATION CASCADE;
 CREATE TYPE LOG_OPERATION AS ENUM ('CREATE', 'UPDATE', 'DELETE');
 
@@ -21,6 +33,16 @@ CREATE TABLE log (
 
 /****************************************/
 
+DROP TABLE IF EXISTS adm_user_log CASCADE;
+CREATE TABLE adm_user_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	name VARCHAR,
+	email VARCHAR
+);
+
+/****************************************/
+
 DROP TABLE IF EXISTS session CASCADE;
 CREATE TABLE session (
 	id SERIAL PRIMARY KEY,
@@ -28,28 +50,6 @@ CREATE TABLE session (
 	ip_address INET,
 	created_at TIMESTAMPTZ,
 	last_access_at TIMESTAMPTZ
-);
-
-/****************************************/
-
-DROP TABLE IF EXISTS adm_user CASCADE;
-CREATE TABLE adm_user (
-	id SERIAL PRIMARY KEY,
-	name VARCHAR,
-	email VARCHAR NOT NULL DEFAULT '',
-	password VARCHAR NOT NULL DEFAULT ''
-);
-
-CREATE UNIQUE INDEX ON adm_user(email);
-
-/****************************************/
-
-DROP TABLE IF EXISTS adm_user_log CASCADE;
-CREATE TABLE adm_user_log (
-	log_id INT REFERENCES log(id),
-	id INT,
-	name VARCHAR,
-	email VARCHAR
 );
 
 /****************************************/
