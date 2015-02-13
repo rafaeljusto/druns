@@ -85,7 +85,7 @@ func main() {
 		os.Exit(8)
 	}
 
-	userDAO := dao.NewUser(db.DB, addr, id)
+	userDAO := dao.NewUser(tx, addr, id)
 	if users, err := userDAO.FindAll(); err != nil {
 		fmt.Printf("Error retrieving users. Details: %s\n", err)
 		os.Exit(9)
