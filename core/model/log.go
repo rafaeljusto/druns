@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	LogOperationCreation LogOperation = "CREATE"
-	LogOperationUpdate   LogOperation = "UPDATE"
-	LogOperationRemoval  LogOperation = "DELETE"
+	LogOperationCreation LogOperation = "Create"
+	LogOperationUpdate   LogOperation = "Update"
+	LogOperationRemoval  LogOperation = "Delete"
 )
 
 type LogOperation string

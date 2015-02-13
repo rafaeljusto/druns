@@ -55,6 +55,8 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 	user, err := userDAO.FindById(id)
 
 	if err != nil {
+		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
+
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return

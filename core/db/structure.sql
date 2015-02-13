@@ -20,7 +20,7 @@ CREATE UNIQUE INDEX ON adm_user(email);
 /****************************************/
 
 DROP TYPE IF EXISTS LOG_OPERATION CASCADE;
-CREATE TYPE LOG_OPERATION AS ENUM ('CREATE', 'UPDATE', 'DELETE');
+CREATE TYPE LOG_OPERATION AS ENUM ('Create', 'Update', 'Delete');
 
 DROP TABLE IF EXISTS log CASCADE;
 CREATE TABLE log (
@@ -69,6 +69,37 @@ CREATE TABLE client_log (
 	id INT,
 	name VARCHAR,
 	birthday DATE
+);
+
+/****************************************/
+
+DROP TYPE IF EXISTS WEEKDAY CASCADE;
+CREATE TYPE WEEKDAY AS ENUM ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+
+DROP TYPE IF EXISTS GROUP_TYPE CASCADE;
+CREATE TYPE GROUP_TYPE AS ENUM ('Weekley', 'Once');
+
+DROP TABLE IF EXISTS group CASCADE;
+CREATE TABLE group (
+	id SERIAL PRIMARY KEY,
+	weekday WEEKDAY,
+	time TIME,
+	duration INT,
+	type GROUP_TYPE,
+	capacity INT
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS group CASCADE;
+CREATE TABLE group_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	weekday WEEKDAY,
+	time TIME,
+	duration INT,
+	type GROUP_TYPE,
+	capacity INT
 );
 
 /****************************************/

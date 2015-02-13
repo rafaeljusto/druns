@@ -110,7 +110,7 @@ func (dao *Session) FindById(id int) (model.Session, error) {
 	)
 
 	if err == sql.ErrNoRows {
-		return s, core.NewError(core.ErrNotFound)
+		return s, core.ErrNotFound
 
 	} else if err != nil {
 		return s, core.NewError(err)

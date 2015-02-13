@@ -169,6 +169,7 @@ func (dao *User) FindAll() ([]model.User, error) {
 	for rows.Next() {
 		u, err := dao.load(rows)
 		if err != nil {
+			// TODO: Check ErrNotFound and ignore it
 			return nil, err
 		}
 
@@ -190,7 +191,7 @@ func (dao *User) load(row row) (model.User, error) {
 	)
 
 	if err == sql.ErrNoRows {
-		return u, core.NewError(core.ErrNotFound)
+		return u, core.ErrNotFound
 
 	} else if err != nil {
 		return u, core.NewError(err)
@@ -215,7 +216,7 @@ func (dao *User) VerifyPassword(email mail.Address, password string) (bool, erro
 	)
 
 	if err == sql.ErrNoRows {
-		return false, core.NewError(core.ErrNotFound)
+		return false, core.ErrNotFound
 
 	} else if err != nil {
 		return false, core.NewError(err)

@@ -10,7 +10,7 @@ import (
 	"github.com/rafaeljusto/druns/core/model"
 )
 
-type Client struct {
+type Group struct {
 	SQLer       SQLer
 	IP          net.IP
 	Agent       int
@@ -18,47 +18,50 @@ type Client struct {
 	tableFields []string
 }
 
-func NewClient(sqler SQLer, ip net.IP, agent int) Client {
-	return Client{
+func NewGroup(sqler SQLer, ip net.IP, agent int) Group {
+	return Group{
 		SQLer:     sqler,
 		IP:        ip,
 		Agent:     agent,
-		tableName: "client",
+		tableName: "group",
 		tableFields: []string{
 			"id",
-			"name",
-			"birthday",
+			"weekday",
+			"time",
+			"duration",
+			"type",
+			"capacity",
 		},
 	}
 }
 
-func (dao *Client) Save(c *model.Client) error {
+func (dao *Group) Save(g *model.Group) error {
 	if dao.Agent == 0 || dao.IP == nil {
 		return core.NewError(fmt.Errorf("No log information defined to persist information"))
 	}
 
 	var operation model.LogOperation
 
-	if c.Id == 0 {
-		if err := dao.insert(c); err != nil {
+	if g.Id == 0 {
+		if err := dao.insert(g); err != nil {
 			return err
 		}
 
 		operation = model.LogOperationCreation
 
 	} else {
-		if err := dao.update(c); err != nil {
+		if err := dao.update(g); err != nil {
 			return err
 		}
 
 		operation = model.LogOperationUpdate
 	}
 
-	clientLogDAO := NewClientLog(dao.SQLer, dao.IP, dao.Agent)
-	return clientLogDAO.save(c, operation)
+	GroupLogDAO := NewGroupLog(dao.SQLer, dao.IP, dao.Agent)
+	return GroupLogDAO.save(g, operation)
 }
 
-func (dao *Client) insert(c *model.Client) error {
+func (dao *Group) insert(g *model.Group) error {
 	query := fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES (DEFAULT, %s) RETURNING id",
 		dao.tableName,
@@ -68,19 +71,22 @@ func (dao *Client) insert(c *model.Client) error {
 
 	row := dao.SQLer.QueryRow(
 		query,
-		c.Name.String(),
-		c.Birthday.String(),
+		g.Weekday.String(),
+		g.Time,
+		g.Duration,
+		g.Type,
+		g.Capacity,
 	)
 
-	if err := row.Scan(&c.Id); err != nil {
+	if err := row.Scan(&g.Id); err != nil {
 		return core.NewError(err)
 	}
 
 	return nil
 }
 
-func (dao *Client) update(c *model.Client) error {
-	if lastClient, err := dao.FindById(c.Id); err == nil && lastClient.Equal(*c) {
+func (dao *Group) update(g *model.Group) error {
+	if lastGroup, err := dao.FindById(g.Id); err == nil && lastGroup.Equal(*g) {
 		// Nothing changed
 		return nil
 
@@ -89,15 +95,18 @@ func (dao *Client) update(c *model.Client) error {
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET name = $1, birthday = $2 WHERE id = $3",
+		"UPDATE %s SET weekday = $1, time = $2, duration = $3, type = $4, capacity = $5 WHERE id = $6",
 		dao.tableName,
 	)
 
 	_, err := dao.SQLer.Exec(
 		query,
-		c.Name.String(),
-		c.Birthday.String(),
-		c.Id,
+		g.Weekday.String(),
+		g.Time,
+		g.Duration,
+		g.Type,
+		g.Capacity,
+		g.Id,
 	)
 
 	if err != nil {
@@ -107,7 +116,7 @@ func (dao *Client) update(c *model.Client) error {
 	return nil
 }
 
-func (dao *Client) FindById(id int) (model.Client, error) {
+func (dao *Group) FindById(id int) (model.Group, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -116,15 +125,15 @@ func (dao *Client) FindById(id int) (model.Client, error) {
 
 	row := dao.SQLer.QueryRow(query, id)
 
-	c, err := dao.load(row)
+	g, err := dao.load(row)
 	if err != nil {
-		return c, err
+		return g, err
 	}
 
-	return c, nil
+	return g, nil
 }
 
-func (dao *Client) FindAll() (model.Clients, error) {
+func (dao *Group) FindAll() (model.Groups, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s",
 		strings.Join(dao.tableFields, ", "),
@@ -136,38 +145,39 @@ func (dao *Client) FindAll() (model.Clients, error) {
 		return nil, core.NewError(err)
 	}
 
-	var clients model.Clients
+	var groups model.Groups
 
 	for rows.Next() {
-		c, err := dao.load(rows)
+		g, err := dao.load(rows)
 		if err != nil {
 			// TODO: Check ErrNotFound and ignore it
 			return nil, err
 		}
 
-		clients = append(clients, c)
+		groups = append(groups, g)
 	}
 
-	return clients, nil
+	return groups, nil
 }
 
-func (dao *Client) load(row row) (model.Client, error) {
-	var c model.Client
-	var name string
+func (dao *Group) load(row row) (model.Group, error) {
+	var g model.Group
 
 	err := row.Scan(
-		&c.Id,
-		&name,
-		&c.Birthday.Time,
+		&g.Id,
+		&g.Weekday,
+		&g.Time,
+		&g.Duration,
+		&g.Type,
+		&g.Capacity,
 	)
 
 	if err == sql.ErrNoRows {
-		return c, core.ErrNotFound
+		return g, core.ErrNotFound
 
 	} else if err != nil {
-		return c, core.NewError(err)
+		return g, core.NewError(err)
 	}
 
-	c.Name.Set(name)
-	return c, nil
+	return g, nil
 }
