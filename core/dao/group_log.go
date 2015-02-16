@@ -22,7 +22,7 @@ func NewGroupLog(sqler SQLer, ip net.IP, agent int) GroupLog {
 		SQLer:     sqler,
 		IP:        ip,
 		Agent:     agent,
-		tableName: "group_log",
+		tableName: "client_group_log",
 		tableFields: []string{
 			"id",
 			"weekday",

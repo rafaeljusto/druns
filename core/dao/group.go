@@ -23,7 +23,7 @@ func NewGroup(sqler SQLer, ip net.IP, agent int) Group {
 		SQLer:     sqler,
 		IP:        ip,
 		Agent:     agent,
-		tableName: "group",
+		tableName: "client_group",
 		tableFields: []string{
 			"id",
 			"weekday",
