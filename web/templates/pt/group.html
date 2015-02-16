@@ -1,0 +1,70 @@
+[[template "prefix" .]]
+
+      [[template "menu" .]]
+                
+      <form action="[[url "group"]]" method="post">
+        <input type="hidden" name="id" value="[[.Group.Id]]">
+              
+        [[$msg := index .FieldMessage "weekday"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="weekday" class="control-label">Dia da Semana</label>
+          <select name="weekday" id="weekday" class="form-control">
+            <option value="Sunday" [[if weq .Group.Weekday "Sunday"]]selected[[end]]>Domingo</option>
+            <option value="Monday" [[if weq .Group.Weekday "Monday"]]selected[[end]]>Segunda-Feira</option>
+            <option value="Tuesday" [[if weq .Group.Weekday "Tuesday"]]selected[[end]]>Ter&ccedil;a-Feira</option>
+            <option value="Wednesday" [[if weq .Group.Weekday "Wednesday"]]selected[[end]]>Quarta-Feira</option>
+            <option value="Thursday" [[if weq .Group.Weekday "Thursday"]]selected[[end]]>Quinta-Feira</option>
+            <option value="Friday" [[if weq .Group.Weekday "Friday"]]selected[[end]]>Sexta-Feira</option>
+            <option value="Saturday" [[if weq .Group.Weekday "Saturday"]]selected[[end]]>S&aacute;bado</option>
+          </select>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        [[$msg := index .FieldMessage "time"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="time" class="control-label">Hor&aacute;rio</label>
+          <input type="time" class="form-control" id="time" name="time"
+              value="[[.Group.Time]]" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        [[$msg := index .FieldMessage "duration"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="duration" class="control-label">Dura&ccedil;&atilde;o</label>
+          <input type="range" class="form-control" id="duration" name="duration"
+              value="[[.Group.Duration]]" min="30" max="120" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        [[$msg := index .FieldMessage "type"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="type" class="control-label">Tipo</label>
+          <select name="type" id="type" class="form-control">
+            <option value="Weekley" [[if geq .Group.Type "Weekley"]]selected[[end]]>Semanal</option>
+            <option value="Once" [[if geq .Group.Type "Once"]]selected[[end]]>&Uacute;nico</option>
+          </select>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        [[$msg := index .FieldMessage "capacity"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="capacity" class="control-label">Capacidade</label>
+          <input type="number" class="form-control" id="capacity" name="capacity"
+              value="[[.Group.Duration]]" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+
+        <button type="submit" class="btn btn-success">Salvar</button>
+      </form>
+              
+      [[if ne .Message ""]]
+      <div class="alert alert-danger" role="alert">[[.Message]]</div>
+      [[end]]
+
+[[template "posfix" .]]

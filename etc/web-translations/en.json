@@ -1,6 +1,10 @@
 {
 	"authentication-error": "Authentication error",
 	"invalid-date": "Invalid date format",
+	"invalid-duration": "Invalid duration",
 	"invalid-email": "Invalid e-mail format",
+	"invalid-group-type": "Invalid group type",
+	"invalid-time": "Invalid time format",
+	"invalid-weekday": "Invalid weekday",
 	"session-expired": "Session expired"
 }
