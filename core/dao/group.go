@@ -72,9 +72,9 @@ func (dao *Group) insert(g *model.Group) error {
 	row := dao.SQLer.QueryRow(
 		query,
 		g.Weekday.String(),
-		g.Time,
-		g.Duration,
-		g.Type,
+		g.Time.String(),
+		g.Duration.String(),
+		g.Type.String(),
 		g.Capacity,
 	)
 

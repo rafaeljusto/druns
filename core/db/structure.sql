@@ -85,7 +85,7 @@ CREATE TABLE client_group (
 	weekday WEEKDAY,
 	time TIME,
 	duration INT,
-	type GROUP_TYPE,
+	type CLIENT_GROUP_TYPE,
 	capacity INT
 );
 
@@ -98,7 +98,7 @@ CREATE TABLE client_group_log (
 	weekday WEEKDAY,
 	time TIME,
 	duration INT,
-	type GROUP_TYPE,
+	type CLIENT_GROUP_TYPE,
 	capacity INT
 );
 
