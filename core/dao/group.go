@@ -163,12 +163,14 @@ func (dao *Group) FindAll() (model.Groups, error) {
 func (dao *Group) load(row row) (model.Group, error) {
 	var g model.Group
 
+	var weekday, duration, groupType []byte
+
 	err := row.Scan(
 		&g.Id,
-		&g.Weekday,
-		&g.Time,
-		&g.Duration,
-		&g.Type,
+		&weekday,
+		&g.Time.Time,
+		&duration,
+		&groupType,
 		&g.Capacity,
 	)
 
@@ -177,6 +179,16 @@ func (dao *Group) load(row row) (model.Group, error) {
 
 	} else if err != nil {
 		return g, core.NewError(err)
+	}
+
+	if err := g.Weekday.UnmarshalText(weekday); err != nil {
+		return g, err
+	}
+	if err := g.Duration.UnmarshalText(duration); err != nil {
+		return g, err
+	}
+	if err := g.Type.UnmarshalText(groupType); err != nil {
+		return g, err
 	}
 
 	return g, nil

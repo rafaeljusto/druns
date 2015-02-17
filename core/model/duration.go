@@ -41,5 +41,5 @@ func (d *Duration) UnmarshalText(data []byte) (err error) {
 }
 
 func (d Duration) String() string {
-	return fmt.Sprintf("%d", d.Minutes())
+	return fmt.Sprintf("%d", int(d.Minutes()))
 }

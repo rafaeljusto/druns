@@ -52,10 +52,11 @@ func (dao *GroupLog) save(g *model.Group, operation model.LogOperation) error {
 
 	_, err := dao.SQLer.Exec(
 		query,
+		g.Id,
 		g.Weekday.String(),
-		g.Time,
-		g.Duration,
-		g.Type,
+		g.Time.String(),
+		g.Duration.String(),
+		g.Type.String(),
 		g.Capacity,
 		log.Id,
 	)
