@@ -77,8 +77,8 @@ func (dao *User) insert(u *model.User) error {
 
 	row := dao.SQLer.QueryRow(
 		query,
-		u.Name.String(),
-		u.Email.String(),
+		u.Name,
+		u.Email,
 		base64.StdEncoding.EncodeToString(hashedPassword),
 	)
 
@@ -105,8 +105,8 @@ func (dao *User) update(u *model.User) error {
 
 	_, err := dao.SQLer.Exec(
 		query,
-		u.Name.String(),
-		u.Email.String(),
+		u.Name,
+		u.Email,
 		u.Id,
 	)
 
@@ -181,12 +181,12 @@ func (dao *User) FindAll() ([]model.User, error) {
 
 func (dao *User) load(row row) (model.User, error) {
 	var u model.User
-	var name, email, hashedPassword string
+	var hashedPassword string
 
 	err := row.Scan(
 		&u.Id,
-		&name,
-		&email,
+		&u.Name,
+		&u.Email,
 		&hashedPassword,
 	)
 
@@ -197,8 +197,6 @@ func (dao *User) load(row row) (model.User, error) {
 		return u, core.NewError(err)
 	}
 
-	u.Name.Set(name)
-	u.Email.Set(email)
 	return u, nil
 }
 

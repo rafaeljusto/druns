@@ -72,11 +72,11 @@ func (dao *Group) insert(g *model.Group) error {
 
 	row := dao.SQLer.QueryRow(
 		query,
-		g.Name.String(),
-		g.Weekday.String(),
-		g.Time.String(),
-		g.Duration.String(),
-		g.Type.String(),
+		g.Name,
+		g.Weekday,
+		g.Time,
+		g.Duration,
+		g.Type,
 		g.Capacity,
 	)
 
@@ -103,11 +103,11 @@ func (dao *Group) update(g *model.Group) error {
 
 	_, err := dao.SQLer.Exec(
 		query,
-		g.Name.String(),
-		g.Weekday.String(),
-		g.Time.String(),
-		g.Duration.String(),
-		g.Type.String(),
+		g.Name,
+		g.Weekday,
+		g.Time,
+		g.Duration,
+		g.Type,
 		g.Capacity,
 		g.Id,
 	)
@@ -165,16 +165,14 @@ func (dao *Group) FindAll() (model.Groups, error) {
 
 func (dao *Group) load(row row) (model.Group, error) {
 	var g model.Group
-	var name string
-	var weekday, duration, groupType []byte
 
 	err := row.Scan(
 		&g.Id,
-		&name,
-		&weekday,
-		&g.Time.Time,
-		&duration,
-		&groupType,
+		&g.Name,
+		&g.Weekday,
+		&g.Time,
+		&g.Duration,
+		&g.Type,
 		&g.Capacity,
 	)
 
@@ -183,18 +181,6 @@ func (dao *Group) load(row row) (model.Group, error) {
 
 	} else if err != nil {
 		return g, core.NewError(err)
-	}
-
-	g.Name.Set(name)
-
-	if err := g.Weekday.UnmarshalText(weekday); err != nil {
-		return g, err
-	}
-	if err := g.Duration.UnmarshalText(duration); err != nil {
-		return g, err
-	}
-	if err := g.Type.UnmarshalText(groupType); err != nil {
-		return g, err
 	}
 
 	return g, nil

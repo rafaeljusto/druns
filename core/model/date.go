@@ -1,16 +1,28 @@
 package model
 
 import (
+	"database/sql/driver"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/tr"
 )
 
 type Date struct {
 	time.Time
+}
+
+func (d *Date) Set(value string) (err error) {
+	value = strings.TrimSpace(value)
+
+	if d.Time, err = time.Parse(`2006-01-02`, value); err != nil {
+		err = errors.NewValidation(tr.CodeInvalidDate, err)
+	}
+
+	return
 }
 
 // http://golang.org/src/time/time.go # MarshalJSON()
@@ -34,22 +46,13 @@ func (d Date) MarshalText() ([]byte, error) {
 	return []byte(d.Format(`2006-01-02`)), nil
 }
 
-func (d *Date) UnmarshalJSON(data []byte) (err error) {
-	value := strings.TrimSpace(string(data))
-	d.Time, err = time.Parse(`"2006-01-02"`, value)
-	if err != nil {
-		err = errors.NewValidation(tr.CodeInvalidDate, err)
-	}
-	return
+func (d *Date) UnmarshalJSON(data []byte) error {
+	value := strings.Trim(string(data), ` "`)
+	return d.Set(value)
 }
 
-func (d *Date) UnmarshalText(data []byte) (err error) {
-	value := strings.TrimSpace(string(data))
-	d.Time, err = time.Parse(`2006-01-02`, value)
-	if err != nil {
-		err = errors.NewValidation(tr.CodeInvalidDate, err)
-	}
-	return
+func (d *Date) UnmarshalText(data []byte) error {
+	return d.Set(string(data))
 }
 
 func (d Date) String() string {
@@ -57,4 +60,29 @@ func (d Date) String() string {
 		return ""
 	}
 	return d.Format("2006-01-02")
+}
+
+func (d Date) Value() (driver.Value, error) {
+	return d.Time, nil
+}
+
+func (d *Date) Scan(src interface{}) (err error) {
+	if src == nil {
+		d.Time = time.Time{}
+		return
+	}
+
+	switch t := src.(type) {
+	case int64, float64, bool:
+		return core.NewError(fmt.Errorf("Unsupported type to convert into a Date"))
+
+	case time.Time:
+		d.Time = t
+	case []byte:
+		err = d.Set(string(t))
+	case string:
+		err = d.Set(t)
+	}
+
+	return
 }
