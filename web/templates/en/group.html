@@ -14,6 +14,18 @@
           <p class="help-block">[[$msg]]</p>
           [[end]]
         </div>
+        [[$msg := index .FieldMessage "place"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="place.id" class="control-label">Place</label>
+          <select name="place.id" id="place.id" class="form-control">
+            [[range $place := .Places]]
+            <option value="[[$place.Id]]" [[if eq $.Group.Place.Id $place.Id]]selected[[end]]>[[$place.Name]]</option>
+            [[end]]
+          </select>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
         [[$msg := index .FieldMessage "weekday"]]
         <div class="form-group [[if ne $msg ""]]has-error[[end]]">
           <label for="weekday" class="control-label">Weekday</label>

@@ -39,8 +39,7 @@ func (h client) Response() (string, data.Former) {
 
 func (h *client) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
-		response.ExecuteTemplate("client.html",
-			data.NewClient(h.Session().User.Name, data.MenuClients))
+		response.ExecuteTemplate(h.Response())
 		return
 	}
 
@@ -52,7 +51,7 @@ func (h *client) Get(response trama.Response, r *http.Request) {
 	}
 
 	clientDAO := dao.NewClient(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	client, err := clientDAO.FindById(id)
+	h.Client, err = clientDAO.FindById(id)
 
 	if err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
@@ -62,9 +61,7 @@ func (h *client) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	data := data.NewClient(h.Session().User.Name, data.MenuClients)
-	data.Client = client
-	response.ExecuteTemplate("client.html", data)
+	response.ExecuteTemplate(h.Response())
 }
 
 func (h *client) Post(response trama.Response, r *http.Request) {

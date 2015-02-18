@@ -16,7 +16,7 @@
         [[range $group := .Groups]]
             <tr>
               <td><a href="[[url "group"]]?id=[[$group.Id]]">[[$group.Name]]</a></td>
-              <td></td>
+              <td>[[$group.Place.Name]]</td>
               <td>
                 [[if eq $group.Weekday "Sunday"]]Domingo[[end]]
                 [[if eq $group.Weekday "Monday"]]Segunda-feira[[end]]

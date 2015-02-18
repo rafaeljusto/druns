@@ -64,7 +64,7 @@ func (s *Session) CheckFingerprint(fingerprint, secret string) bool {
 	return s.Fingerprint(secret) == fingerprint
 }
 
-func (s *Session) Equal(other Session) bool {
+func (s Session) Equal(other Session) bool {
 	if s.Id != other.Id ||
 		!s.User.Equal(other.User) ||
 		!s.IPAddress.Equal(other.IPAddress) ||

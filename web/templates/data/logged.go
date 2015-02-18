@@ -11,6 +11,7 @@ const (
 	MenuReports        Menu = "reports"
 	MenuGroups         Menu = "groups"
 	MenuClients        Menu = "clients"
+	MenuPlaces         Menu = "places"
 	MenuAdministrators Menu = "administrators"
 )
 

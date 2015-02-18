@@ -39,8 +39,7 @@ func (h administrator) Response() (string, data.Former) {
 
 func (h *administrator) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
-		response.ExecuteTemplate("administrator.html",
-			data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators))
+		response.ExecuteTemplate(h.Response())
 		return
 	}
 
@@ -52,7 +51,7 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 	}
 
 	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	user, err := userDAO.FindById(id)
+	h.User, err = userDAO.FindById(id)
 
 	if err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
@@ -62,9 +61,7 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	data := data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators)
-	data.User = user
-	response.ExecuteTemplate("administrator.html", data)
+	response.ExecuteTemplate(h.Response())
 }
 
 func (h *administrator) Post(response trama.Response, r *http.Request) {

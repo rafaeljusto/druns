@@ -1,24 +1,27 @@
 [[define "menu"]]
-			<p class="text-right text-uppercase">
-				<span class="text-uppercase"><strong>[[.Username]]</strong></span><br/>
-				<small>[[.Time]]</small>
-			</p>
+      <p class="text-right text-uppercase">
+        <span class="text-uppercase"><strong>[[.Username]]</strong></span><br/>
+        <small>[[.Time]]</small>
+      </p>
 
-			<ul class="nav nav-tabs nav-justified" role="navigation">
-			  <li role="presentation" [[if eq .Menu "schedule"]]class="active"[[end]]>
-			  	<a href="[[url "schedule"]]">Schedule</a>
-			  </li>
-			  <li role="presentation" [[if eq .Menu "reports"]]class="active"[[end]]>
-			  	<a href="[[url "reports"]]">Reports</a>
-			  </li>
-			  <li role="presentation" [[if eq .Menu "groups"]]class="active"[[end]]>
-			  	<a href="[[url "groups"]]">Groups</a>
-			  </li>
-			  <li role="presentation" [[if eq .Menu "clients"]]class="active"[[end]]>
-			  	<a href="[[url "clients"]]">Clients</a>
-			  </li>
-			  <li role="presentation" [[if eq .Menu "administrators"]]class="active"[[end]]>
-			  	<a href="[[url "administrators"]]">Administrators</a>
-			  </li>
-			</ul>
+      <ul class="nav nav-tabs nav-justified" role="navigation">
+        <li role="presentation" [[if eq .Menu "schedule"]]class="active"[[end]]>
+          <a href="[[url "schedule"]]">Schedule</a>
+        </li>
+        <li role="presentation" [[if eq .Menu "reports"]]class="active"[[end]]>
+          <a href="[[url "reports"]]">Reports</a>
+        </li>
+        <li role="presentation" [[if eq .Menu "groups"]]class="active"[[end]]>
+          <a href="[[url "groups"]]">Groups</a>
+        </li>
+        <li role="presentation" [[if eq .Menu "clients"]]class="active"[[end]]>
+          <a href="[[url "clients"]]">Clients</a>
+        </li>
+        <li role="presentation" [[if eq .Menu "places"]]class="active"[[end]]>
+          <a href="[[url "places"]]">Places</a>
+        </li>
+        <li role="presentation" [[if eq .Menu "administrators"]]class="active"[[end]]>
+          <a href="[[url "administrators"]]">Administrators</a>
+        </li>
+      </ul>
 [[end]]

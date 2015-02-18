@@ -7,7 +7,7 @@ type User struct {
 	Password string
 }
 
-func (u *User) Equal(other User) bool {
+func (u User) Equal(other User) bool {
 	if u.Id != other.Id ||
 		u.Name != other.Name ||
 		u.Email != other.Email ||

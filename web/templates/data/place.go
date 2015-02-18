@@ -2,15 +2,14 @@ package data
 
 import "github.com/rafaeljusto/druns/core/model"
 
-type Group struct {
+type Place struct {
 	Logged
 	Form
-	Group  model.Group
-	Places []model.Place
+	Place model.Place
 }
 
-func NewGroup(username model.Name, menu Menu) Group {
-	return Group{
+func NewPlace(username model.Name, menu Menu) Place {
+	return Place{
 		Logged: NewLogged(username, menu),
 		Form:   NewForm(),
 	}

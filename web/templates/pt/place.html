@@ -1,0 +1,41 @@
+[[template "prefix" .]]
+
+      [[template "menu" .]]
+      
+      <form action="[[url "place"]]" method="post">
+        <input type="hidden" name="id" value="[[.Place.Id]]">
+      
+        [[$msg := index .FieldMessage "name"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="name" class="control-label">Nome</label>
+          <input type="text" class="form-control" id="name" name="name"
+            value="[[.Place.Name]]" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        <!--
+        TODO: Autocomplete for Addresses and Search Terms
+
+          https://developers.google.com/maps/documentation/javascript/places-autocomplete
+          https://developers.google.com/places/documentation/autocomplete
+          https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-addressform
+        -->
+        [[$msg := index .FieldMessage "address"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="address" class="control-label">Endere&ccedil;o</label>
+          <input type="text" class="form-control" id="address" name="address"
+            value="[[.Place.Address]]" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        
+        <button type="submit" class="btn btn-success">Salvar</button>
+      </form>
+      
+      [[if ne .Message ""]]
+      <div class="alert alert-danger" role="alert">[[.Message]]</div>
+      [[end]]
+
+[[template "posfix" .]]

@@ -1,17 +1,17 @@
 package model
 
-type Client struct {
-	Id       int
-	Name     Name
-	Birthday Date
+type Place struct {
+	Id      int
+	Name    Name
+	Address Address
 }
 
-func (c Client) Equal(other Client) bool {
-	return c == other
+func (p Place) Equal(other Place) bool {
+	return p == other
 }
 
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////
 
-type Clients []Client
+type Places []Place

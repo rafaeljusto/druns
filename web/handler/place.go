@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -15,12 +14,12 @@ import (
 )
 
 func init() {
-	Mux.RegisterPage("/group", func() trama.WebHandler {
-		return new(group)
+	Mux.RegisterPage("/place", func() trama.WebHandler {
+		return new(place)
 	})
 }
 
-type group struct {
+type place struct {
 	trama.DefaultWebHandler
 	interceptor.DatabaseCompliant
 	interceptor.RemoteAddressCompliant
@@ -29,21 +28,16 @@ type group struct {
 	interceptor.SessionCompliant
 	interceptor.POSTCompliant
 
-	Group model.Group `request:"post"`
+	Place model.Place `request:"post"`
 }
 
-func (h group) Response() (string, data.Former) {
-	placeDAO := dao.NewPlace(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	places, _ := placeDAO.FindAll()
-
-	data := data.NewGroup(h.Session().User.Name, data.MenuGroups)
-	data.Group = h.Group
-	data.Places = places
-
-	return "group.html", &data
+func (h place) Response() (string, data.Former) {
+	data := data.NewPlace(h.Session().User.Name, data.MenuPlaces)
+	data.Place = h.Place
+	return "place.html", &data
 }
 
-func (h *group) Get(response trama.Response, r *http.Request) {
+func (h *place) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
 		response.ExecuteTemplate(h.Response())
 		return
@@ -56,8 +50,8 @@ func (h *group) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	groupDAO := dao.NewGroup(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	h.Group, err = groupDAO.FindById(id)
+	placeDAO := dao.NewPlace(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
+	h.Place, err = placeDAO.FindById(id)
 
 	if err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
@@ -70,30 +64,23 @@ func (h *group) Get(response trama.Response, r *http.Request) {
 	response.ExecuteTemplate(h.Response())
 }
 
-func (h *group) Post(response trama.Response, r *http.Request) {
-	groupDAO := dao.NewGroup(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	if err := groupDAO.Save(&h.Group); err != nil {
+func (h *place) Post(response trama.Response, r *http.Request) {
+	placeDAO := dao.NewPlace(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
+	if err := placeDAO.Save(&h.Place); err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
 	}
 
-	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("groups"), http.StatusFound)
+	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("places"), http.StatusFound)
 	return
 }
 
-func (h *group) Templates() trama.TemplateGroupSet {
-	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
-		"weq": func(value1 model.Weekday, value2 string) bool {
-			return value1.String() == value2
-		},
-		"geq": func(value1 model.GroupType, value2 string) bool {
-			return value1.String() == value2
-		},
-	})
+func (h *place) Templates() trama.TemplateGroupSet {
+	groupSet := trama.NewTemplateGroupSet(nil)
 
 	for _, language := range config.DrunsConfig.Languages {
-		templates := config.DrunsConfig.HTMLTemplates(language, "group")
+		templates := config.DrunsConfig.HTMLTemplates(language, "place")
 
 		groupSet.Insert(trama.TemplateGroup{
 			Name:  language,
@@ -104,7 +91,7 @@ func (h *group) Templates() trama.TemplateGroupSet {
 	return groupSet
 }
 
-func (h *group) Interceptors() trama.WebInterceptorChain {
+func (h *place) Interceptors() trama.WebInterceptorChain {
 	return trama.NewWebInterceptorChain(
 		interceptor.NewRemoteAddressWeb(h),
 		interceptor.NewAcceptLanguageWeb(h),

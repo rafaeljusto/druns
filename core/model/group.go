@@ -84,6 +84,7 @@ func (g *GroupType) Scan(src interface{}) error {
 type Group struct {
 	Id       int
 	Name     Name
+	Place    Place
 	Weekday  Weekday
 	Time     Time
 	Duration Duration
@@ -91,8 +92,8 @@ type Group struct {
 	Capacity int
 }
 
-func (g *Group) Equal(other Group) bool {
-	return *g == other
+func (g Group) Equal(other Group) bool {
+	return g == other
 }
 
 /////////////////////////////////////////////////////////

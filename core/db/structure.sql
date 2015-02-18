@@ -73,6 +73,25 @@ CREATE TABLE client_log (
 
 /****************************************/
 
+DROP TABLE IF EXISTS place CASCADE;
+CREATE TABLE place (
+	id SERIAL PRIMARY KEY,
+	name VARCHAR,
+	address VARCHAR
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS place_log CASCADE;
+CREATE TABLE place_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	name VARCHAR,
+	address VARCHAR
+);
+
+/****************************************/
+
 DROP TYPE IF EXISTS WEEKDAY CASCADE;
 CREATE TYPE WEEKDAY AS ENUM ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
 
@@ -83,6 +102,7 @@ DROP TABLE IF EXISTS client_group CASCADE;
 CREATE TABLE client_group (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR,
+	place_id INT REFERENCES place(id),
 	weekday WEEKDAY,
 	time TIME,
 	duration INT,
@@ -97,6 +117,7 @@ CREATE TABLE client_group_log (
 	log_id INT REFERENCES log(id),
 	id INT,
 	name VARCHAR,
+	place_id INT,
 	weekday WEEKDAY,
 	time TIME,
 	duration INT,

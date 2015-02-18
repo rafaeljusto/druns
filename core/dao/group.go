@@ -27,6 +27,7 @@ func NewGroup(sqler SQLer, ip net.IP, agent int) Group {
 		tableFields: []string{
 			"id",
 			"name",
+			"place_id",
 			"weekday",
 			"time",
 			"duration",
@@ -73,6 +74,7 @@ func (dao *Group) insert(g *model.Group) error {
 	row := dao.SQLer.QueryRow(
 		query,
 		g.Name,
+		g.Place.Id,
 		g.Weekday,
 		g.Time,
 		g.Duration,
@@ -104,6 +106,7 @@ func (dao *Group) update(g *model.Group) error {
 	_, err := dao.SQLer.Exec(
 		query,
 		g.Name,
+		g.Place.Id,
 		g.Weekday,
 		g.Time,
 		g.Duration,
@@ -128,7 +131,7 @@ func (dao *Group) FindById(id int) (model.Group, error) {
 
 	row := dao.SQLer.QueryRow(query, id)
 
-	g, err := dao.load(row)
+	g, err := dao.load(row, true)
 	if err != nil {
 		return g, err
 	}
@@ -151,7 +154,7 @@ func (dao *Group) FindAll() (model.Groups, error) {
 	var groups model.Groups
 
 	for rows.Next() {
-		g, err := dao.load(rows)
+		g, err := dao.load(rows, false)
 		if err != nil {
 			// TODO: Check ErrNotFound and ignore it
 			return nil, err
@@ -160,15 +163,26 @@ func (dao *Group) FindAll() (model.Groups, error) {
 		groups = append(groups, g)
 	}
 
+	// We cannot load a composite object while we are iterating over the main
+	// result, that's why we only load it after we finish the iteration
+	placeDAO := NewPlace(dao.SQLer, dao.IP, dao.Agent)
+	for i, g := range groups {
+		if g.Place, err = placeDAO.FindById(g.Place.Id); err != nil {
+			return nil, err
+		}
+		groups[i] = g
+	}
+
 	return groups, nil
 }
 
-func (dao *Group) load(row row) (model.Group, error) {
+func (dao *Group) load(row row, eager bool) (model.Group, error) {
 	var g model.Group
 
 	err := row.Scan(
 		&g.Id,
 		&g.Name,
+		&g.Place.Id,
 		&g.Weekday,
 		&g.Time,
 		&g.Duration,
@@ -181,6 +195,13 @@ func (dao *Group) load(row row) (model.Group, error) {
 
 	} else if err != nil {
 		return g, core.NewError(err)
+	}
+
+	if eager {
+		placeDAO := NewPlace(dao.SQLer, dao.IP, dao.Agent)
+		if g.Place, err = placeDAO.FindById(g.Place.Id); err != nil {
+			return g, err
+		}
 	}
 
 	return g, nil

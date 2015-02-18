@@ -7,7 +7,7 @@
           <thead>
             <tr>
               <th>Name</th>
-              <th>Location</th>
+              <th>Place</th>
               <th>Weekday</th>
               <th>Time</th>
             </tr>
@@ -16,7 +16,7 @@
         [[range $group := .Groups]]
             <tr>
               <td><a href="[[url "group"]]?id=[[$group.Id]]">[[$group.Name]]</a></td>
-              <td></td>
+              <td>[[$group.Place.Name]]</td>
               <td>[[$group.Weekday]]</td>
               <td>[[$group.Time]]</td>
             </tr>
