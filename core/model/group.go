@@ -61,6 +61,7 @@ func (g GroupType) String() string {
 
 type Group struct {
 	Id       int
+	Name     Name
 	Weekday  Weekday
 	Time     Time
 	Duration Duration

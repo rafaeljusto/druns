@@ -26,6 +26,7 @@ func NewGroup(sqler SQLer, ip net.IP, agent int) Group {
 		tableName: "client_group",
 		tableFields: []string{
 			"id",
+			"name",
 			"weekday",
 			"time",
 			"duration",
@@ -71,6 +72,7 @@ func (dao *Group) insert(g *model.Group) error {
 
 	row := dao.SQLer.QueryRow(
 		query,
+		g.Name.String(),
 		g.Weekday.String(),
 		g.Time.String(),
 		g.Duration.String(),
@@ -95,16 +97,17 @@ func (dao *Group) update(g *model.Group) error {
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET weekday = $1, time = $2, duration = $3, type = $4, capacity = $5 WHERE id = $6",
+		"UPDATE %s SET name = $1, weekday = $2, time = $3, duration = $4, type = $5, capacity = $6 WHERE id = $7",
 		dao.tableName,
 	)
 
 	_, err := dao.SQLer.Exec(
 		query,
+		g.Name.String(),
 		g.Weekday.String(),
-		g.Time,
-		g.Duration,
-		g.Type,
+		g.Time.String(),
+		g.Duration.String(),
+		g.Type.String(),
 		g.Capacity,
 		g.Id,
 	)
@@ -162,11 +165,12 @@ func (dao *Group) FindAll() (model.Groups, error) {
 
 func (dao *Group) load(row row) (model.Group, error) {
 	var g model.Group
-
+	var name string
 	var weekday, duration, groupType []byte
 
 	err := row.Scan(
 		&g.Id,
+		&name,
 		&weekday,
 		&g.Time.Time,
 		&duration,
@@ -180,6 +184,8 @@ func (dao *Group) load(row row) (model.Group, error) {
 	} else if err != nil {
 		return g, core.NewError(err)
 	}
+
+	g.Name.Set(name)
 
 	if err := g.Weekday.UnmarshalText(weekday); err != nil {
 		return g, err

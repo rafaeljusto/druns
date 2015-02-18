@@ -4,7 +4,16 @@
                 
       <form action="[[url "group"]]" method="post">
         <input type="hidden" name="id" value="[[.Group.Id]]">
-              
+        
+        [[$msg := index .FieldMessage "name"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="name" class="control-label">Name</label>
+          <input type="text" class="form-control" id="name" name="name"
+            value="[[.Group.Name]]" required>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
         [[$msg := index .FieldMessage "weekday"]]
         <div class="form-group [[if ne $msg ""]]has-error[[end]]">
           <label for="weekday" class="control-label">Weekday</label>
@@ -54,7 +63,7 @@
         <div class="form-group [[if ne $msg ""]]has-error[[end]]">
           <label for="capacity" class="control-label">Capacity</label>
           <input type="number" class="form-control" id="capacity" name="capacity"
-              value="[[.Group.Duration]]" required>
+              value="[[.Group.Capacity]]" required>
           [[if ne $msg ""]]
           <p class="help-block">[[$msg]]</p>
           [[end]]

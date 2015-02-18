@@ -1,26 +1,40 @@
 [[template "prefix" .]]
 
-			[[template "menu" .]]
+      [[template "menu" .]]
 
-			<div class="table-responsive">
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th>Local</th>
-							<th>Dia da Semana</th>
-							<th>Hor&aacute;rio</th>
-						</tr>
-					</thead>
-					<tbody>
-				[[range $group := .Groups]]
-						
-				[[end]]
-					</tbody>
-				</table>
-			</div>
-			
-			<a class="btn btn-default" aria-label="Left Align" href="[[url "group"]]">
-				<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Novo Grupo
-			</a>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Local</th>
+              <th>Dia da Semana</th>
+              <th>Hor&aacute;rio</th>
+            </tr>
+          </thead>
+          <tbody>
+        [[range $group := .Groups]]
+            <tr>
+              <td><a href="[[url "group"]]?id=[[$group.Id]]">[[$group.Name]]</a></td>
+              <td></td>
+              <td>
+                [[if eq $group.Weekday "Sunday"]]Domingo[[end]]
+                [[if eq $group.Weekday "Monday"]]Segunda-feira[[end]]
+                [[if eq $group.Weekday "Tuesday"]]Ter&ccedil;a-Feira[[end]]
+                [[if eq $group.Weekday "Wednesday"]]Quarta-Feira[[end]]
+                [[if eq $group.Weekday "Thursday"]]Quinta-Feira[[end]]
+                [[if eq $group.Weekday "Friday"]]Sexta-Feira[[end]]
+                [[if eq $group.Weekday "Saturday"]]S&aacute;bado[[end]]
+              </td>
+              <td>[[$group.Time]]</td>
+            </tr>
+        [[end]]
+          </tbody>
+        </table>
+      </div>
+      
+      <a class="btn btn-default" aria-label="Left Align" href="[[url "group"]]">
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Novo Grupo
+      </a>
 
 [[template "posfix" .]]

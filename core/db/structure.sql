@@ -82,6 +82,7 @@ CREATE TYPE CLIENT_GROUP_TYPE AS ENUM ('Weekley', 'Once');
 DROP TABLE IF EXISTS client_group CASCADE;
 CREATE TABLE client_group (
 	id SERIAL PRIMARY KEY,
+	name VARCHAR,
 	weekday WEEKDAY,
 	time TIME,
 	duration INT,
@@ -95,6 +96,7 @@ DROP TABLE IF EXISTS client_group_log CASCADE;
 CREATE TABLE client_group_log (
 	log_id INT REFERENCES log(id),
 	id INT,
+	name VARCHAR,
 	weekday WEEKDAY,
 	time TIME,
 	duration INT,

@@ -25,6 +25,7 @@ func NewGroupLog(sqler SQLer, ip net.IP, agent int) GroupLog {
 		tableName: "client_group_log",
 		tableFields: []string{
 			"id",
+			"name",
 			"weekday",
 			"time",
 			"duration",
@@ -53,6 +54,7 @@ func (dao *GroupLog) save(g *model.Group, operation model.LogOperation) error {
 	_, err := dao.SQLer.Exec(
 		query,
 		g.Id,
+		g.Name.String(),
 		g.Weekday.String(),
 		g.Time.String(),
 		g.Duration.String(),
