@@ -1,13 +1,16 @@
 package data
 
-import "github.com/rafaeljusto/druns/core/model"
+import (
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/place"
+)
 
 type Places struct {
 	Logged
-	Places []model.Place
+	Places []place.Place
 }
 
-func NewPlaces(username model.Name, menu Menu, places []model.Place) Places {
+func NewPlaces(username core.Name, menu Menu, places []place.Place) Places {
 	return Places{
 		Logged: NewLogged(username, menu),
 		Places: places,

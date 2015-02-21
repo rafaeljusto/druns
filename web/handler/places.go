@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core/dao"
+	"github.com/rafaeljusto/druns/core/place"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -26,8 +26,7 @@ type places struct {
 }
 
 func (h *places) Get(response trama.Response, r *http.Request) {
-	placeDAO := dao.NewPlace(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	places, err := placeDAO.FindAll()
+	places, err := place.NewService().FindAll(h.Tx())
 
 	if err != nil {
 		h.Logger().Error(err)

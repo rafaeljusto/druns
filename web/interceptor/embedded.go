@@ -4,11 +4,12 @@ import (
 	"net"
 	"reflect"
 
+	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
-	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/core/protocol"
-	"github.com/rafaeljusto/druns/core/tr"
+	"github.com/rafaeljusto/druns/core/session"
+	"github.com/rafaeljusto/druns/web/tr"
 )
 
 type DatabaseCompliant struct {
@@ -94,7 +95,7 @@ func (h *LanguageCompliant) SetMessages(messages tr.MessageHolder) {
 	h.messages = messages
 }
 
-func (h *LanguageCompliant) Msg(code tr.Code, args ...interface{}) string {
+func (h *LanguageCompliant) Msg(code core.ValidationErrorCode, args ...interface{}) string {
 	return h.messages.Get(code, args...)
 }
 
@@ -144,13 +145,13 @@ func (h *HTTPTransactionCompliant) HTTPId() string {
 ////////////////////////////////////////////////////////////////
 
 type SessionCompliant struct {
-	session model.Session
+	session session.Session
 }
 
-func (h *SessionCompliant) SetSession(session model.Session) {
+func (h *SessionCompliant) SetSession(session session.Session) {
 	h.session = session
 }
 
-func (h *SessionCompliant) Session() model.Session {
+func (h *SessionCompliant) Session() session.Session {
 	return h.session
 }

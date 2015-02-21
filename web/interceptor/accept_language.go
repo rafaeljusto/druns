@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core/tr"
 	"github.com/rafaeljusto/druns/web/config"
+	"github.com/rafaeljusto/druns/web/tr"
 )
 
 type languageMessager interface {

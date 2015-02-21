@@ -16,7 +16,7 @@ var (
 
 var translations map[string]translation
 
-type translation map[Code]string
+type translation map[core.ValidationErrorCode]string
 
 func init() {
 	translations = make(map[string]translation)
@@ -37,7 +37,7 @@ func LoadTranslations(dirname string) error {
 
 		language := file.Name()[:strings.Index(file.Name(), ".")]
 		language = strings.Split(language, "-")[0]
-		translation := make(map[Code]string)
+		translation := make(map[core.ValidationErrorCode]string)
 
 		bytes, err := ioutil.ReadFile(path.Join(dirname, file.Name()))
 		if err != nil {

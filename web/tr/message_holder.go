@@ -3,6 +3,7 @@ package tr
 import (
 	"fmt"
 
+	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/web/config"
 )
@@ -15,7 +16,7 @@ func NewMessageHolder(language string) MessageHolder {
 	return MessageHolder{language}
 }
 
-func (m MessageHolder) Get(c Code, args ...interface{}) string {
+func (m MessageHolder) Get(c core.ValidationErrorCode, args ...interface{}) string {
 	choosenLanguage := m.language
 
 	translation, exists := translations[choosenLanguage]

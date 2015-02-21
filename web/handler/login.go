@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core/dao"
-	"github.com/rafaeljusto/druns/core/tr"
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/user"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/session"
@@ -39,7 +39,7 @@ func (h *login) Get(response trama.Response, r *http.Request) {
 
 	data := data.NewLogin("")
 	if message := r.FormValue("m"); len(message) > 0 {
-		data.Message = h.Msg(tr.Code(message))
+		data.Message = h.Msg(core.ValidationErrorCode(message))
 	}
 
 	response.ExecuteTemplate("login.html", data)
@@ -55,18 +55,18 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 	address, err := mail.ParseAddress(email)
 	if err != nil {
 		data := data.NewLogin(email)
-		data.FieldMessage["email"] = h.Msg(tr.CodeInvalidEmail)
+		data.FieldMessage["email"] = h.Msg(core.ValidationErrorCodeInvalidEmail)
 		response.ExecuteTemplate("login.html", data)
 		return
 	}
 
-	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), 0)
-	if ok, err := userDAO.VerifyPassword(*address, password); !ok || err != nil {
+	ok, err := user.NewService().VerifyPassword(h.Tx(), *address, password)
+	if !ok || err != nil {
 		if err != nil {
 			h.Logger().Error(err)
 		}
 		data := data.NewLogin(email)
-		data.Message = h.Msg(tr.CodeAuthenticationError)
+		data.Message = h.Msg(core.ValidationErrorCodeAuthenticationError)
 		response.ExecuteTemplate("login.html", data)
 		return
 	}

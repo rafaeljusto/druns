@@ -1,13 +1,16 @@
 package data
 
-import "github.com/rafaeljusto/druns/core/model"
+import (
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/client"
+)
 
 type Clients struct {
 	Logged
-	Clients []model.Client
+	Clients []client.Client
 }
 
-func NewClients(username model.Name, menu Menu, clients []model.Client) Clients {
+func NewClients(username core.Name, menu Menu, clients []client.Client) Clients {
 	return Clients{
 		Logged:  NewLogged(username, menu),
 		Clients: clients,

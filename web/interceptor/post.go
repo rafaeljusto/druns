@@ -9,7 +9,6 @@ import (
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/rafaeljusto/schema"
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/log"
-	"github.com/rafaeljusto/druns/core/tr"
 	"github.com/rafaeljusto/druns/web/templates/data"
 )
 
@@ -17,7 +16,7 @@ type poster interface {
 	RequestValue() reflect.Value
 	SetRequestValue(reflect.Value)
 	Response() (string, data.Former)
-	Msg(code tr.Code, args ...interface{}) string
+	Msg(code core.ValidationErrorCode, args ...interface{}) string
 	Logger() *log.Logger
 	HTTPId() string
 }
@@ -61,7 +60,7 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 
 	if conversionErr, ok := err.(schema.ConversionError); ok {
 		template, former := i.handler.Response()
-		code := tr.Code(conversionErr.Err.Error())
+		code := core.ValidationErrorCode(conversionErr.Err.Error())
 		former.AddFieldMessage(conversionErr.Key, i.handler.Msg(code))
 		response.ExecuteTemplate(template, former)
 
@@ -70,7 +69,7 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 		for _, err := range multiErr {
 			println(err.Error())
 			if conversionErr, ok := err.(schema.ConversionError); ok {
-				code := tr.Code(conversionErr.Err.Error())
+				code := core.ValidationErrorCode(conversionErr.Err.Error())
 				former.AddFieldMessage(conversionErr.Key, i.handler.Msg(code))
 			}
 		}

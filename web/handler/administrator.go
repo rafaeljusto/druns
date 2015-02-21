@@ -6,8 +6,7 @@ import (
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
-	"github.com/rafaeljusto/druns/core/dao"
-	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/core/user"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -28,7 +27,7 @@ type administrator struct {
 	interceptor.SessionCompliant
 	interceptor.POSTCompliant
 
-	User model.User `request:"post"`
+	User user.User `request:"post"`
 }
 
 func (h administrator) Response() (string, data.Former) {
@@ -50,12 +49,8 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	h.User, err = userDAO.FindById(id)
-
-	if err != nil {
+	if h.User, err = user.NewService().FindById(h.Tx(), id); err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
-
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
@@ -65,8 +60,8 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *administrator) Post(response trama.Response, r *http.Request) {
-	userDAO := dao.NewUser(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	if err := userDAO.Save(&h.User); err != nil {
+	err := user.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.User)
+	if err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return

@@ -1,14 +1,17 @@
 package data
 
-import "github.com/rafaeljusto/druns/core/model"
+import (
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/place"
+)
 
 type Place struct {
 	Logged
 	Form
-	Place model.Place
+	Place place.Place
 }
 
-func NewPlace(username model.Name, menu Menu) Place {
+func NewPlace(username core.Name, menu Menu) Place {
 	return Place{
 		Logged: NewLogged(username, menu),
 		Form:   NewForm(),

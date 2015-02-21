@@ -1,13 +1,16 @@
 package data
 
-import "github.com/rafaeljusto/druns/core/model"
+import (
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/user"
+)
 
 type Administrators struct {
 	Logged
-	Users []model.User
+	Users []user.User
 }
 
-func NewAdministrators(username model.Name, menu Menu, users []model.User) Administrators {
+func NewAdministrators(username core.Name, menu Menu, users []user.User) Administrators {
 	return Administrators{
 		Logged: NewLogged(username, menu),
 		Users:  users,

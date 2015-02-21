@@ -1,15 +1,19 @@
 package data
 
-import "github.com/rafaeljusto/druns/core/model"
+import (
+	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/group"
+	"github.com/rafaeljusto/druns/core/place"
+)
 
 type Group struct {
 	Logged
 	Form
-	Group  model.Group
-	Places []model.Place
+	Group  group.Group
+	Places []place.Place
 }
 
-func NewGroup(username model.Name, menu Menu) Group {
+func NewGroup(username core.Name, menu Menu) Group {
 	return Group{
 		Logged: NewLogged(username, menu),
 		Form:   NewForm(),

@@ -7,23 +7,21 @@ import (
 	"time"
 
 	"github.com/rafaeljusto/druns/core"
-	"github.com/rafaeljusto/druns/core/dao"
-	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/password"
+	"github.com/rafaeljusto/druns/core/session"
+	"github.com/rafaeljusto/druns/core/user"
 	"github.com/rafaeljusto/druns/web/config"
 )
 
-func NewSession(sqler dao.SQLer, email string, ipAddress net.IP) (*http.Cookie, error) {
-	userDAO := dao.NewUser(sqler, nil, 0)
-	user, err := userDAO.FindByEmail(email)
+func NewSession(sqler db.SQLer, email string, ipAddress net.IP) (*http.Cookie, error) {
+	user, err := user.NewService().FindByEmail(sqler, email)
 	if err != nil {
 		return nil, err
 	}
 
-	session := model.NewSession(user, ipAddress)
-	sessionDAO := dao.NewSession(sqler)
-
-	if err := sessionDAO.Save(&session); err != nil {
+	s, err := session.NewService().Create(sqler, user, ipAddress)
+	if err != nil {
 		return nil, err
 	}
 
@@ -34,51 +32,50 @@ func NewSession(sqler dao.SQLer, email string, ipAddress net.IP) (*http.Cookie, 
 
 	return &http.Cookie{
 		Name:   "session",
-		Value:  session.Fingerprint(secret),
+		Value:  s.Fingerprint(secret),
 		Path:   "/",
 		Secure: true,
 	}, nil
 }
 
-func LoadAndCheckSession(sqler dao.SQLer, cookie *http.Cookie,
-	ipAddress net.IP) (model.Session, error) {
+func LoadAndCheckSession(sqler db.SQLer, cookie *http.Cookie,
+	ipAddress net.IP) (session.Session, error) {
 
-	var session model.Session
+	var s session.Session
 	var err error
 
-	sessionId, err := model.SessionFingerprintId(cookie.Value)
+	sessionId, err := session.SessionFingerprintId(cookie.Value)
 	if err != nil {
-		return session, err
+		return s, err
 	}
 
-	sessionDAO := dao.NewSession(sqler)
-	session, err = sessionDAO.FindById(sessionId)
+	s, err = session.NewService().FindById(sqler, sessionId)
 	if err != nil {
-		return session, err
+		return s, err
 	}
 
-	if !session.IPAddress.Equal(ipAddress) {
-		return session, core.NewError(fmt.Errorf("IP address '%s' does not match with session IP '%s'",
-			ipAddress, session.IPAddress))
+	if !s.IPAddress.Equal(ipAddress) {
+		return s, core.NewError(fmt.Errorf("IP address '%s' does not match with session IP '%s'",
+			ipAddress, s.IPAddress))
 	}
 
 	secret, err := password.Decrypt(config.DrunsConfig.Session.Secret)
 	if err != nil {
-		return session, err
+		return s, err
 	}
 
-	if !session.CheckFingerprint(cookie.Value, secret) {
-		return session, core.NewError(fmt.Errorf("Fingerprint does not match"))
+	if !s.CheckFingerprint(cookie.Value, secret) {
+		return s, core.NewError(fmt.Errorf("Fingerprint does not match"))
 	}
 
-	if time.Now().Sub(session.LastAccessAt) > config.DrunsConfig.Session.Timeout.Duration {
-		return session, core.NewError(fmt.Errorf("Session expired"))
+	if time.Now().Sub(s.LastAccessAt) > config.DrunsConfig.Session.Timeout.Duration {
+		return s, core.NewError(fmt.Errorf("Session expired"))
 	}
 
-	session.LastAccessAt = time.Now()
-	if err := sessionDAO.Save(&session); err != nil {
-		return session, err
+	s.LastAccessAt = time.Now()
+	if err = session.NewService().Save(sqler, &s); err != nil {
+		return s, err
 	}
 
-	return session, nil
+	return s, nil
 }

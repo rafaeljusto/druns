@@ -6,8 +6,7 @@ import (
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
-	"github.com/rafaeljusto/druns/core/dao"
-	"github.com/rafaeljusto/druns/core/model"
+	"github.com/rafaeljusto/druns/core/place"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -15,11 +14,11 @@ import (
 
 func init() {
 	Mux.RegisterPage("/place", func() trama.WebHandler {
-		return new(place)
+		return new(placeHandler)
 	})
 }
 
-type place struct {
+type placeHandler struct {
 	trama.DefaultWebHandler
 	interceptor.DatabaseCompliant
 	interceptor.RemoteAddressCompliant
@@ -28,16 +27,16 @@ type place struct {
 	interceptor.SessionCompliant
 	interceptor.POSTCompliant
 
-	Place model.Place `request:"post"`
+	Place place.Place `request:"post"`
 }
 
-func (h place) Response() (string, data.Former) {
+func (h placeHandler) Response() (string, data.Former) {
 	data := data.NewPlace(h.Session().User.Name, data.MenuPlaces)
 	data.Place = h.Place
 	return "place.html", &data
 }
 
-func (h *place) Get(response trama.Response, r *http.Request) {
+func (h *placeHandler) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
 		response.ExecuteTemplate(h.Response())
 		return
@@ -50,12 +49,8 @@ func (h *place) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	placeDAO := dao.NewPlace(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	h.Place, err = placeDAO.FindById(id)
-
-	if err != nil {
+	if h.Place, err = place.NewService().FindById(h.Tx(), id); err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
-
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
@@ -64,9 +59,9 @@ func (h *place) Get(response trama.Response, r *http.Request) {
 	response.ExecuteTemplate(h.Response())
 }
 
-func (h *place) Post(response trama.Response, r *http.Request) {
-	placeDAO := dao.NewPlace(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	if err := placeDAO.Save(&h.Place); err != nil {
+func (h *placeHandler) Post(response trama.Response, r *http.Request) {
+	err := place.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.Place)
+	if err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
@@ -76,7 +71,7 @@ func (h *place) Post(response trama.Response, r *http.Request) {
 	return
 }
 
-func (h *place) Templates() trama.TemplateGroupSet {
+func (h *placeHandler) Templates() trama.TemplateGroupSet {
 	groupSet := trama.NewTemplateGroupSet(nil)
 
 	for _, language := range config.DrunsConfig.Languages {
@@ -91,7 +86,7 @@ func (h *place) Templates() trama.TemplateGroupSet {
 	return groupSet
 }
 
-func (h *place) Interceptors() trama.WebInterceptorChain {
+func (h *placeHandler) Interceptors() trama.WebInterceptorChain {
 	return trama.NewWebInterceptorChain(
 		interceptor.NewRemoteAddressWeb(h),
 		interceptor.NewAcceptLanguageWeb(h),

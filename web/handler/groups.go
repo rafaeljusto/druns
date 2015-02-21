@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core/dao"
+	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -26,8 +26,7 @@ type groups struct {
 }
 
 func (h *groups) Get(response trama.Response, r *http.Request) {
-	groupDAO := dao.NewGroup(h.Tx(), h.RemoteAddress(), h.Session().User.Id)
-	groups, err := groupDAO.FindAll()
+	groups, err := group.NewService().FindAll(h.Tx())
 
 	if err != nil {
 		h.Logger().Error(err)
