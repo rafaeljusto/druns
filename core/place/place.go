@@ -1,0 +1,21 @@
+package place
+
+import (
+	"github.com/rafaeljusto/druns/core"
+)
+
+type Place struct {
+	Id      int
+	Name    core.Name
+	Address core.Address
+}
+
+func (p Place) Equal(other Place) bool {
+	return p == other
+}
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+type Places []Place

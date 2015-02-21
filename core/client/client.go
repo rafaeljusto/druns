@@ -1,0 +1,21 @@
+package client
+
+import (
+	"github.com/rafaeljusto/druns/core"
+)
+
+type Client struct {
+	Id       int
+	Name     core.Name
+	Birthday core.Date
+}
+
+func (c Client) Equal(other Client) bool {
+	return c == other
+}
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+type Clients []Client
