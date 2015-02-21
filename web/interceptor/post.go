@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/rafaeljusto/schema"
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/tr"
 	"github.com/rafaeljusto/druns/web/templates/data"
-	"github.com/rafaeljusto/schema"
 )
 
 type poster interface {

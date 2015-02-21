@@ -8,9 +8,9 @@ import (
 	"net/mail"
 	"strings"
 
+	"github.com/rafaeljusto/druns/Godeps/_workspace/src/golang.org/x/crypto/bcrypt"
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/model"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {

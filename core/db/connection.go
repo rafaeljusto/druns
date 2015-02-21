@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	_ "github.com/lib/pq"
+	_ "github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/lib/pq"
 	"github.com/rafaeljusto/druns/core"
 )
 

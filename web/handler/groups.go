@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/dao"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"

@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gustavo-hms/trama"
+	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/log"
