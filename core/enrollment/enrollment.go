@@ -1,15 +1,31 @@
 package enrollment
 
-const (
-	TypeReservation Type = iota
-	TypeRegular     Type = iota
-	TypeReplacement Type = iota
+import (
+	"github.com/rafaeljusto/druns/core/client"
+	"github.com/rafaeljusto/druns/core/group"
 )
 
-type Type int
+const (
+	TypeReservation Type = "Reservation"
+	TypeRegular     Type = "Regular"
+	TypeReplacement Type = "Replacement"
+)
+
+type Type string
 
 type Enrollment struct {
+	Id     int
 	Type   Type
-	Client Client
-	Group  Group
+	Client client.Client
+	Group  group.Group
 }
+
+func (e Enrollment) Equal(other Enrollment) bool {
+	return e == other
+}
+
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
+
+type Enrollments []Enrollment

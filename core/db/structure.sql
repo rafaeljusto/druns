@@ -127,6 +127,30 @@ CREATE TABLE client_group_log (
 
 /****************************************/
 
+DROP TYPE IF EXISTS ENROLLMENT_TYPE CASCADE;
+CREATE TYPE ENROLLMENT_TYPE AS ENUM ('Reservation', 'Regular', 'Replacement');
+
+DROP TABLE IF EXISTS enrollment CASCADE;
+CREATE TABLE enrollment (
+	id SERIAL PRIMARY KEY,
+	client_id INT REFERENCES client(id),
+	group_id INT REFERENCES group(id),
+	type ENROLLMENT_TYPE
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS enrollment_log CASCADE;
+CREATE TABLE enrollment_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	client_id INT,
+	group_id INT,
+	type ENROLLMENT_TYPE
+);
+
+/****************************************/
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO druns;
 GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO druns;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO druns;
