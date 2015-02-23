@@ -43,6 +43,8 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 	}
 
 	decoder := schema.NewDecoder()
+	decoder.IgnoreUnknownKeys(true)
+
 	if err := r.ParseForm(); err != nil {
 		i.handler.Logger().Error(core.NewError(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
