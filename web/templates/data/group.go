@@ -2,6 +2,7 @@ package data
 
 import (
 	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/enrollment"
 	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/place"
 )
@@ -9,8 +10,9 @@ import (
 type Group struct {
 	Logged
 	Form
-	Group  group.Group
-	Places []place.Place
+	Group       group.Group
+	Places      []place.Place
+	Enrollments []enrollment.Enrollment
 }
 
 func NewGroup(username core.Name, menu Menu) Group {

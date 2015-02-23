@@ -7,10 +7,10 @@ import (
 	"net/mail"
 	"os"
 
-	"github.com/rafaeljusto/druns/core/dao"
+	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
-	"github.com/rafaeljusto/druns/core/model"
 	"github.com/rafaeljusto/druns/core/password"
+	"github.com/rafaeljusto/druns/core/user"
 	"github.com/rafaeljusto/druns/web/config"
 )
 
@@ -47,14 +47,14 @@ func main() {
 	}
 	defer db.DB.Close()
 
-	e, err := model.NewEmail(email)
+	e, err := core.NewEmail(email)
 	if err != nil {
 		fmt.Printf("Invalid e-mail. Details: %s\n", err)
 		os.Exit(4)
 	}
 
-	user := model.User{
-		Name:     model.NewName(name),
+	u := user.User{
+		Name:     core.NewName(name),
 		Email:    e,
 		Password: pwd,
 	}
@@ -85,8 +85,7 @@ func main() {
 		os.Exit(8)
 	}
 
-	userDAO := dao.NewUser(tx, addr, id)
-	if users, err := userDAO.FindAll(); err != nil {
+	if users, err := user.NewService().FindAll(tx); err != nil {
 		fmt.Printf("Error retrieving users. Details: %s\n", err)
 		os.Exit(9)
 
@@ -95,7 +94,7 @@ func main() {
 		return
 	}
 
-	if err := userDAO.Save(&user); err != nil {
+	if err := user.NewService().Save(tx, addr, id, &u); err != nil {
 		fmt.Printf("Error saving the user. Details: %s\n", err)
 		os.Exit(10)
 	}

@@ -83,7 +83,37 @@
 
         <button type="submit" class="btn btn-success">Save</button>
       </form>
-              
+
+      [[if gt .Group.Id 0]]
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <caption>Enrollments</caption>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            [[range $enrollment := .Enrollments]]
+            <tr>
+              <td>
+                <a href="[[url "enrollment"]]?id=[[$enrollment.Id]]&back=[[url "group"]]%3Fid=[[.Group.Id]]">
+                  [[$enrollment.Client.Name]]
+                </a>
+              </td>
+              <td>[[$enrollment.Type]]</td>
+            </tr>
+            [[end]]
+          </tbody>
+        </table>
+      </div>
+      
+      <a class="btn btn-default" aria-label="Left Align" href="[[url "enrollment"]]?back=[[url "group"]]%3Fid=[[.Group.Id]]">
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> New Enrollment
+      </a>
+      [[end]]
+
       [[if ne .Message ""]]
       <div class="alert alert-danger" role="alert">[[.Message]]</div>
       [[end]]

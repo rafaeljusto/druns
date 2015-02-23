@@ -1,0 +1,53 @@
+[[template "prefix" .]]
+
+      [[template "menu" .]]
+      
+      <form action="[[url "enrollment"]]" method="post">
+        <input type="hidden" name="id" value="[[.Enrollment.Id]]">
+        <input type="hidden" name="back" value="[[.Back]]">
+      
+        [[$msg := index .FieldMessage "client"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="client" class="control-label">Cliente</label>
+          <select name="client.id" id="client" class="form-control">
+            [[range $client := .Clients]]
+            <option value="[[$client.Id]]" [[if eq $.Enrollment.Client.Id $client.Id]]selected[[end]]>[[$client.Name]]</option>
+            [[end]]
+          </select>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        [[$msg := index .FieldMessage "group"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="group" class="control-label">Grupo</label>
+          <select name="group.id" id="group" class="form-control">
+            [[range $group := .Groups]]
+            <option value="[[$group.Id]]" [[if eq $.Enrollment.Group.Id $group.Id]]selected[[end]]>[[$group.Name]]</option>
+            [[end]]
+          </select>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+        [[$msg := index .FieldMessage "type"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="type" class="control-label">Tipo</label>
+          <select name="type" id="type" class="form-control">
+            <option value="Reservation" [[if teq .Enrollment.Type "Reservation"]]selected[[end]]>Reserva</option>
+            <option value="Regular" [[if teq .Enrollment.Type "Regular"]]selected[[end]]>Normal</option>
+            <option value="Replacement" [[if teq .Enrollment.Type "Replacement"]]selected[[end]]>Reposi&ccedil;&atilde;o</option>
+          </select>
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
+                
+        <button type="submit" class="btn btn-success">Salvar</button>
+      </form>
+      
+      [[if ne .Message ""]]
+      <div class="alert alert-danger" role="alert">[[.Message]]</div>
+      [[end]]
+
+[[template "posfix" .]]

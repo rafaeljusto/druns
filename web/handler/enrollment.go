@@ -1,24 +1,28 @@
 package handler
 
 import (
+	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
-	"github.com/rafaeljusto/druns/core/place"
+	"github.com/rafaeljusto/druns/core/client"
+	"github.com/rafaeljusto/druns/core/enrollment"
+	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
 )
 
 func init() {
-	Mux.RegisterPage("/place", func() trama.WebHandler {
-		return new(placeHandler)
+	Mux.RegisterPage("/enrollment", func() trama.WebHandler {
+		return new(enrollmentHandler)
 	})
 }
 
-type placeHandler struct {
+type enrollmentHandler struct {
 	trama.DefaultWebHandler
 	interceptor.DatabaseCompliant
 	interceptor.RemoteAddressCompliant
@@ -27,16 +31,19 @@ type placeHandler struct {
 	interceptor.SessionCompliant
 	interceptor.POSTCompliant
 
-	Place place.Place `request:"post"`
+	Enrollment enrollment.Enrollment `request:"post"`
 }
 
-func (h placeHandler) Response(r *http.Request) (string, data.Former) {
-	data := data.NewPlace(h.Session().User.Name, data.MenuPlaces)
-	data.Place = h.Place
-	return "place.html", &data
+func (h enrollmentHandler) Response(r *http.Request) (string, data.Former) {
+	data := data.NewEnrollment(h.Session().User.Name, data.MenuGroups)
+	data.Enrollment = h.Enrollment
+	data.Clients, _ = client.NewService().FindAll(h.Tx())
+	data.Groups, _ = group.NewService().FindAll(h.Tx())
+	data.Back = r.FormValue("back")
+	return "enrollment.html", &data
 }
 
-func (h *placeHandler) Get(response trama.Response, r *http.Request) {
+func (h *enrollmentHandler) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
 		response.ExecuteTemplate(h.Response(r))
 		return
@@ -49,7 +56,7 @@ func (h *placeHandler) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	if h.Place, err = place.NewService().FindById(h.Tx(), id); err != nil {
+	if h.Enrollment, err = enrollment.NewService().FindById(h.Tx(), id); err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
@@ -59,23 +66,32 @@ func (h *placeHandler) Get(response trama.Response, r *http.Request) {
 	response.ExecuteTemplate(h.Response(r))
 }
 
-func (h *placeHandler) Post(response trama.Response, r *http.Request) {
-	err := place.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.Place)
+func (h *enrollmentHandler) Post(response trama.Response, r *http.Request) {
+	err := enrollment.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.Enrollment)
 	if err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
 	}
 
-	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("places"), http.StatusFound)
+	back := r.FormValue("back")
+	if len(back) == 0 {
+		back = fmt.Sprintf("%s?id=%d", config.DrunsConfig.URLs.GetHTTPS("group"), h.Enrollment.Group.Id)
+	}
+
+	response.Redirect(back, http.StatusFound)
 	return
 }
 
-func (h *placeHandler) Templates() trama.TemplateGroupSet {
-	groupSet := trama.NewTemplateGroupSet(nil)
+func (h *enrollmentHandler) Templates() trama.TemplateGroupSet {
+	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
+		"teq": func(value1 enrollment.Type, value2 string) bool {
+			return value1.String() == value2
+		},
+	})
 
 	for _, language := range config.DrunsConfig.Languages {
-		templates := config.DrunsConfig.HTMLTemplates(language, "place")
+		templates := config.DrunsConfig.HTMLTemplates(language, "enrollment")
 
 		groupSet.Insert(trama.TemplateGroup{
 			Name:  language,
@@ -86,7 +102,7 @@ func (h *placeHandler) Templates() trama.TemplateGroupSet {
 	return groupSet
 }
 
-func (h *placeHandler) Interceptors() trama.WebInterceptorChain {
+func (h *enrollmentHandler) Interceptors() trama.WebInterceptorChain {
 	return trama.NewWebInterceptorChain(
 		interceptor.NewRemoteAddressWeb(h),
 		interceptor.NewAcceptLanguageWeb(h),

@@ -15,7 +15,7 @@ import (
 type poster interface {
 	RequestValue() reflect.Value
 	SetRequestValue(reflect.Value)
-	Response() (string, data.Former)
+	Response(r *http.Request) (string, data.Former)
 	Msg(code core.ValidationErrorCode, args ...interface{}) string
 	Logger() *log.Logger
 	HTTPId() string
@@ -59,21 +59,30 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 	}
 
 	if conversionErr, ok := err.(schema.ConversionError); ok {
-		template, former := i.handler.Response()
+		template, former := i.handler.Response(r)
 		code := core.ValidationErrorCode(conversionErr.Err.Error())
 		former.AddFieldMessage(conversionErr.Key, i.handler.Msg(code))
 		response.ExecuteTemplate(template, former)
 
 	} else if multiErr, ok := err.(schema.MultiError); ok {
-		template, former := i.handler.Response()
+		template, former := i.handler.Response(r)
+		internalError := false
+
 		for _, err := range multiErr {
-			println(err.Error())
 			if conversionErr, ok := err.(schema.ConversionError); ok {
 				code := core.ValidationErrorCode(conversionErr.Err.Error())
 				former.AddFieldMessage(conversionErr.Key, i.handler.Msg(code))
+			} else {
+				internalError = true
+				i.handler.Logger().Error(core.NewError(err))
 			}
 		}
-		response.ExecuteTemplate(template, former)
+
+		if internalError {
+			response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
+		} else {
+			response.ExecuteTemplate(template, former)
+		}
 
 	} else {
 		i.handler.Logger().Error(core.NewError(err))

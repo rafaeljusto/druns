@@ -30,7 +30,7 @@ type administrator struct {
 	User user.User `request:"post"`
 }
 
-func (h administrator) Response() (string, data.Former) {
+func (h administrator) Response(r *http.Request) (string, data.Former) {
 	data := data.NewAdministrator(h.Session().User.Name, data.MenuAdministrators)
 	data.User = h.User
 	return "administrator.html", &data
@@ -38,7 +38,7 @@ func (h administrator) Response() (string, data.Former) {
 
 func (h *administrator) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
-		response.ExecuteTemplate(h.Response())
+		response.ExecuteTemplate(h.Response(r))
 		return
 	}
 
@@ -56,7 +56,7 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	response.ExecuteTemplate(h.Response())
+	response.ExecuteTemplate(h.Response(r))
 }
 
 func (h *administrator) Post(response trama.Response, r *http.Request) {

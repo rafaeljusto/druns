@@ -134,7 +134,7 @@ DROP TABLE IF EXISTS enrollment CASCADE;
 CREATE TABLE enrollment (
 	id SERIAL PRIMARY KEY,
 	client_id INT REFERENCES client(id),
-	group_id INT REFERENCES group(id),
+	client_group_id INT REFERENCES client_group(id),
 	type ENROLLMENT_TYPE
 );
 
@@ -145,7 +145,7 @@ CREATE TABLE enrollment_log (
 	log_id INT REFERENCES log(id),
 	id INT,
 	client_id INT,
-	group_id INT,
+	client_group_id INT,
 	type ENROLLMENT_TYPE
 );
 

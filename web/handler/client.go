@@ -30,7 +30,7 @@ type clientHandler struct {
 	Client client.Client `request:"post"`
 }
 
-func (h clientHandler) Response() (string, data.Former) {
+func (h clientHandler) Response(r *http.Request) (string, data.Former) {
 	data := data.NewClient(h.Session().User.Name, data.MenuClients)
 	data.Client = h.Client
 	return "client.html", &data
@@ -38,7 +38,7 @@ func (h clientHandler) Response() (string, data.Former) {
 
 func (h *clientHandler) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
-		response.ExecuteTemplate(h.Response())
+		response.ExecuteTemplate(h.Response(r))
 		return
 	}
 
@@ -56,7 +56,7 @@ func (h *clientHandler) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	response.ExecuteTemplate(h.Response())
+	response.ExecuteTemplate(h.Response(r))
 }
 
 func (h *clientHandler) Post(response trama.Response, r *http.Request) {

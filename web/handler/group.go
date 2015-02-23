@@ -7,6 +7,7 @@ import (
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/enrollment"
 	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/place"
 	"github.com/rafaeljusto/druns/web/config"
@@ -32,17 +33,25 @@ type groupHandler struct {
 	Group group.Group `request:"post"`
 }
 
-func (h groupHandler) Response() (string, data.Former) {
+func (h groupHandler) Response(r *http.Request) (string, data.Former) {
 	data := data.NewGroup(h.Session().User.Name, data.MenuGroups)
 	data.Group = h.Group
 	data.Places, _ = place.NewService().FindAll(h.Tx())
+
+	if h.Group.Id > 0 {
+		var err error
+		data.Enrollments, err = enrollment.NewService().FindByGroup(h.Tx(), h.Group.Id)
+		if err != nil {
+			h.Logger().Error(core.NewError(err))
+		}
+	}
 
 	return "group.html", &data
 }
 
 func (h *groupHandler) Get(response trama.Response, r *http.Request) {
 	if len(r.FormValue("id")) == 0 {
-		response.ExecuteTemplate(h.Response())
+		response.ExecuteTemplate(h.Response(r))
 		return
 	}
 
@@ -60,7 +69,7 @@ func (h *groupHandler) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	response.ExecuteTemplate(h.Response())
+	response.ExecuteTemplate(h.Response(r))
 }
 
 func (h *groupHandler) Post(response trama.Response, r *http.Request) {

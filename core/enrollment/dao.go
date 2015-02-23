@@ -30,7 +30,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 		tableFields: []string{
 			"id",
 			"client_id",
-			"group_id",
+			"client_group_id",
 			"type",
 		},
 	}
@@ -130,14 +130,14 @@ func (dao *dao) FindById(id int) (Enrollment, error) {
 	return e, nil
 }
 
-func (dao *dao) FindAll() (Enrollments, error) {
+func (dao *dao) FindByGroup(groupId int) (Enrollments, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s",
+		"SELECT %s FROM %s WHERE client_group_id = $1",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
 
-	rows, err := dao.SQLer.Query(query)
+	rows, err := dao.SQLer.Query(query, groupId)
 	if err != nil {
 		return nil, core.NewError(err)
 	}

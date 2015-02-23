@@ -3,6 +3,7 @@
 	"invalid-date": "Invalid date format",
 	"invalid-duration": "Invalid duration",
 	"invalid-email": "Invalid e-mail format",
+	"invalid-enrollment-type": "Invalid enrollment type",
 	"invalid-group-type": "Invalid group type",
 	"invalid-time": "Invalid time format",
 	"invalid-weekday": "Invalid weekday",
