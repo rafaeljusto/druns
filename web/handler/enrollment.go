@@ -35,12 +35,23 @@ type enrollmentHandler struct {
 }
 
 func (h enrollmentHandler) Response(r *http.Request) (string, data.Former) {
-	data := data.NewEnrollment(h.Session().User.Name, data.MenuGroups)
-	data.Enrollment = h.Enrollment
-	data.Clients, _ = client.NewService().FindAll(h.Tx())
-	data.Groups, _ = group.NewService().FindAll(h.Tx())
-	data.Back = r.FormValue("back")
-	return "enrollment.html", &data
+	d := data.NewEnrollment(h.Session().User.Name, data.MenuGroups)
+	d.Enrollment = h.Enrollment
+
+	var err error
+
+	d.Clients, err = client.NewService().FindAll(h.Tx())
+	if err != nil {
+		h.Logger().Error(core.NewError(err))
+	}
+
+	d.Groups, err = group.NewService().FindAll(h.Tx())
+	if err != nil {
+		h.Logger().Error(core.NewError(err))
+	}
+
+	d.Back = r.FormValue("back")
+	return "enrollment.html", &d
 }
 
 func (h *enrollmentHandler) Get(response trama.Response, r *http.Request) {
