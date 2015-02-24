@@ -11,6 +11,12 @@ type Time struct {
 	time.Time
 }
 
+func NewTime(value time.Time) Time {
+	return Time{
+		Time: value,
+	}
+}
+
 func (t *Time) Set(value string) (err error) {
 	value = strings.TrimSpace(value)
 

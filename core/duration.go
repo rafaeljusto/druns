@@ -12,6 +12,12 @@ type Duration struct {
 	time.Duration
 }
 
+func NewDuration(value time.Duration) Duration {
+	return Duration{
+		Duration: value,
+	}
+}
+
 func (d *Duration) Set(value string) (err error) {
 	value = strings.TrimSpace(value)
 

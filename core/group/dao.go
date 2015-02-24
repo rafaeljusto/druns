@@ -143,7 +143,7 @@ func (dao *dao) FindById(id int) (Group, error) {
 
 func (dao *dao) FindAll() (Groups, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s",
+		"SELECT %s FROM %s ORDER BY name",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)

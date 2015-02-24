@@ -127,7 +127,7 @@ func (dao *dao) FindById(id int) (Client, error) {
 
 func (dao *dao) FindAll() (Clients, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s",
+		"SELECT %s FROM %s ORDER BY name",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)

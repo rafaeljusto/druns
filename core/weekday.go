@@ -11,6 +11,12 @@ type Weekday struct {
 	time.Weekday
 }
 
+func NewWeekday(value time.Weekday) Weekday {
+	return Weekday{
+		Weekday: value,
+	}
+}
+
 func (w *Weekday) Set(value string) (err error) {
 	value = strings.TrimSpace(value)
 	switch value {
