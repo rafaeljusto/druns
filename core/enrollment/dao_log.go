@@ -27,7 +27,7 @@ func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 		tableFields: []string{
 			"id",
 			"client_id",
-			"group_id",
+			"client_group_id",
 			"type",
 			"log_id",
 		},

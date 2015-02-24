@@ -94,7 +94,7 @@ func (dao *dao) update(e *Enrollment) error {
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET client_id = $1, group_id = $2, type = $3 WHERE id = $4",
+		"UPDATE %s SET client_id = $1, client_group_id = $2, type = $3 WHERE id = $4",
 		dao.tableName,
 	)
 
@@ -130,6 +130,53 @@ func (dao *dao) FindById(id int) (Enrollment, error) {
 	return e, nil
 }
 
+func (dao *dao) FindByClient(clientId int) (Enrollments, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s WHERE client_id = $1",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	rows, err := dao.SQLer.Query(query, clientId)
+	if err != nil {
+		return nil, core.NewError(err)
+	}
+
+	var enrollments Enrollments
+
+	for rows.Next() {
+		e, err := dao.load(rows, false)
+		if err != nil {
+			// TODO: Check ErrNotFound and ignore it
+			return nil, err
+		}
+
+		enrollments = append(enrollments, e)
+	}
+
+	// We cannot load a composite object while we are iterating over the main
+	// result, that's why we only load it after we finish the iteration
+
+	clientService := client.NewService()
+	groupService := group.NewService()
+
+	for i, e := range enrollments {
+		e.Client, err = clientService.FindById(dao.SQLer, e.Client.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		e.Group, err = groupService.FindById(dao.SQLer, e.Group.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		enrollments[i] = e
+	}
+
+	return enrollments, nil
+}
+
 func (dao *dao) FindByGroup(groupId int) (Enrollments, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE client_group_id = $1",
@@ -145,13 +192,13 @@ func (dao *dao) FindByGroup(groupId int) (Enrollments, error) {
 	var enrollments Enrollments
 
 	for rows.Next() {
-		c, err := dao.load(rows, false)
+		e, err := dao.load(rows, false)
 		if err != nil {
 			// TODO: Check ErrNotFound and ignore it
 			return nil, err
 		}
 
-		enrollments = append(enrollments, c)
+		enrollments = append(enrollments, e)
 	}
 
 	// We cannot load a composite object while we are iterating over the main

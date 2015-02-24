@@ -138,6 +138,10 @@ CREATE TABLE enrollment (
 	type ENROLLMENT_TYPE
 );
 
+CREATE UNIQUE INDEX ON enrollment(client_id, client_group_id);
+CREATE INDEX ON enrollment(client_id);
+CREATE INDEX ON enrollment(client_group_id);
+
 /****************************************/
 
 DROP TABLE IF EXISTS enrollment_log CASCADE;

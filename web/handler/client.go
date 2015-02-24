@@ -7,6 +7,7 @@ import (
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/client"
+	"github.com/rafaeljusto/druns/core/enrollment"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -33,6 +34,15 @@ type clientHandler struct {
 func (h clientHandler) Response(r *http.Request) (string, data.Former) {
 	data := data.NewClient(h.Session().User.Name, data.MenuClients)
 	data.Client = h.Client
+
+	if h.Client.Id > 0 {
+		var err error
+		data.Enrollments, err = enrollment.NewService().FindByClient(h.Tx(), h.Client.Id)
+		if err != nil {
+			h.Logger().Error(core.NewError(err))
+		}
+	}
+
 	return "client.html", &data
 }
 

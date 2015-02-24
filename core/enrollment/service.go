@@ -23,6 +23,11 @@ func (s Service) FindById(sqler db.SQLer, id int) (Enrollment, error) {
 	return dao.FindById(id)
 }
 
+func (s Service) FindByClient(sqler db.SQLer, clientId int) (Enrollments, error) {
+	dao := newDAO(sqler, nil, 0)
+	return dao.FindByClient(clientId)
+}
+
 func (s Service) FindByGroup(sqler db.SQLer, groupId int) (Enrollments, error) {
 	dao := newDAO(sqler, nil, 0)
 	return dao.FindByGroup(groupId)

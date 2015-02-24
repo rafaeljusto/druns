@@ -36,10 +36,14 @@ type groupHandler struct {
 func (h groupHandler) Response(r *http.Request) (string, data.Former) {
 	data := data.NewGroup(h.Session().User.Name, data.MenuGroups)
 	data.Group = h.Group
-	data.Places, _ = place.NewService().FindAll(h.Tx())
+
+	var err error
+	data.Places, err = place.NewService().FindAll(h.Tx())
+	if err != nil {
+		h.Logger().Error(core.NewError(err))
+	}
 
 	if h.Group.Id > 0 {
-		var err error
 		data.Enrollments, err = enrollment.NewService().FindByGroup(h.Tx(), h.Group.Id)
 		if err != nil {
 			h.Logger().Error(core.NewError(err))
@@ -80,6 +84,9 @@ func (h *groupHandler) Post(response trama.Response, r *http.Request) {
 		return
 	}
 
+	// TODO: Maybe we should keep the user on this page to allow him to add
+	// enrollments. If so, we need to add a success message to make it clear
+	// that the object was created or updated
 	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("groups"), http.StatusFound)
 	return
 }
