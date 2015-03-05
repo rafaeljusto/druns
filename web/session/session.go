@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/core/session"
 	"github.com/rafaeljusto/druns/core/user"
@@ -55,7 +55,7 @@ func LoadAndCheckSession(sqler db.SQLer, cookie *http.Cookie,
 	}
 
 	if !s.IPAddress.Equal(ipAddress) {
-		return s, core.NewError(fmt.Errorf("IP address '%s' does not match with session IP '%s'",
+		return s, errors.New(fmt.Errorf("IP address '%s' does not match with session IP '%s'",
 			ipAddress, s.IPAddress))
 	}
 
@@ -65,11 +65,11 @@ func LoadAndCheckSession(sqler db.SQLer, cookie *http.Cookie,
 	}
 
 	if !s.CheckFingerprint(cookie.Value, secret) {
-		return s, core.NewError(fmt.Errorf("Fingerprint does not match"))
+		return s, errors.New(fmt.Errorf("Fingerprint does not match"))
 	}
 
 	if time.Now().Sub(s.LastAccessAt) > config.DrunsConfig.Session.Timeout.Duration {
-		return s, core.NewError(fmt.Errorf("Session expired"))
+		return s, errors.New(fmt.Errorf("Session expired"))
 	}
 
 	s.LastAccessAt = time.Now()

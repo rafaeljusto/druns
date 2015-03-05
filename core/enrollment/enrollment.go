@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/client"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/group"
 )
 
@@ -31,7 +31,7 @@ func (t *Type) Set(value string) (err error) {
 	case TypeReplacement:
 		t.value = TypeReplacement
 	default:
-		err = core.NewValidationError(core.ValidationErrorCodeInvalidEnrollmentType, err)
+		err = errors.NewValidation(errors.ValidationCodeInvalidEnrollmentType, err)
 	}
 	return
 }
@@ -64,12 +64,12 @@ func (t Type) Value() (driver.Value, error) {
 func (t *Type) Scan(src interface{}) error {
 	if src == nil {
 		t.value = ""
-		return core.NewError(fmt.Errorf("Unsupported type to convert into a Type"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Type"))
 	}
 
 	switch value := src.(type) {
 	case int64, float64, bool, time.Time:
-		return core.NewError(fmt.Errorf("Unsupported type to convert into a Type"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Type"))
 
 	case []byte:
 		return t.Set(string(value))

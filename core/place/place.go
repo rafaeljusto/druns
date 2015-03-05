@@ -1,13 +1,13 @@
 package place
 
 import (
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/types"
 )
 
 type Place struct {
 	Id      int
-	Name    core.Name
-	Address core.Address
+	Name    types.Name
+	Address types.Address
 }
 
 func (p Place) Equal(other Place) bool {

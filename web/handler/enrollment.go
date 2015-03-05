@@ -7,9 +7,9 @@ import (
 	"strconv"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/client"
 	"github.com/rafaeljusto/druns/core/enrollment"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
@@ -42,12 +42,12 @@ func (h enrollmentHandler) Response(r *http.Request) (string, data.Former) {
 
 	d.Clients, err = client.NewService().FindAll(h.Tx())
 	if err != nil {
-		h.Logger().Error(core.NewError(err))
+		h.Logger().Error(errors.New(err))
 	}
 
 	d.Groups, err = group.NewService().FindAll(h.Tx())
 	if err != nil {
-		h.Logger().Error(core.NewError(err))
+		h.Logger().Error(errors.New(err))
 	}
 
 	d.Back = r.FormValue("back")
@@ -62,7 +62,7 @@ func (h *enrollmentHandler) Get(response trama.Response, r *http.Request) {
 
 	id, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
-		h.Logger().Error(core.NewError(err))
+		h.Logger().Error(errors.New(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
 	}

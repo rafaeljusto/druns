@@ -1,8 +1,8 @@
 package data
 
 import (
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/client"
+	"github.com/rafaeljusto/druns/core/types"
 )
 
 type Clients struct {
@@ -10,7 +10,7 @@ type Clients struct {
 	Clients []client.Client
 }
 
-func NewClients(username core.Name, menu Menu, clients []client.Client) Clients {
+func NewClients(username types.Name, menu Menu, clients []client.Client) Clients {
 	return Clients{
 		Logged:  NewLogged(username, menu),
 		Clients: clients,

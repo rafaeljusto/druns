@@ -6,20 +6,20 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
-	"errors"
+	"fmt"
 
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 func Encrypt(password string) (string, error) {
 	block, err := aes.NewCipher(getKey())
 	if err != nil {
-		return "", core.NewError(err)
+		return "", errors.New(err)
 	}
 
 	iv := make([]byte, block.BlockSize())
 	if _, err = rand.Read(iv); err != nil {
-		return "", core.NewError(err)
+		return "", errors.New(err)
 	}
 
 	ofbStream := cipher.NewOFB(block, iv)
@@ -34,16 +34,16 @@ func Encrypt(password string) (string, error) {
 func Decrypt(password string) (string, error) {
 	encryptedPassword, err := base64.StdEncoding.DecodeString(password)
 	if err != nil {
-		return "", core.NewError(err)
+		return "", errors.New(err)
 	}
 
 	block, err := aes.NewCipher(getKey())
 	if err != nil {
-		return "", core.NewError(err)
+		return "", errors.New(err)
 	}
 
 	if len(encryptedPassword) < block.BlockSize() {
-		return "", core.NewError(errors.New("password is to small to be decrypted"))
+		return "", errors.New(fmt.Errorf("password is to small to be decrypted"))
 	}
 
 	iv := encryptedPassword[:block.BlockSize()]

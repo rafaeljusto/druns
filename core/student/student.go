@@ -1,6 +1,10 @@
 package model
 
+import (
+	"github.com/rafaeljusto/druns/core/class"
+)
+
 type Student struct {
-	Class    Class
+	Class    class.Class
 	Attended bool
 }

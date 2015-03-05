@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/user"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
@@ -39,7 +39,7 @@ func (h *login) Get(response trama.Response, r *http.Request) {
 
 	data := data.NewLogin("")
 	if message := r.FormValue("m"); len(message) > 0 {
-		data.Message = h.Msg(core.ValidationErrorCode(message))
+		data.Message = h.Msg(errors.ValidationCode(message))
 	}
 
 	response.ExecuteTemplate("login.html", data)
@@ -55,7 +55,7 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 	address, err := mail.ParseAddress(email)
 	if err != nil {
 		data := data.NewLogin(email)
-		data.FieldMessage["email"] = h.Msg(core.ValidationErrorCodeInvalidEmail)
+		data.FieldMessage["email"] = h.Msg(errors.ValidationCodeInvalidEmail)
 		response.ExecuteTemplate("login.html", data)
 		return
 	}
@@ -66,7 +66,7 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 			h.Logger().Error(err)
 		}
 		data := data.NewLogin(email)
-		data.Message = h.Msg(core.ValidationErrorCodeAuthenticationError)
+		data.Message = h.Msg(errors.ValidationCodeAuthenticationError)
 		response.ExecuteTemplate("login.html", data)
 		return
 	}

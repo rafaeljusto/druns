@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/user"
 )
 
@@ -47,7 +47,7 @@ func (s *Session) Fingerprint(secret string) string {
 
 func SessionFingerprintId(fingerprint string) (int, error) {
 	if !SessionFingerprint.MatchString(fingerprint) {
-		return 0, core.NewError(fmt.Errorf("Session fingerprint '%s' has an invalid format",
+		return 0, errors.New(fmt.Errorf("Session fingerprint '%s' has an invalid format",
 			fingerprint))
 	}
 
@@ -55,7 +55,7 @@ func SessionFingerprintId(fingerprint string) (int, error) {
 	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
-		return id, core.NewError(err)
+		return id, errors.New(err)
 	}
 
 	return id, nil

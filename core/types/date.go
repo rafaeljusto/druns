@@ -1,10 +1,12 @@
-package core
+package types
 
 import (
 	"database/sql/driver"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type Date struct {
@@ -21,7 +23,7 @@ func (d *Date) Set(value string) (err error) {
 	value = strings.TrimSpace(value)
 
 	if d.Time, err = time.Parse(`2006-01-02`, value); err != nil {
-		err = NewValidationError(ValidationErrorCodeInvalidDate, err)
+		err = errors.NewValidation(errors.ValidationCodeInvalidDate, err)
 	}
 
 	return
@@ -76,7 +78,7 @@ func (d *Date) Scan(src interface{}) (err error) {
 
 	switch t := src.(type) {
 	case int64, float64, bool:
-		return NewError(fmt.Errorf("Unsupported type to convert into a Date"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Date"))
 
 	case time.Time:
 		d.Time = t

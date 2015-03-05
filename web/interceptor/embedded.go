@@ -4,8 +4,8 @@ import (
 	"net"
 	"reflect"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/protocol"
 	"github.com/rafaeljusto/druns/core/session"
@@ -95,7 +95,7 @@ func (h *LanguageCompliant) SetMessages(messages tr.MessageHolder) {
 	h.messages = messages
 }
 
-func (h *LanguageCompliant) Msg(code core.ValidationErrorCode, args ...interface{}) string {
+func (h *LanguageCompliant) Msg(code errors.ValidationCode, args ...interface{}) string {
 	return h.messages.Get(code, args...)
 }
 

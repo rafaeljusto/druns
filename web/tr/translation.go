@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 
 var translations map[string]translation
 
-type translation map[core.ValidationErrorCode]string
+type translation map[errors.ValidationCode]string
 
 func init() {
 	translations = make(map[string]translation)
@@ -27,7 +27,7 @@ func LoadTranslations(dirname string) error {
 
 	files, err := ioutil.ReadDir(dirname)
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	for _, file := range files {
@@ -37,15 +37,15 @@ func LoadTranslations(dirname string) error {
 
 		language := file.Name()[:strings.Index(file.Name(), ".")]
 		language = strings.Split(language, "-")[0]
-		translation := make(map[core.ValidationErrorCode]string)
+		translation := make(map[errors.ValidationCode]string)
 
 		bytes, err := ioutil.ReadFile(path.Join(dirname, file.Name()))
 		if err != nil {
-			return core.NewError(err)
+			return errors.New(err)
 		}
 
 		if err := json.Unmarshal(bytes, &translation); err != nil {
-			return core.NewError(err)
+			return errors.New(err)
 		}
 
 		translations[language] = translation

@@ -1,10 +1,12 @@
-package core
+package types
 
 import (
 	"database/sql/driver"
-	"errors"
+	"fmt"
 	"strings"
 	"time"
+
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type Address struct {
@@ -46,7 +48,7 @@ func (n *Address) Scan(src interface{}) error {
 
 	switch t := src.(type) {
 	case int64, float64, bool, time.Time:
-		return NewError(errors.New("Unsupported type to convert into an Address"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into an Address"))
 
 	case []byte:
 		n.Set(string(t))

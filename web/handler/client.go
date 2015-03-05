@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/client"
 	"github.com/rafaeljusto/druns/core/enrollment"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -39,7 +39,7 @@ func (h clientHandler) Response(r *http.Request) (string, data.Former) {
 		var err error
 		data.Enrollments, err = enrollment.NewService().FindByClient(h.Tx(), h.Client.Id)
 		if err != nil {
-			h.Logger().Error(core.NewError(err))
+			h.Logger().Error(errors.New(err))
 		}
 	}
 
@@ -54,7 +54,7 @@ func (h *clientHandler) Get(response trama.Response, r *http.Request) {
 
 	id, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
-		h.Logger().Error(core.NewError(err))
+		h.Logger().Error(errors.New(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
 	}

@@ -1,15 +1,14 @@
 package enrollment
 
 import (
-	"database/sql"
 	"fmt"
 	"net"
 	"strings"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/client"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/dblog"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/group"
 )
 
@@ -38,7 +37,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 
 func (dao *dao) Save(e *Enrollment) error {
 	if dao.Agent == 0 || dao.IP == nil {
-		return core.NewError(fmt.Errorf("No log information defined to persist information"))
+		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
 	var operation dblog.Operation
@@ -78,7 +77,7 @@ func (dao *dao) insert(e *Enrollment) error {
 	)
 
 	if err := row.Scan(&e.Id); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -107,7 +106,7 @@ func (dao *dao) update(e *Enrollment) error {
 	)
 
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -139,7 +138,7 @@ func (dao *dao) FindByClient(clientId int) (Enrollments, error) {
 
 	rows, err := dao.SQLer.Query(query, clientId)
 	if err != nil {
-		return nil, core.NewError(err)
+		return nil, errors.New(err)
 	}
 
 	var enrollments Enrollments
@@ -186,7 +185,7 @@ func (dao *dao) FindByGroup(groupId int) (Enrollments, error) {
 
 	rows, err := dao.SQLer.Query(query, groupId)
 	if err != nil {
-		return nil, core.NewError(err)
+		return nil, errors.New(err)
 	}
 
 	var enrollments Enrollments
@@ -234,11 +233,8 @@ func (dao *dao) load(row db.Row, eager bool) (Enrollment, error) {
 		&e.Type,
 	)
 
-	if err == sql.ErrNoRows {
-		return e, core.ErrNotFound
-
-	} else if err != nil {
-		return e, core.NewError(err)
+	if err != nil {
+		return e, errors.New(err)
 	}
 
 	if eager {

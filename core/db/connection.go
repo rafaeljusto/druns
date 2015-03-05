@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	_ "github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/lib/pq"
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 // We are using an interface to allow overwriting DB with a custom type. Useful for the integration
@@ -70,11 +70,11 @@ func Start(host string, port int, user, password, name string) error {
 
 	sqlDB, err := sql.Open(Driver, connParams)
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	if err := sqlDB.Ping(); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	// sql.Open returns a concrete type and not an interface, so we must set the global variable only

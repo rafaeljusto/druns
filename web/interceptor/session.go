@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/session"
 	"github.com/rafaeljusto/druns/web/config"
@@ -72,7 +72,7 @@ func (i SessionWeb) Before(response trama.Response, r *http.Request) {
 		i.handler.Logger().Error(err)
 	}
 
-	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("login", "m="+string(core.ValidationErrorCodeSessionExpired)),
+	response.Redirect(config.DrunsConfig.URLs.GetHTTPS("login", "m="+string(errors.ValidationCodeSessionExpired)),
 		http.StatusFound)
 }
 
@@ -83,7 +83,7 @@ func (i SessionWeb) Before(response trama.Response, r *http.Request) {
 func auth(r *http.Request, tx db.Transaction, remoteAddress net.IP) (session.Session, error) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
-		return session.Session{}, core.NewError(err)
+		return session.Session{}, errors.New(err)
 	}
 
 	return websession.LoadAndCheckSession(tx, cookie, remoteAddress)

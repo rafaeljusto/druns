@@ -1,10 +1,12 @@
-package core
+package types
 
 import (
 	"database/sql/driver"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type Time struct {
@@ -21,7 +23,7 @@ func (t *Time) Set(value string) (err error) {
 	value = strings.TrimSpace(value)
 
 	if t.Time, err = time.Parse(`15:04`, value); err != nil {
-		err = NewValidationError(ValidationErrorCodeInvalidTime, err)
+		err = errors.NewValidation(errors.ValidationCodeInvalidTime, err)
 	}
 
 	return
@@ -64,7 +66,7 @@ func (t *Time) Scan(src interface{}) (err error) {
 
 	switch v := src.(type) {
 	case int64, float64, bool:
-		return NewError(fmt.Errorf("Unsupported type to convert into a Time"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Time"))
 
 	case time.Time:
 		t.Time = v

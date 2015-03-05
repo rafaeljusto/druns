@@ -1,10 +1,12 @@
-package core
+package types
 
 import (
 	"database/sql/driver"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 // Duration is always represented in minutes
@@ -22,7 +24,7 @@ func (d *Duration) Set(value string) (err error) {
 	value = strings.TrimSpace(value)
 
 	if d.Duration, err = time.ParseDuration(fmt.Sprintf("%sm", value)); err != nil {
-		err = NewValidationError(ValidationErrorCodeInvalidDuration, err)
+		err = errors.NewValidation(errors.ValidationCodeInvalidDuration, err)
 	}
 
 	return
@@ -60,7 +62,7 @@ func (d *Duration) Scan(src interface{}) (err error) {
 
 	switch t := src.(type) {
 	case bool, time.Time:
-		return NewError(fmt.Errorf("Unsupported type to convert into a Duration"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Duration"))
 
 	case int64:
 		d.Duration, err = time.ParseDuration(fmt.Sprintf("%dm", int64(t)))

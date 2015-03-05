@@ -1,13 +1,12 @@
 package session
 
 import (
-	"database/sql"
 	"fmt"
 	"net"
 	"strings"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/user"
 )
 
@@ -56,7 +55,7 @@ func (dao *dao) insert(s *Session) error {
 	)
 
 	if err := row.Scan(&s.Id); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -83,7 +82,7 @@ func (dao *dao) update(s *Session) error {
 	)
 
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -110,11 +109,8 @@ func (dao *dao) FindById(id int) (Session, error) {
 		&s.LastAccessAt,
 	)
 
-	if err == sql.ErrNoRows {
-		return s, core.ErrNotFound
-
-	} else if err != nil {
-		return s, core.NewError(err)
+	if err != nil {
+		return s, errors.New(err)
 	}
 
 	s.IPAddress = net.ParseIP(ipAddress)

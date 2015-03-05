@@ -1,13 +1,13 @@
 package client
 
 import (
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/types"
 )
 
 type Client struct {
 	Id       int
-	Name     core.Name
-	Birthday core.Date
+	Name     types.Name
+	Birthday types.Date
 }
 
 func (c Client) Equal(other Client) bool {

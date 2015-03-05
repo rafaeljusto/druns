@@ -1,14 +1,13 @@
 package group
 
 import (
-	"database/sql"
 	"fmt"
 	"net"
 	"strings"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/dblog"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/place"
 )
 
@@ -41,7 +40,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 
 func (dao *dao) Save(g *Group) error {
 	if dao.Agent == 0 || dao.IP == nil {
-		return core.NewError(fmt.Errorf("No log information defined to persist information"))
+		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
 	var operation dblog.Operation
@@ -85,7 +84,7 @@ func (dao *dao) insert(g *Group) error {
 	)
 
 	if err := row.Scan(&g.Id); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -118,7 +117,7 @@ func (dao *dao) update(g *Group) error {
 	)
 
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -150,7 +149,7 @@ func (dao *dao) FindAll() (Groups, error) {
 
 	rows, err := dao.SQLer.Query(query)
 	if err != nil {
-		return nil, core.NewError(err)
+		return nil, errors.New(err)
 	}
 
 	var groups Groups
@@ -192,11 +191,8 @@ func (dao *dao) load(row db.Row, eager bool) (Group, error) {
 		&g.Capacity,
 	)
 
-	if err == sql.ErrNoRows {
-		return g, core.ErrNotFound
-
-	} else if err != nil {
-		return g, core.NewError(err)
+	if err != nil {
+		return g, errors.New(err)
 	}
 
 	if eager {

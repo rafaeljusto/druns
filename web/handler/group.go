@@ -6,10 +6,11 @@ import (
 	"strconv"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/enrollment"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/place"
+	"github.com/rafaeljusto/druns/core/types"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -40,13 +41,13 @@ func (h groupHandler) Response(r *http.Request) (string, data.Former) {
 	var err error
 	data.Places, err = place.NewService().FindAll(h.Tx())
 	if err != nil {
-		h.Logger().Error(core.NewError(err))
+		h.Logger().Error(errors.New(err))
 	}
 
 	if h.Group.Id > 0 {
 		data.Enrollments, err = enrollment.NewService().FindByGroup(h.Tx(), h.Group.Id)
 		if err != nil {
-			h.Logger().Error(core.NewError(err))
+			h.Logger().Error(errors.New(err))
 		}
 	}
 
@@ -61,7 +62,7 @@ func (h *groupHandler) Get(response trama.Response, r *http.Request) {
 
 	id, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
-		h.Logger().Error(core.NewError(err))
+		h.Logger().Error(errors.New(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
 	}
@@ -93,7 +94,7 @@ func (h *groupHandler) Post(response trama.Response, r *http.Request) {
 
 func (h *groupHandler) Templates() trama.TemplateGroupSet {
 	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
-		"weq": func(value1 core.Weekday, value2 string) bool {
+		"weq": func(value1 types.Weekday, value2 string) bool {
 			return value1.String() == value2
 		},
 		"geq": func(value1 group.Type, value2 string) bool {

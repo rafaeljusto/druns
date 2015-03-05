@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/core/protocol"
@@ -100,7 +100,7 @@ func main() {
 func initializeLogger() error {
 	logAddr := net.JoinHostPort(config.DrunsConfig.Log.Host, strconv.Itoa(config.DrunsConfig.Log.Port))
 	if err := log.Connect("druns", logAddr); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 	return nil
 }
@@ -155,7 +155,7 @@ func initializeTrama() error {
 		config.DrunsConfig.Paths.WebAssets)))
 
 	if err := handler.Mux.ParseTemplates(); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil

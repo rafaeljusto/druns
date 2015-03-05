@@ -1,10 +1,12 @@
-package core
+package types
 
 import (
 	"database/sql/driver"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type Weekday struct {
@@ -35,7 +37,7 @@ func (w *Weekday) Set(value string) (err error) {
 	case time.Saturday.String():
 		w.Weekday = time.Saturday
 	default:
-		err = NewValidationError(ValidationErrorCodeInvalidWeekday, err)
+		err = errors.NewValidation(errors.ValidationCodeInvalidWeekday, err)
 	}
 	return
 }
@@ -63,12 +65,12 @@ func (w Weekday) Value() (driver.Value, error) {
 
 func (w *Weekday) Scan(src interface{}) error {
 	if src == nil {
-		return NewError(fmt.Errorf("Unsupported type to convert into a Weekday"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Weekday"))
 	}
 
 	switch t := src.(type) {
 	case int64, float64, bool, time.Time:
-		return NewError(fmt.Errorf("Unsupported type to convert into a Weekday"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Weekday"))
 
 	case []byte:
 		w.Set(string(t))

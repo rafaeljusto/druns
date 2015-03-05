@@ -1,8 +1,8 @@
 package data
 
 import (
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/place"
+	"github.com/rafaeljusto/druns/core/types"
 )
 
 type Places struct {
@@ -10,7 +10,7 @@ type Places struct {
 	Places []place.Place
 }
 
-func NewPlaces(username core.Name, menu Menu, places []place.Place) Places {
+func NewPlaces(username types.Name, menu Menu, places []place.Place) Places {
 	return Places{
 		Logged: NewLogged(username, menu),
 		Places: places,

@@ -5,9 +5,9 @@ import (
 	"net"
 	"strings"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/dblog"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type daoLog struct {
@@ -55,7 +55,7 @@ func (dao *daoLog) save(p *Place, operation dblog.Operation) error {
 	)
 
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil

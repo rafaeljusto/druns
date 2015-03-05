@@ -1,14 +1,13 @@
 package client
 
 import (
-	"database/sql"
 	"fmt"
 	"net"
 	"strings"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/dblog"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type dao struct {
@@ -35,7 +34,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 
 func (dao *dao) Save(c *Client) error {
 	if dao.Agent == 0 || dao.IP == nil {
-		return core.NewError(fmt.Errorf("No log information defined to persist information"))
+		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
 	var operation dblog.Operation
@@ -74,7 +73,7 @@ func (dao *dao) insert(c *Client) error {
 	)
 
 	if err := row.Scan(&c.Id); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -102,7 +101,7 @@ func (dao *dao) update(c *Client) error {
 	)
 
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -134,7 +133,7 @@ func (dao *dao) FindAll() (Clients, error) {
 
 	rows, err := dao.SQLer.Query(query)
 	if err != nil {
-		return nil, core.NewError(err)
+		return nil, errors.New(err)
 	}
 
 	var clients Clients
@@ -161,12 +160,5 @@ func (dao *dao) load(row db.Row) (Client, error) {
 		&c.Birthday,
 	)
 
-	if err == sql.ErrNoRows {
-		return c, core.ErrNotFound
-
-	} else if err != nil {
-		return c, core.NewError(err)
-	}
-
-	return c, nil
+	return c, errors.New(err)
 }

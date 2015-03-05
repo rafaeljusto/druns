@@ -1,10 +1,10 @@
 package data
 
 import (
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/enrollment"
 	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/place"
+	"github.com/rafaeljusto/druns/core/types"
 )
 
 type Group struct {
@@ -15,7 +15,7 @@ type Group struct {
 	Enrollments []enrollment.Enrollment
 }
 
-func NewGroup(username core.Name, menu Menu) Group {
+func NewGroup(username types.Name, menu Menu) Group {
 	return Group{
 		Logged: NewLogged(username, menu),
 		Form:   NewForm(),

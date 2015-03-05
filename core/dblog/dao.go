@@ -1,14 +1,13 @@
 package dblog
 
 import (
-	"database/sql"
 	"fmt"
 	"net"
 	"strings"
 	"time"
 
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type dao struct {
@@ -50,7 +49,7 @@ func (dao dao) Save(dbLog *DBLog) error {
 	)
 
 	if err := row.Scan(&dbLog.Id); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -76,14 +75,7 @@ func (dao dao) FindById(id int64) (DBLog, error) {
 		&dbLog.Operation,
 	)
 
-	if err == sql.ErrNoRows {
-		return dbLog, core.ErrNotFound
-
-	} else if err != nil {
-		return dbLog, core.NewError(err)
-	}
-
 	dbLog.IPAddress = net.ParseIP(ipAddress)
 
-	return dbLog, nil
+	return dbLog, errors.New(err)
 }

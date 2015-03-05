@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/place"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
@@ -44,7 +44,7 @@ func (h *placeHandler) Get(response trama.Response, r *http.Request) {
 
 	id, err := strconv.Atoi(r.FormValue("id"))
 	if err != nil {
-		h.Logger().Error(core.NewError(err))
+		h.Logger().Error(errors.New(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
 	}

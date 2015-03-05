@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 var (
@@ -113,11 +113,11 @@ func (u URLs) GetHTTP(name string, params ...string) string {
 func LoadConfig(path string) error {
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	if err := json.Unmarshal(bytes, &DrunsConfig); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil

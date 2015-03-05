@@ -7,7 +7,7 @@ import (
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/rafaeljusto/schema"
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/web/templates/data"
 )
@@ -16,7 +16,7 @@ type poster interface {
 	RequestValue() reflect.Value
 	SetRequestValue(reflect.Value)
 	Response(r *http.Request) (string, data.Former)
-	Msg(code core.ValidationErrorCode, args ...interface{}) string
+	Msg(code errors.ValidationCode, args ...interface{}) string
 	Logger() *log.Logger
 	HTTPId() string
 }
@@ -46,7 +46,7 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 	decoder.IgnoreUnknownKeys(true)
 
 	if err := r.ParseForm(); err != nil {
-		i.handler.Logger().Error(core.NewError(err))
+		i.handler.Logger().Error(errors.New(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
 		return
 	}
@@ -62,7 +62,7 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 
 	if conversionErr, ok := err.(schema.ConversionError); ok {
 		template, former := i.handler.Response(r)
-		code := core.ValidationErrorCode(conversionErr.Err.Error())
+		code := errors.ValidationCode(conversionErr.Err.Error())
 		former.AddFieldMessage(conversionErr.Key, i.handler.Msg(code))
 		response.ExecuteTemplate(template, former)
 
@@ -72,11 +72,11 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 
 		for _, err := range multiErr {
 			if conversionErr, ok := err.(schema.ConversionError); ok {
-				code := core.ValidationErrorCode(conversionErr.Err.Error())
+				code := errors.ValidationCode(conversionErr.Err.Error())
 				former.AddFieldMessage(conversionErr.Key, i.handler.Msg(code))
 			} else {
 				internalError = true
-				i.handler.Logger().Error(core.NewError(err))
+				i.handler.Logger().Error(errors.New(err))
 			}
 		}
 
@@ -87,7 +87,7 @@ func (i *POST) Before(response trama.Response, r *http.Request) {
 		}
 
 	} else {
-		i.handler.Logger().Error(core.NewError(err))
+		i.handler.Logger().Error(errors.New(err))
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
 	}
 }

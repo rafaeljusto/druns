@@ -6,8 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/place"
+	"github.com/rafaeljusto/druns/core/types"
 )
 
 const (
@@ -27,7 +28,7 @@ func (g *Type) Set(value string) (err error) {
 	case TypeOnce:
 		g.value = TypeOnce
 	default:
-		err = core.NewValidationError(core.ValidationErrorCodeInvalidGroupType, err)
+		err = errors.NewValidation(errors.ValidationCodeInvalidGroupType, err)
 	}
 	return
 }
@@ -60,12 +61,12 @@ func (g Type) Value() (driver.Value, error) {
 func (g *Type) Scan(src interface{}) error {
 	if src == nil {
 		g.value = ""
-		return core.NewError(fmt.Errorf("Unsupported type to convert into a Type"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Type"))
 	}
 
 	switch t := src.(type) {
 	case int64, float64, bool, time.Time:
-		return core.NewError(fmt.Errorf("Unsupported type to convert into a Type"))
+		return errors.New(fmt.Errorf("Unsupported type to convert into a Type"))
 
 	case []byte:
 		return g.Set(string(t))
@@ -82,11 +83,11 @@ func (g *Type) Scan(src interface{}) error {
 
 type Group struct {
 	Id       int
-	Name     core.Name
+	Name     types.Name
 	Place    place.Place
-	Weekday  core.Weekday
-	Time     core.Time
-	Duration core.Duration
+	Weekday  types.Weekday
+	Time     types.Time
+	Duration types.Duration
 	Type     Type
 	Capacity int
 }

@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/web/templates/data"
 )
@@ -50,11 +50,11 @@ func (i *DatabaseAJAX) After(w http.ResponseWriter, r *http.Request) {
 		if responseWriter.Status() >= 200 && responseWriter.Status() < 400 {
 			if err := i.handler.Tx().Commit(); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				i.handler.Logger().Error(core.NewError(err))
+				i.handler.Logger().Error(errors.New(err))
 			}
 		} else {
 			if err := i.handler.Tx().Rollback(); err != nil {
-				i.handler.Logger().Error(core.NewError(err))
+				i.handler.Logger().Error(errors.New(err))
 			}
 		}
 
@@ -62,7 +62,7 @@ func (i *DatabaseAJAX) After(w http.ResponseWriter, r *http.Request) {
 		i.handler.Logger().Warning("Unknown ResponseWriter")
 
 		if err := i.handler.Tx().Rollback(); err != nil {
-			i.handler.Logger().Error(core.NewError(err))
+			i.handler.Logger().Error(errors.New(err))
 		}
 	}
 }
@@ -93,12 +93,12 @@ func (i *DatabaseWeb) Before(response trama.Response, r *http.Request) {
 func (i *DatabaseWeb) After(response trama.Response, r *http.Request) {
 	if response.TemplateName() == "500.html" {
 		if err := i.handler.Tx().Rollback(); err != nil {
-			i.handler.Logger().Error(core.NewError(err))
+			i.handler.Logger().Error(errors.New(err))
 		}
 
 	} else {
 		if err := i.handler.Tx().Commit(); err != nil {
-			i.handler.Logger().Error(core.NewError(err))
+			i.handler.Logger().Error(errors.New(err))
 			response.ExecuteTemplate("500.html", data.NewInternalServerError(i.handler.HTTPId()))
 		}
 	}

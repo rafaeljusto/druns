@@ -1,13 +1,13 @@
 package user
 
 import (
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/types"
 )
 
 type User struct {
 	Id       int
-	Name     core.Name
-	Email    core.Email
+	Name     types.Name
+	Email    types.Email
 	Password string
 }
 

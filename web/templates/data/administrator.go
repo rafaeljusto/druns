@@ -1,7 +1,7 @@
 package data
 
 import (
-	"github.com/rafaeljusto/druns/core"
+	"github.com/rafaeljusto/druns/core/types"
 	"github.com/rafaeljusto/druns/core/user"
 )
 
@@ -11,7 +11,7 @@ type Administrator struct {
 	User user.User
 }
 
-func NewAdministrator(username core.Name, menu Menu) Administrator {
+func NewAdministrator(username types.Name, menu Menu) Administrator {
 	return Administrator{
 		Logged: NewLogged(username, menu),
 		Form:   NewForm(),

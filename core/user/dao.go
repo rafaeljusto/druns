@@ -1,7 +1,6 @@
 package user
 
 import (
-	"database/sql"
 	"encoding/base64"
 	"fmt"
 	"net"
@@ -9,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/golang.org/x/crypto/bcrypt"
-	"github.com/rafaeljusto/druns/core"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/dblog"
+	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type dao struct {
@@ -39,7 +38,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 
 func (dao *dao) Save(u *User) error {
 	if dao.Agent == 0 || dao.IP == nil {
-		return core.NewError(fmt.Errorf("No log information defined to persist information"))
+		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
 	var operation dblog.Operation
@@ -73,7 +72,7 @@ func (dao *dao) insert(u *User) error {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.MinCost)
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	row := dao.SQLer.QueryRow(
@@ -84,7 +83,7 @@ func (dao *dao) insert(u *User) error {
 	)
 
 	if err := row.Scan(&u.Id); err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -112,7 +111,7 @@ func (dao *dao) update(u *User) error {
 	)
 
 	if err != nil {
-		return core.NewError(err)
+		return errors.New(err)
 	}
 
 	return nil
@@ -162,7 +161,7 @@ func (dao *dao) FindAll() ([]User, error) {
 
 	rows, err := dao.SQLer.Query(query)
 	if err != nil {
-		return nil, core.NewError(err)
+		return nil, errors.New(err)
 	}
 
 	var users []User
@@ -191,14 +190,7 @@ func (dao *dao) load(row db.Row) (User, error) {
 		&hashedPassword,
 	)
 
-	if err == sql.ErrNoRows {
-		return u, core.ErrNotFound
-
-	} else if err != nil {
-		return u, core.NewError(err)
-	}
-
-	return u, nil
+	return u, errors.New(err)
 }
 
 func (dao *dao) VerifyPassword(email mail.Address, password string) (bool, error) {
@@ -214,20 +206,17 @@ func (dao *dao) VerifyPassword(email mail.Address, password string) (bool, error
 		&base64Password,
 	)
 
-	if err == sql.ErrNoRows {
-		return false, core.ErrNotFound
-
-	} else if err != nil {
-		return false, core.NewError(err)
+	if err != nil {
+		return false, errors.New(err)
 	}
 
 	hashedPassword, err := base64.StdEncoding.DecodeString(base64Password)
 	if err != nil {
-		return false, core.NewError(err)
+		return false, errors.New(err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword(hashedPassword, []byte(password)); err != nil {
-		return false, core.NewError(err)
+		return false, errors.New(err)
 	}
 
 	return true, nil
