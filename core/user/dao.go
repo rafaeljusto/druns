@@ -82,20 +82,13 @@ func (dao *dao) insert(u *User) error {
 		base64.StdEncoding.EncodeToString(hashedPassword),
 	)
 
-	if err := row.Scan(&u.Id); err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	err = row.Scan(&u.Id)
+	return errors.New(err)
 }
 
 func (dao *dao) update(u *User) error {
-	if lastUser, err := dao.FindById(u.Id); err == nil && lastUser.Equal(*u) {
-		// Nothing changed
+	if u.revision == db.Revision(u) {
 		return nil
-
-	} else if err != nil {
-		return err
 	}
 
 	query := fmt.Sprintf(
@@ -110,11 +103,7 @@ func (dao *dao) update(u *User) error {
 		u.Id,
 	)
 
-	if err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	return errors.New(err)
 }
 
 func (dao *dao) FindById(id int) (User, error) {
@@ -190,6 +179,7 @@ func (dao *dao) load(row db.Row) (User, error) {
 		&hashedPassword,
 	)
 
+	u.revision = db.Revision(u)
 	return u, errors.New(err)
 }
 

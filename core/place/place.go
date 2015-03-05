@@ -5,13 +5,10 @@ import (
 )
 
 type Place struct {
-	Id      int
-	Name    types.Name
-	Address types.Address
-}
-
-func (p Place) Equal(other Place) bool {
-	return p == other
+	Id       int
+	Name     types.Name
+	Address  types.Address
+	revision uint64
 }
 
 /////////////////////////////////////////////////////////

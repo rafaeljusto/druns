@@ -85,14 +85,11 @@ func (t *Type) Scan(src interface{}) error {
 /////////////////////////////////////////////////////////
 
 type Enrollment struct {
-	Id     int
-	Type   Type
-	Client client.Client
-	Group  group.Group
-}
-
-func (e Enrollment) Equal(other Enrollment) bool {
-	return e == other
+	Id       int
+	Type     Type
+	Client   client.Client
+	Group    group.Group
+	revision uint64
 }
 
 /////////////////////////////////////////////////////////

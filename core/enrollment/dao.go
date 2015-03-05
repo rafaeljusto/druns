@@ -76,20 +76,13 @@ func (dao *dao) insert(e *Enrollment) error {
 		e.Type,
 	)
 
-	if err := row.Scan(&e.Id); err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	err := row.Scan(&e.Id)
+	return errors.New(err)
 }
 
 func (dao *dao) update(e *Enrollment) error {
-	if lastEnrollment, err := dao.FindById(e.Id); err == nil && lastEnrollment.Equal(*e) {
-		// Nothing changed
+	if e.revision == db.Revision(e) {
 		return nil
-
-	} else if err != nil {
-		return err
 	}
 
 	query := fmt.Sprintf(
@@ -105,11 +98,7 @@ func (dao *dao) update(e *Enrollment) error {
 		e.Id,
 	)
 
-	if err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	return errors.New(err)
 }
 
 func (dao *dao) FindById(id int) (Enrollment, error) {
@@ -249,5 +238,6 @@ func (dao *dao) load(row db.Row, eager bool) (Enrollment, error) {
 		}
 	}
 
+	e.revision = db.Revision(e)
 	return e, nil
 }

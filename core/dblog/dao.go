@@ -48,11 +48,8 @@ func (dao dao) Save(dbLog *DBLog) error {
 		string(dbLog.Operation),
 	)
 
-	if err := row.Scan(&dbLog.Id); err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	err := row.Scan(&dbLog.Id)
+	return errors.New(err)
 }
 
 func (dao dao) FindById(id int64) (DBLog, error) {

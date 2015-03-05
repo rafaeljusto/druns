@@ -90,10 +90,7 @@ type Group struct {
 	Duration types.Duration
 	Type     Type
 	Capacity int
-}
-
-func (g Group) Equal(other Group) bool {
-	return g == other
+	revision uint64
 }
 
 /////////////////////////////////////////////////////////

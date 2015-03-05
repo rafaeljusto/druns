@@ -54,20 +54,13 @@ func (dao *dao) insert(s *Session) error {
 		s.LastAccessAt,
 	)
 
-	if err := row.Scan(&s.Id); err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	err := row.Scan(&s.Id)
+	return errors.New(err)
 }
 
 func (dao *dao) update(s *Session) error {
-	if lastSession, err := dao.FindById(s.Id); err == nil && lastSession.Equal(*s) {
-		// Nothing changed
+	if s.revision == db.Revision(s) {
 		return nil
-
-	} else if err != nil {
-		return err
 	}
 
 	query := fmt.Sprintf(
@@ -81,11 +74,7 @@ func (dao *dao) update(s *Session) error {
 		s.Id,
 	)
 
-	if err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	return errors.New(err)
 }
 
 func (dao *dao) FindById(id int) (Session, error) {
@@ -115,5 +104,6 @@ func (dao *dao) FindById(id int) (Session, error) {
 
 	s.IPAddress = net.ParseIP(ipAddress)
 	s.User, err = user.NewService().FindById(dao.SQLer, userId)
+	s.revision = db.Revision(s)
 	return s, err
 }

@@ -83,20 +83,13 @@ func (dao *dao) insert(g *Group) error {
 		g.Capacity,
 	)
 
-	if err := row.Scan(&g.Id); err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	err := row.Scan(&g.Id)
+	return errors.New(err)
 }
 
 func (dao *dao) update(g *Group) error {
-	if lastGroup, err := dao.FindById(g.Id); err == nil && lastGroup.Equal(*g) {
-		// Nothing changed
+	if g.revision == db.Revision(g) {
 		return nil
-
-	} else if err != nil {
-		return err
 	}
 
 	query := fmt.Sprintf(
@@ -116,11 +109,7 @@ func (dao *dao) update(g *Group) error {
 		g.Id,
 	)
 
-	if err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	return errors.New(err)
 }
 
 func (dao *dao) FindById(id int) (Group, error) {
@@ -199,5 +188,6 @@ func (dao *dao) load(row db.Row, eager bool) (Group, error) {
 		g.Place, err = place.NewService().FindById(dao.SQLer, g.Place.Id)
 	}
 
+	g.revision = db.Revision(g)
 	return g, err
 }

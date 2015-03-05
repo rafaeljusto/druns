@@ -72,20 +72,13 @@ func (dao *dao) insert(p *Place) error {
 		p.Address,
 	)
 
-	if err := row.Scan(&p.Id); err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	err := row.Scan(&p.Id)
+	return errors.New(err)
 }
 
 func (dao *dao) update(p *Place) error {
-	if lastPlace, err := dao.FindById(p.Id); err == nil && lastPlace.Equal(*p) {
-		// Nothing changed
+	if p.revision == db.Revision(p) {
 		return nil
-
-	} else if err != nil {
-		return err
 	}
 
 	query := fmt.Sprintf(
@@ -160,5 +153,6 @@ func (dao *dao) load(row db.Row) (Place, error) {
 		&p.Address,
 	)
 
+	p.revision = db.Revision(p)
 	return p, errors.New(err)
 }

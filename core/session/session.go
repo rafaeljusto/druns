@@ -25,6 +25,7 @@ type Session struct {
 	IPAddress    net.IP
 	CreatedAt    time.Time
 	LastAccessAt time.Time
+	revision     uint64
 }
 
 func NewSession(u user.User, ip net.IP) Session {
@@ -63,17 +64,4 @@ func SessionFingerprintId(fingerprint string) (int, error) {
 
 func (s *Session) CheckFingerprint(fingerprint, secret string) bool {
 	return s.Fingerprint(secret) == fingerprint
-}
-
-func (s Session) Equal(other Session) bool {
-	if s.Id != other.Id ||
-		!s.User.Equal(other.User) ||
-		!s.IPAddress.Equal(other.IPAddress) ||
-		!s.CreatedAt.Equal(other.CreatedAt) ||
-		!s.LastAccessAt.Equal(other.LastAccessAt) {
-
-		return false
-	}
-
-	return true
 }

@@ -72,20 +72,13 @@ func (dao *dao) insert(c *Client) error {
 		c.Birthday,
 	)
 
-	if err := row.Scan(&c.Id); err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	err := row.Scan(&c.Id)
+	return errors.New(err)
 }
 
 func (dao *dao) update(c *Client) error {
-	if lastClient, err := dao.FindById(c.Id); err == nil && lastClient.Equal(*c) {
-		// Nothing changed
+	if c.revision == db.Revision(c) {
 		return nil
-
-	} else if err != nil {
-		return err
 	}
 
 	query := fmt.Sprintf(
@@ -100,11 +93,7 @@ func (dao *dao) update(c *Client) error {
 		c.Id,
 	)
 
-	if err != nil {
-		return errors.New(err)
-	}
-
-	return nil
+	return errors.New(err)
 }
 
 func (dao *dao) FindById(id int) (Client, error) {
@@ -160,5 +149,6 @@ func (dao *dao) load(row db.Row) (Client, error) {
 		&c.Birthday,
 	)
 
+	c.revision = db.Revision(c)
 	return c, errors.New(err)
 }

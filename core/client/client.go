@@ -8,10 +8,7 @@ type Client struct {
 	Id       int
 	Name     types.Name
 	Birthday types.Date
-}
-
-func (c Client) Equal(other Client) bool {
-	return c == other
+	revision uint64
 }
 
 /////////////////////////////////////////////////////////
