@@ -11,6 +11,11 @@ func Revision(object interface{}) uint64 {
 	value := reflect.ValueOf(object)
 	valueType := value.Type()
 
+	if value.Kind() == reflect.Ptr {
+		value = value.Elem()
+		valueType = value.Type()
+	}
+
 	h := crc64.New(crc64.MakeTable(crc64.ECMA))
 
 	for i := 0; i < valueType.NumField(); i++ {
