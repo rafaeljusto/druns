@@ -32,7 +32,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 	}
 }
 
-func (dao *dao) Save(p *Place) error {
+func (dao *dao) save(p *Place) error {
 	if dao.Agent == 0 || dao.IP == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
@@ -100,7 +100,7 @@ func (dao *dao) update(p *Place) error {
 	return nil
 }
 
-func (dao *dao) FindById(id int) (Place, error) {
+func (dao *dao) findById(id int) (Place, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -117,7 +117,7 @@ func (dao *dao) FindById(id int) (Place, error) {
 	return p, nil
 }
 
-func (dao *dao) FindAll() (Places, error) {
+func (dao *dao) findAll() (Places, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s",
 		strings.Join(dao.tableFields, ", "),

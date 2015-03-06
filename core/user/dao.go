@@ -36,7 +36,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 	}
 }
 
-func (dao *dao) Save(u *User) error {
+func (dao *dao) save(u *User) error {
 	if dao.Agent == 0 || dao.IP == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
@@ -106,7 +106,7 @@ func (dao *dao) update(u *User) error {
 	return errors.New(err)
 }
 
-func (dao *dao) FindById(id int) (User, error) {
+func (dao *dao) findById(id int) (User, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -123,7 +123,7 @@ func (dao *dao) FindById(id int) (User, error) {
 	return u, nil
 }
 
-func (dao *dao) FindByEmail(email string) (User, error) {
+func (dao *dao) findByEmail(email string) (User, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE email = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -140,7 +140,7 @@ func (dao *dao) FindByEmail(email string) (User, error) {
 	return u, nil
 }
 
-func (dao *dao) FindAll() ([]User, error) {
+func (dao *dao) findAll() ([]User, error) {
 	// Avoid selecting the BOOTSTRAP user
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE email != ''",
@@ -183,7 +183,7 @@ func (dao *dao) load(row db.Row) (User, error) {
 	return u, errors.New(err)
 }
 
-func (dao *dao) VerifyPassword(email mail.Address, password string) (bool, error) {
+func (dao *dao) verifyPassword(email mail.Address, password string) (bool, error) {
 	query := fmt.Sprintf(
 		"SELECT password FROM %s WHERE email = $1",
 		dao.tableName,

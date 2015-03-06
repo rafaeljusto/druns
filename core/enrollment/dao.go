@@ -35,7 +35,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 	}
 }
 
-func (dao *dao) Save(e *Enrollment) error {
+func (dao *dao) save(e *Enrollment) error {
 	if dao.Agent == 0 || dao.IP == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
@@ -101,7 +101,7 @@ func (dao *dao) update(e *Enrollment) error {
 	return errors.New(err)
 }
 
-func (dao *dao) FindById(id int) (Enrollment, error) {
+func (dao *dao) findById(id int) (Enrollment, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -118,7 +118,7 @@ func (dao *dao) FindById(id int) (Enrollment, error) {
 	return e, nil
 }
 
-func (dao *dao) FindByClient(clientId int) (Enrollments, error) {
+func (dao *dao) findByClient(clientId int) (Enrollments, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE client_id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -165,7 +165,7 @@ func (dao *dao) FindByClient(clientId int) (Enrollments, error) {
 	return enrollments, nil
 }
 
-func (dao *dao) FindByGroup(groupId int) (Enrollments, error) {
+func (dao *dao) findByGroup(groupId int) (Enrollments, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE client_group_id = $1",
 		strings.Join(dao.tableFields, ", "),

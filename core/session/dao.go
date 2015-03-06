@@ -30,7 +30,7 @@ func newDAO(sqler db.SQLer) dao {
 	}
 }
 
-func (dao *dao) Save(s *Session) error {
+func (dao *dao) save(s *Session) error {
 	if s.Id == 0 {
 		return dao.insert(s)
 	} else {
@@ -77,7 +77,7 @@ func (dao *dao) update(s *Session) error {
 	return errors.New(err)
 }
 
-func (dao *dao) FindById(id int) (Session, error) {
+func (dao *dao) findById(id int) (Session, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),

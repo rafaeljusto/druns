@@ -15,15 +15,15 @@ func NewService() Service {
 
 func (s Service) Save(sqler db.SQLer, ip net.IP, agent int, c *Client) error {
 	dao := newDAO(sqler, ip, agent)
-	return dao.Save(c)
+	return dao.save(c)
 }
 
 func (s Service) FindById(sqler db.SQLer, id int) (Client, error) {
 	dao := newDAO(sqler, nil, 0)
-	return dao.FindById(id)
+	return dao.findById(id)
 }
 
 func (s Service) FindAll(sqler db.SQLer) (Clients, error) {
 	dao := newDAO(sqler, nil, 0)
-	return dao.FindAll()
+	return dao.findAll()
 }
