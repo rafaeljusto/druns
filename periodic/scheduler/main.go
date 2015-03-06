@@ -8,7 +8,6 @@ import (
 
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/errors"
-	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/web/config"
@@ -48,11 +47,15 @@ func main() {
 		return
 	}
 
-	_, err = group.NewService(tx).FindAll()
-	if err != nil {
-		Logger.Errorf("Error retrieving groups. Details: %s", err)
-		return
-	}
+	// groups, err := group.NewService(tx).FindAll()
+	// if err != nil {
+	// 	Logger.Errorf("Error retrieving groups. Details: %s", err)
+	// 	return
+	// }
+
+	// for _, group := range groups {
+	// 	classes, err := class.FindByGroupId(group.Id)
+	// }
 }
 
 func initializeLogger() error {
