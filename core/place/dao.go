@@ -11,18 +11,18 @@ import (
 )
 
 type dao struct {
-	SQLer       db.SQLer
-	IP          net.IP
-	Agent       int
+	sqler       db.SQLer
+	ip          net.IP
+	agent       int
 	tableName   string
 	tableFields []string
 }
 
 func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 	return dao{
-		SQLer:     sqler,
-		IP:        ip,
-		Agent:     agent,
+		sqler:     sqler,
+		ip:        ip,
+		agent:     agent,
 		tableName: "place",
 		tableFields: []string{
 			"id",
@@ -33,7 +33,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 }
 
 func (dao *dao) save(p *Place) error {
-	if dao.Agent == 0 || dao.IP == nil {
+	if dao.agent == 0 || dao.ip == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
@@ -54,7 +54,7 @@ func (dao *dao) save(p *Place) error {
 		operation = dblog.OperationUpdate
 	}
 
-	logDAO := newDAOLog(dao.SQLer, dao.IP, dao.Agent)
+	logDAO := newDAOLog(dao.sqler, dao.ip, dao.agent)
 	return logDAO.save(p, operation)
 }
 
@@ -66,7 +66,7 @@ func (dao *dao) insert(p *Place) error {
 		db.Placeholders(dao.tableFields[1:]),
 	)
 
-	row := dao.SQLer.QueryRow(
+	row := dao.sqler.QueryRow(
 		query,
 		p.Name,
 		p.Address,
@@ -86,7 +86,7 @@ func (dao *dao) update(p *Place) error {
 		dao.tableName,
 	)
 
-	_, err := dao.SQLer.Exec(
+	_, err := dao.sqler.Exec(
 		query,
 		p.Name,
 		p.Address,
@@ -107,7 +107,7 @@ func (dao *dao) findById(id int) (Place, error) {
 		dao.tableName,
 	)
 
-	row := dao.SQLer.QueryRow(query, id)
+	row := dao.sqler.QueryRow(query, id)
 
 	p, err := dao.load(row)
 	if err != nil {
@@ -124,7 +124,7 @@ func (dao *dao) findAll() (Places, error) {
 		dao.tableName,
 	)
 
-	rows, err := dao.SQLer.Query(query)
+	rows, err := dao.sqler.Query(query)
 	if err != nil {
 		return nil, errors.New(err)
 	}

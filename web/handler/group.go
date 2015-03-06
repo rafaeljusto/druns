@@ -39,13 +39,13 @@ func (h groupHandler) Response(r *http.Request) (string, data.Former) {
 	data.Group = h.Group
 
 	var err error
-	data.Places, err = place.NewService().FindAll(h.Tx())
+	data.Places, err = place.NewService(h.Tx()).FindAll()
 	if err != nil {
 		h.Logger().Error(errors.New(err))
 	}
 
 	if h.Group.Id > 0 {
-		data.Enrollments, err = enrollment.NewService().FindByGroup(h.Tx(), h.Group.Id)
+		data.Enrollments, err = enrollment.NewService(h.Tx()).FindByGroup(h.Group.Id)
 		if err != nil {
 			h.Logger().Error(errors.New(err))
 		}
@@ -67,7 +67,7 @@ func (h *groupHandler) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	if h.Group, err = group.NewService().FindById(h.Tx(), id); err != nil {
+	if h.Group, err = group.NewService(h.Tx()).FindById(id); err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
@@ -78,7 +78,7 @@ func (h *groupHandler) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *groupHandler) Post(response trama.Response, r *http.Request) {
-	err := group.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.Group)
+	err := group.NewService(h.Tx()).Save(h.RemoteAddress(), h.Session().User.Id, &h.Group)
 	if err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))

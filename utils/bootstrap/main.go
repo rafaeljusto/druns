@@ -93,7 +93,7 @@ func main() {
 		os.Exit(8)
 	}
 
-	if users, err := user.NewService().FindAll(tx); err != nil {
+	if users, err := user.NewService(tx).FindAll(); err != nil {
 		fmt.Printf("Error retrieving users. Details: %s\n", err)
 		os.Exit(9)
 
@@ -102,7 +102,7 @@ func main() {
 		return
 	}
 
-	if err := user.NewService().Save(tx, addr, id, &u); err != nil {
+	if err := user.NewService(tx).Save(addr, id, &u); err != nil {
 		fmt.Printf("Error saving the user. Details: %s\n", err)
 		os.Exit(10)
 	}
@@ -308,7 +308,7 @@ func generateClients(tx db.Transaction, ip net.IP, agent int) bool {
 	}
 
 	for _, c := range clients {
-		if err := client.NewService().Save(tx, ip, agent, &c); err != nil {
+		if err := client.NewService(tx).Save(ip, agent, &c); err != nil {
 			fmt.Printf("Error creating a client. Details: %s\n", err)
 			return false
 		}
@@ -324,7 +324,7 @@ func generatePlaces(tx db.Transaction, ip net.IP, agent int) bool {
 	}
 
 	for _, p := range places {
-		if err := place.NewService().Save(tx, ip, agent, &p); err != nil {
+		if err := place.NewService(tx).Save(ip, agent, &p); err != nil {
 			fmt.Printf("Error creating a place. Details: %s\n", err)
 			return false
 		}
@@ -350,7 +350,7 @@ func generateGroups(tx db.Transaction, ip net.IP, agent int) bool {
 			Capacity: rand.Intn(20) + 10,
 		}
 
-		if err := group.NewService().Save(tx, ip, agent, &g); err != nil {
+		if err := group.NewService(tx).Save(ip, agent, &g); err != nil {
 			fmt.Printf("Error creating a group. Details: %s\n", err)
 			return false
 		}
@@ -393,7 +393,7 @@ func generateEnrollments(tx db.Transaction, ip net.IP, agent int) bool {
 			Group:  group.Group{Id: groupId},
 		}
 
-		if err := enrollment.NewService().Save(tx, ip, agent, &e); err != nil {
+		if err := enrollment.NewService(tx).Save(ip, agent, &e); err != nil {
 			fmt.Printf("Error creating an enrollment. Details: %s\n", err)
 			return false
 		}

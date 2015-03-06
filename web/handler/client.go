@@ -37,7 +37,7 @@ func (h clientHandler) Response(r *http.Request) (string, data.Former) {
 
 	if h.Client.Id > 0 {
 		var err error
-		data.Enrollments, err = enrollment.NewService().FindByClient(h.Tx(), h.Client.Id)
+		data.Enrollments, err = enrollment.NewService(h.Tx()).FindByClient(h.Client.Id)
 		if err != nil {
 			h.Logger().Error(errors.New(err))
 		}
@@ -59,7 +59,7 @@ func (h *clientHandler) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	if h.Client, err = client.NewService().FindById(h.Tx(), id); err != nil {
+	if h.Client, err = client.NewService(h.Tx()).FindById(id); err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
@@ -70,7 +70,7 @@ func (h *clientHandler) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *clientHandler) Post(response trama.Response, r *http.Request) {
-	err := client.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.Client)
+	err := client.NewService(h.Tx()).Save(h.RemoteAddress(), h.Session().User.Id, &h.Client)
 	if err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))

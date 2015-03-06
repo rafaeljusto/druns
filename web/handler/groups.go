@@ -26,7 +26,7 @@ type groups struct {
 }
 
 func (h *groups) Get(response trama.Response, r *http.Request) {
-	groups, err := group.NewService().FindAll(h.Tx())
+	groups, err := group.NewService(h.Tx()).FindAll()
 
 	if err != nil {
 		h.Logger().Error(err)

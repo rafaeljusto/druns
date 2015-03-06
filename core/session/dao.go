@@ -11,14 +11,14 @@ import (
 )
 
 type dao struct {
-	SQLer       db.SQLer
+	sqler       db.SQLer
 	tableName   string
 	tableFields []string
 }
 
 func newDAO(sqler db.SQLer) dao {
 	return dao{
-		SQLer:     sqler,
+		sqler:     sqler,
 		tableName: "session",
 		tableFields: []string{
 			"id",
@@ -46,7 +46,7 @@ func (dao *dao) insert(s *Session) error {
 		db.Placeholders(dao.tableFields[1:]),
 	)
 
-	row := dao.SQLer.QueryRow(
+	row := dao.sqler.QueryRow(
 		query,
 		s.User.Id,
 		s.IPAddress.String(),
@@ -68,7 +68,7 @@ func (dao *dao) update(s *Session) error {
 		dao.tableName,
 	)
 
-	_, err := dao.SQLer.Exec(
+	_, err := dao.sqler.Exec(
 		query,
 		s.LastAccessAt,
 		s.Id,
@@ -84,7 +84,7 @@ func (dao *dao) findById(id int) (Session, error) {
 		dao.tableName,
 	)
 
-	row := dao.SQLer.QueryRow(query, id)
+	row := dao.sqler.QueryRow(query, id)
 
 	var s Session
 	var userId int
@@ -103,7 +103,7 @@ func (dao *dao) findById(id int) (Session, error) {
 	}
 
 	s.IPAddress = net.ParseIP(ipAddress)
-	s.User, err = user.NewService().FindById(dao.SQLer, userId)
+	s.User, err = user.NewService(dao.sqler).FindById(userId)
 	s.revision = db.Revision(s)
 	return s, err
 }

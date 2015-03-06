@@ -49,7 +49,7 @@ func (h *placeHandler) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	if h.Place, err = place.NewService().FindById(h.Tx(), id); err != nil {
+	if h.Place, err = place.NewService(h.Tx()).FindById(id); err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
@@ -60,7 +60,7 @@ func (h *placeHandler) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *placeHandler) Post(response trama.Response, r *http.Request) {
-	err := place.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.Place)
+	err := place.NewService(h.Tx()).Save(h.RemoteAddress(), h.Session().User.Id, &h.Place)
 	if err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))

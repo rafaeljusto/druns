@@ -11,18 +11,18 @@ import (
 )
 
 type daoLog struct {
-	SQLer       db.SQLer
-	IP          net.IP
-	Agent       int
+	sqler       db.SQLer
+	ip          net.IP
+	agent       int
 	tableName   string
 	tableFields []string
 }
 
 func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 	return daoLog{
-		SQLer:     sqler,
-		IP:        ip,
-		Agent:     agent,
+		sqler:     sqler,
+		ip:        ip,
+		agent:     agent,
 		tableName: "enrollment_log",
 		tableFields: []string{
 			"id",
@@ -35,7 +35,7 @@ func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 }
 
 func (dao *daoLog) save(e *Enrollment, operation dblog.Operation) error {
-	dbLog, err := dblog.NewService().Create(dao.SQLer, dao.Agent, dao.IP, operation)
+	dbLog, err := dblog.NewService().Create(dao.sqler, dao.agent, dao.ip, operation)
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (dao *daoLog) save(e *Enrollment, operation dblog.Operation) error {
 		db.Placeholders(dao.tableFields),
 	)
 
-	_, err = dao.SQLer.Exec(
+	_, err = dao.sqler.Exec(
 		query,
 		e.Id,
 		e.Client.Id,

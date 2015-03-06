@@ -12,18 +12,18 @@ import (
 )
 
 type dao struct {
-	SQLer       db.SQLer
-	IP          net.IP
-	Agent       int
+	sqler       db.SQLer
+	ip          net.IP
+	agent       int
 	tableName   string
 	tableFields []string
 }
 
 func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 	return dao{
-		SQLer:     sqler,
-		IP:        ip,
-		Agent:     agent,
+		sqler:     sqler,
+		ip:        ip,
+		agent:     agent,
 		tableName: "client_group",
 		tableFields: []string{
 			"id",
@@ -39,7 +39,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 }
 
 func (dao *dao) save(g *Group) error {
-	if dao.Agent == 0 || dao.IP == nil {
+	if dao.agent == 0 || dao.ip == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
@@ -60,7 +60,7 @@ func (dao *dao) save(g *Group) error {
 		operation = dblog.OperationUpdate
 	}
 
-	logDAO := newDAOLog(dao.SQLer, dao.IP, dao.Agent)
+	logDAO := newDAOLog(dao.sqler, dao.ip, dao.agent)
 	return logDAO.save(g, operation)
 }
 
@@ -72,7 +72,7 @@ func (dao *dao) insert(g *Group) error {
 		db.Placeholders(dao.tableFields[1:]),
 	)
 
-	row := dao.SQLer.QueryRow(
+	row := dao.sqler.QueryRow(
 		query,
 		g.Name,
 		g.Place.Id,
@@ -97,7 +97,7 @@ func (dao *dao) update(g *Group) error {
 		dao.tableName,
 	)
 
-	_, err := dao.SQLer.Exec(
+	_, err := dao.sqler.Exec(
 		query,
 		g.Name,
 		g.Place.Id,
@@ -119,7 +119,7 @@ func (dao *dao) findById(id int) (Group, error) {
 		dao.tableName,
 	)
 
-	row := dao.SQLer.QueryRow(query, id)
+	row := dao.sqler.QueryRow(query, id)
 
 	g, err := dao.load(row, true)
 	if err != nil {
@@ -136,7 +136,7 @@ func (dao *dao) findAll() (Groups, error) {
 		dao.tableName,
 	)
 
-	rows, err := dao.SQLer.Query(query)
+	rows, err := dao.sqler.Query(query)
 	if err != nil {
 		return nil, errors.New(err)
 	}
@@ -155,9 +155,9 @@ func (dao *dao) findAll() (Groups, error) {
 
 	// We cannot load a composite object while we are iterating over the main
 	// result, that's why we only load it after we finish the iteration
-	placeService := place.NewService()
+	placeService := place.NewService(dao.sqler)
 	for i, g := range groups {
-		if g.Place, err = placeService.FindById(dao.SQLer, g.Place.Id); err != nil {
+		if g.Place, err = placeService.FindById(g.Place.Id); err != nil {
 			return nil, err
 		}
 		groups[i] = g
@@ -185,7 +185,7 @@ func (dao *dao) load(row db.Row, eager bool) (Group, error) {
 	}
 
 	if eager {
-		g.Place, err = place.NewService().FindById(dao.SQLer, g.Place.Id)
+		g.Place, err = place.NewService(dao.sqler).FindById(g.Place.Id)
 	}
 
 	g.revision = db.Revision(g)

@@ -13,18 +13,18 @@ import (
 )
 
 type dao struct {
-	SQLer       db.SQLer
-	IP          net.IP
-	Agent       int
+	sqler       db.SQLer
+	ip          net.IP
+	agent       int
 	tableName   string
 	tableFields []string
 }
 
 func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 	return dao{
-		SQLer:     sqler,
-		IP:        ip,
-		Agent:     agent,
+		sqler:     sqler,
+		ip:        ip,
+		agent:     agent,
 		tableName: "enrollment",
 		tableFields: []string{
 			"id",
@@ -36,7 +36,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 }
 
 func (dao *dao) save(e *Enrollment) error {
-	if dao.Agent == 0 || dao.IP == nil {
+	if dao.agent == 0 || dao.ip == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
@@ -57,7 +57,7 @@ func (dao *dao) save(e *Enrollment) error {
 		operation = dblog.OperationUpdate
 	}
 
-	logDAO := newDAOLog(dao.SQLer, dao.IP, dao.Agent)
+	logDAO := newDAOLog(dao.sqler, dao.ip, dao.agent)
 	return logDAO.save(e, operation)
 }
 
@@ -69,7 +69,7 @@ func (dao *dao) insert(e *Enrollment) error {
 		db.Placeholders(dao.tableFields[1:]),
 	)
 
-	row := dao.SQLer.QueryRow(
+	row := dao.sqler.QueryRow(
 		query,
 		e.Client.Id,
 		e.Group.Id,
@@ -90,7 +90,7 @@ func (dao *dao) update(e *Enrollment) error {
 		dao.tableName,
 	)
 
-	_, err := dao.SQLer.Exec(
+	_, err := dao.sqler.Exec(
 		query,
 		e.Client.Id,
 		e.Group.Id,
@@ -108,7 +108,7 @@ func (dao *dao) findById(id int) (Enrollment, error) {
 		dao.tableName,
 	)
 
-	row := dao.SQLer.QueryRow(query, id)
+	row := dao.sqler.QueryRow(query, id)
 
 	e, err := dao.load(row, true)
 	if err != nil {
@@ -125,7 +125,7 @@ func (dao *dao) findByClient(clientId int) (Enrollments, error) {
 		dao.tableName,
 	)
 
-	rows, err := dao.SQLer.Query(query, clientId)
+	rows, err := dao.sqler.Query(query, clientId)
 	if err != nil {
 		return nil, errors.New(err)
 	}
@@ -145,16 +145,16 @@ func (dao *dao) findByClient(clientId int) (Enrollments, error) {
 	// We cannot load a composite object while we are iterating over the main
 	// result, that's why we only load it after we finish the iteration
 
-	clientService := client.NewService()
-	groupService := group.NewService()
+	clientService := client.NewService(dao.sqler)
+	groupService := group.NewService(dao.sqler)
 
 	for i, e := range enrollments {
-		e.Client, err = clientService.FindById(dao.SQLer, e.Client.Id)
+		e.Client, err = clientService.FindById(e.Client.Id)
 		if err != nil {
 			return nil, err
 		}
 
-		e.Group, err = groupService.FindById(dao.SQLer, e.Group.Id)
+		e.Group, err = groupService.FindById(e.Group.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -172,7 +172,7 @@ func (dao *dao) findByGroup(groupId int) (Enrollments, error) {
 		dao.tableName,
 	)
 
-	rows, err := dao.SQLer.Query(query, groupId)
+	rows, err := dao.sqler.Query(query, groupId)
 	if err != nil {
 		return nil, errors.New(err)
 	}
@@ -192,16 +192,16 @@ func (dao *dao) findByGroup(groupId int) (Enrollments, error) {
 	// We cannot load a composite object while we are iterating over the main
 	// result, that's why we only load it after we finish the iteration
 
-	clientService := client.NewService()
-	groupService := group.NewService()
+	clientService := client.NewService(dao.sqler)
+	groupService := group.NewService(dao.sqler)
 
 	for i, e := range enrollments {
-		e.Client, err = clientService.FindById(dao.SQLer, e.Client.Id)
+		e.Client, err = clientService.FindById(e.Client.Id)
 		if err != nil {
 			return nil, err
 		}
 
-		e.Group, err = groupService.FindById(dao.SQLer, e.Group.Id)
+		e.Group, err = groupService.FindById(e.Group.Id)
 		if err != nil {
 			return nil, err
 		}
@@ -227,12 +227,12 @@ func (dao *dao) load(row db.Row, eager bool) (Enrollment, error) {
 	}
 
 	if eager {
-		e.Client, err = client.NewService().FindById(dao.SQLer, e.Client.Id)
+		e.Client, err = client.NewService(dao.sqler).FindById(e.Client.Id)
 		if err != nil {
 			return e, err
 		}
 
-		e.Group, err = group.NewService().FindById(dao.SQLer, e.Group.Id)
+		e.Group, err = group.NewService(dao.sqler).FindById(e.Group.Id)
 		if err != nil {
 			return e, err
 		}

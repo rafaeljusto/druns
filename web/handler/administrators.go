@@ -26,7 +26,7 @@ type administrators struct {
 }
 
 func (h *administrators) Get(response trama.Response, r *http.Request) {
-	users, err := user.NewService().FindAll(h.Tx())
+	users, err := user.NewService(h.Tx()).FindAll()
 
 	if err != nil {
 		h.Logger().Error(err)

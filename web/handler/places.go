@@ -26,7 +26,7 @@ type places struct {
 }
 
 func (h *places) Get(response trama.Response, r *http.Request) {
-	places, err := place.NewService().FindAll(h.Tx())
+	places, err := place.NewService(h.Tx()).FindAll()
 
 	if err != nil {
 		h.Logger().Error(err)

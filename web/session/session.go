@@ -15,12 +15,12 @@ import (
 )
 
 func NewSession(sqler db.SQLer, email string, ipAddress net.IP) (*http.Cookie, error) {
-	user, err := user.NewService().FindByEmail(sqler, email)
+	user, err := user.NewService(sqler).FindByEmail(email)
 	if err != nil {
 		return nil, err
 	}
 
-	s, err := session.NewService().Create(sqler, user, ipAddress)
+	s, err := session.NewService(sqler).Create(user, ipAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func LoadAndCheckSession(sqler db.SQLer, cookie *http.Cookie,
 		return s, err
 	}
 
-	s, err = session.NewService().FindById(sqler, sessionId)
+	s, err = session.NewService(sqler).FindById(sessionId)
 	if err != nil {
 		return s, err
 	}
@@ -73,7 +73,7 @@ func LoadAndCheckSession(sqler db.SQLer, cookie *http.Cookie,
 	}
 
 	s.LastAccessAt = time.Now()
-	if err = session.NewService().Save(sqler, &s); err != nil {
+	if err = session.NewService(sqler).Save(&s); err != nil {
 		return s, err
 	}
 

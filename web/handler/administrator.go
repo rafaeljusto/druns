@@ -49,7 +49,7 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
-	if h.User, err = user.NewService().FindById(h.Tx(), id); err != nil {
+	if h.User, err = user.NewService(h.Tx()).FindById(id); err != nil {
 		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
@@ -60,7 +60,7 @@ func (h *administrator) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *administrator) Post(response trama.Response, r *http.Request) {
-	err := user.NewService().Save(h.Tx(), h.RemoteAddress(), h.Session().User.Id, &h.User)
+	err := user.NewService(h.Tx()).Save(h.RemoteAddress(), h.Session().User.Id, &h.User)
 	if err != nil {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))

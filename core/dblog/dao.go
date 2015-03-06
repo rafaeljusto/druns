@@ -11,14 +11,14 @@ import (
 )
 
 type dao struct {
-	SQLer       db.SQLer
+	sqler       db.SQLer
 	tableName   string
 	tableFields []string
 }
 
 func newDAO(sqler db.SQLer) dao {
 	return dao{
-		SQLer:     sqler,
+		sqler:     sqler,
 		tableName: "log",
 		tableFields: []string{
 			"id",
@@ -30,7 +30,7 @@ func newDAO(sqler db.SQLer) dao {
 	}
 }
 
-func (dao dao) Save(dbLog *DBLog) error {
+func (dao dao) save(dbLog *DBLog) error {
 	query := fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES (DEFAULT, %s) RETURNING id",
 		dao.tableName,
@@ -40,7 +40,7 @@ func (dao dao) Save(dbLog *DBLog) error {
 
 	dbLog.ChangedAt = time.Now()
 
-	row := dao.SQLer.QueryRow(
+	row := dao.sqler.QueryRow(
 		query,
 		dbLog.Agent,
 		dbLog.IPAddress.String(),
@@ -52,14 +52,14 @@ func (dao dao) Save(dbLog *DBLog) error {
 	return errors.New(err)
 }
 
-func (dao dao) FindById(id int64) (DBLog, error) {
+func (dao dao) findById(id int64) (DBLog, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = ?",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
 
-	row := dao.SQLer.QueryRow(query, id)
+	row := dao.sqler.QueryRow(query, id)
 
 	var dbLog DBLog
 	var ipAddress string

@@ -7,23 +7,24 @@ import (
 )
 
 type Service struct {
+	sqler db.SQLer
 }
 
-func NewService() Service {
-	return Service{}
+func NewService(sqler db.SQLer) Service {
+	return Service{sqler}
 }
 
-func (s Service) Save(sqler db.SQLer, ip net.IP, agent int, p *Place) error {
-	dao := newDAO(sqler, ip, agent)
+func (s Service) Save(ip net.IP, agent int, p *Place) error {
+	dao := newDAO(s.sqler, ip, agent)
 	return dao.save(p)
 }
 
-func (s Service) FindById(sqler db.SQLer, id int) (Place, error) {
-	dao := newDAO(sqler, nil, 0)
+func (s Service) FindById(id int) (Place, error) {
+	dao := newDAO(s.sqler, nil, 0)
 	return dao.findById(id)
 }
 
-func (s Service) FindAll(sqler db.SQLer) (Places, error) {
-	dao := newDAO(sqler, nil, 0)
+func (s Service) FindAll() (Places, error) {
+	dao := newDAO(s.sqler, nil, 0)
 	return dao.findAll()
 }

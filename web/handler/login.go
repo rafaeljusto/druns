@@ -60,7 +60,7 @@ func (h *login) Post(response trama.Response, r *http.Request) {
 		return
 	}
 
-	ok, err := user.NewService().VerifyPassword(h.Tx(), *address, password)
+	ok, err := user.NewService(h.Tx()).VerifyPassword(*address, password)
 	if !ok || err != nil {
 		if err != nil {
 			h.Logger().Error(err)

@@ -26,7 +26,7 @@ type clients struct {
 }
 
 func (h *clients) Get(response trama.Response, r *http.Request) {
-	clients, err := client.NewService().FindAll(h.Tx())
+	clients, err := client.NewService(h.Tx()).FindAll()
 
 	if err != nil {
 		h.Logger().Error(err)
