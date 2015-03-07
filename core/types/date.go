@@ -78,7 +78,7 @@ func (d *Date) Scan(src interface{}) (err error) {
 
 	switch t := src.(type) {
 	case int64, float64, bool:
-		return errors.New(fmt.Errorf("Unsupported type to convert into a Date"))
+		return fmt.Errorf("Unsupported type to convert into a Date")
 
 	case time.Time:
 		d.Time = t

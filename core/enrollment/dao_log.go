@@ -35,7 +35,7 @@ func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 }
 
 func (dao *daoLog) save(e *Enrollment, operation dblog.Operation) error {
-	dbLog, err := dblog.NewService().Create(dao.sqler, dao.agent, dao.ip, operation)
+	dbLog, err := dblog.NewService(dao.sqler).Create(dao.agent, dao.ip, operation)
 	if err != nil {
 		return err
 	}

@@ -117,7 +117,7 @@ func (dao *dao) findById(id int) (Place, error) {
 	return p, nil
 }
 
-func (dao *dao) findAll() (Places, error) {
+func (dao *dao) findAll() ([]Place, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s",
 		strings.Join(dao.tableFields, ", "),
@@ -129,7 +129,7 @@ func (dao *dao) findAll() (Places, error) {
 		return nil, errors.New(err)
 	}
 
-	var places Places
+	var places []Place
 
 	for rows.Next() {
 		p, err := dao.load(rows)

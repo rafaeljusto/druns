@@ -5,9 +5,12 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 
+	"github.com/rafaeljusto/druns/core/class"
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/errors"
+	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/web/config"
@@ -47,15 +50,27 @@ func main() {
 		return
 	}
 
-	// groups, err := group.NewService(tx).FindAll()
-	// if err != nil {
-	// 	Logger.Errorf("Error retrieving groups. Details: %s", err)
-	// 	return
-	// }
+	groups, err := group.NewService(tx).FindAll()
+	if err != nil {
+		Logger.Errorf("Error retrieving groups. Details: %s", err)
+		return
+	}
 
-	// for _, group := range groups {
-	// 	classes, err := class.FindByGroupId(group.Id)
-	// }
+	now := time.Now()
+	twoWeeksFromNow := now.Add(2 * 7 * 24 * time.Hour)
+	classService := class.NewService(tx)
+
+	for _, group := range groups {
+		_, err = classService.FindByGroupIdBetweenDates(group.Id, now, twoWeeksFromNow)
+		if err != nil {
+			Logger.Errorf("Error retrieving classes. Details: %s", err)
+			return
+		}
+
+		// TODO: For each weekday, check if their already registered classes,
+		// if not create it! We could also remove classes that are not in the
+		// original time or day of the week determinated by the group
+	}
 }
 
 func initializeLogger() error {

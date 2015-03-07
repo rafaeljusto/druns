@@ -1,14 +1,15 @@
-package group
+package class
 
 import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/dblog"
 	"github.com/rafaeljusto/druns/core/errors"
-	"github.com/rafaeljusto/druns/core/place"
+	"github.com/rafaeljusto/druns/core/group"
 )
 
 type dao struct {
@@ -24,36 +25,31 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 		sqler:     sqler,
 		ip:        ip,
 		agent:     agent,
-		tableName: "client_group",
+		tableName: "class",
 		tableFields: []string{
 			"id",
-			"name",
-			"place_id",
-			"weekday",
-			"time",
-			"duration",
-			"type",
-			"capacity",
+			"client_group_id",
+			"class_date",
 		},
 	}
 }
 
-func (dao *dao) save(g *Group) error {
+func (dao *dao) save(c *Class) error {
 	if dao.agent == 0 || dao.ip == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
 
 	var operation dblog.Operation
 
-	if g.Id == 0 {
-		if err := dao.insert(g); err != nil {
+	if c.Id == 0 {
+		if err := dao.insert(c); err != nil {
 			return err
 		}
 
 		operation = dblog.OperationCreation
 
 	} else {
-		if err := dao.update(g); err != nil {
+		if err := dao.update(c); err != nil {
 			return err
 		}
 
@@ -61,10 +57,10 @@ func (dao *dao) save(g *Group) error {
 	}
 
 	logDAO := newDAOLog(dao.sqler, dao.ip, dao.agent)
-	return logDAO.save(g, operation)
+	return logDAO.save(c, operation)
 }
 
-func (dao *dao) insert(g *Group) error {
+func (dao *dao) insert(c *Class) error {
 	query := fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES (DEFAULT, %s) RETURNING id",
 		dao.tableName,
@@ -74,45 +70,34 @@ func (dao *dao) insert(g *Group) error {
 
 	row := dao.sqler.QueryRow(
 		query,
-		g.Name,
-		g.Place.Id,
-		g.Weekday,
-		g.Time,
-		g.Duration,
-		g.Type,
-		g.Capacity,
+		c.Group.Id,
+		c.Date,
 	)
 
-	err := row.Scan(&g.Id)
+	err := row.Scan(&c.Id)
 	return errors.New(err)
 }
 
-func (dao *dao) update(g *Group) error {
-	if g.revision == db.Revision(g) {
+func (dao *dao) update(c *Class) error {
+	if c.revision == db.Revision(c) {
 		return nil
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET name = $1, weekday = $2, time = $3, duration = $4, type = $5, capacity = $6 WHERE id = $7",
+		"UPDATE %s SET class_date = $1 WHERE id = $2",
 		dao.tableName,
 	)
 
 	_, err := dao.sqler.Exec(
 		query,
-		g.Name,
-		g.Place.Id,
-		g.Weekday,
-		g.Time,
-		g.Duration,
-		g.Type,
-		g.Capacity,
-		g.Id,
+		c.Date,
+		c.Id,
 	)
 
 	return errors.New(err)
 }
 
-func (dao *dao) findById(id int) (Group, error) {
+func (dao *dao) findById(id int) (Class, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -121,17 +106,17 @@ func (dao *dao) findById(id int) (Group, error) {
 
 	row := dao.sqler.QueryRow(query, id)
 
-	g, err := dao.load(row, true)
+	c, err := dao.load(row, true)
 	if err != nil {
-		return g, err
+		return c, err
 	}
 
-	return g, nil
+	return c, nil
 }
 
-func (dao *dao) findAll() ([]Group, error) {
+func (dao *dao) findAll() ([]Class, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s ORDER BY name",
+		"SELECT %s FROM %s",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
@@ -141,53 +126,65 @@ func (dao *dao) findAll() ([]Group, error) {
 		return nil, errors.New(err)
 	}
 
-	var groups []Group
+	var classes []Class
 
 	for rows.Next() {
-		g, err := dao.load(rows, false)
+		c, err := dao.load(rows, false)
 		if err != nil {
 			// TODO: Check ErrNotFound and ignore it
 			return nil, err
 		}
 
-		groups = append(groups, g)
+		classes = append(classes, c)
 	}
 
-	// We cannot load a composite object while we are iterating over the main
-	// result, that's why we only load it after we finish the iteration
-	placeService := place.NewService(dao.sqler)
-	for i, g := range groups {
-		if g.Place, err = placeService.FindById(g.Place.Id); err != nil {
-			return nil, err
-		}
-		groups[i] = g
-	}
-
-	return groups, nil
+	return classes, nil
 }
 
-func (dao *dao) load(row db.Row, eager bool) (Group, error) {
-	var g Group
+func (dao *dao) findByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s WHERE group_id = $1 AND class_date >= $2 AND class_date =< $3",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	rows, err := dao.sqler.Query(query, groupId, begin, end)
+	if err != nil {
+		return nil, errors.New(err)
+	}
+
+	var classes []Class
+
+	for rows.Next() {
+		c, err := dao.load(rows, false)
+		if err != nil {
+			// TODO: Check ErrNotFound and ignore it
+			return nil, err
+		}
+
+		classes = append(classes, c)
+	}
+
+	return classes, nil
+}
+
+func (dao *dao) load(row db.Row, eager bool) (Class, error) {
+	var c Class
 
 	err := row.Scan(
-		&g.Id,
-		&g.Name,
-		&g.Place.Id,
-		&g.Weekday,
-		&g.Time,
-		&g.Duration,
-		&g.Type,
-		&g.Capacity,
+		&c.Id,
+		&c.Group.Id,
+		&c.Date,
 	)
 
 	if err != nil {
-		return g, errors.New(err)
+		return c, errors.New(err)
 	}
 
 	if eager {
-		g.Place, err = place.NewService(dao.sqler).FindById(g.Place.Id)
+		c.Group, err = group.NewService(dao.sqler).FindById(c.Group.Id)
 	}
 
-	g.revision = db.Revision(g)
-	return g, err
+	c.revision = db.Revision(c)
+	return c, err
 }

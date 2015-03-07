@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type Address struct {
@@ -48,7 +46,7 @@ func (n *Address) Scan(src interface{}) error {
 
 	switch t := src.(type) {
 	case int64, float64, bool, time.Time:
-		return errors.New(fmt.Errorf("Unsupported type to convert into an Address"))
+		return fmt.Errorf("Unsupported type to convert into an Address")
 
 	case []byte:
 		n.Set(string(t))

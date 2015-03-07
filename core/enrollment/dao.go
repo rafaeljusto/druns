@@ -118,7 +118,7 @@ func (dao *dao) findById(id int) (Enrollment, error) {
 	return e, nil
 }
 
-func (dao *dao) findByClient(clientId int) (Enrollments, error) {
+func (dao *dao) findByClient(clientId int) ([]Enrollment, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE client_id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -130,7 +130,7 @@ func (dao *dao) findByClient(clientId int) (Enrollments, error) {
 		return nil, errors.New(err)
 	}
 
-	var enrollments Enrollments
+	var enrollments []Enrollment
 
 	for rows.Next() {
 		e, err := dao.load(rows, false)
@@ -165,7 +165,7 @@ func (dao *dao) findByClient(clientId int) (Enrollments, error) {
 	return enrollments, nil
 }
 
-func (dao *dao) findByGroup(groupId int) (Enrollments, error) {
+func (dao *dao) findByGroup(groupId int) ([]Enrollment, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE client_group_id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -177,7 +177,7 @@ func (dao *dao) findByGroup(groupId int) (Enrollments, error) {
 		return nil, errors.New(err)
 	}
 
-	var enrollments Enrollments
+	var enrollments []Enrollment
 
 	for rows.Next() {
 		e, err := dao.load(rows, false)

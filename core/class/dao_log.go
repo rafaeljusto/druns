@@ -1,4 +1,4 @@
-package user
+package class
 
 import (
 	"fmt"
@@ -23,17 +23,17 @@ func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 		sqler:     sqler,
 		ip:        ip,
 		agent:     agent,
-		tableName: "adm_user_log",
+		tableName: "class_log",
 		tableFields: []string{
 			"id",
-			"name",
-			"email",
+			"client_group_id",
+			"class_date",
 			"log_id",
 		},
 	}
 }
 
-func (dao *daoLog) save(u *User, operation dblog.Operation) error {
+func (dao *daoLog) save(c *Class, operation dblog.Operation) error {
 	dbLog, err := dblog.NewService(dao.sqler).Create(dao.agent, dao.ip, operation)
 	if err != nil {
 		return err
@@ -48,9 +48,9 @@ func (dao *daoLog) save(u *User, operation dblog.Operation) error {
 
 	_, err = dao.sqler.Exec(
 		query,
-		u.Id,
-		u.Name,
-		u.Email,
+		c.Id,
+		c.Group.Id,
+		c.Date,
 		dbLog.Id,
 	)
 

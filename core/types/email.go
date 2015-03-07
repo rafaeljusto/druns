@@ -55,7 +55,7 @@ func (e *Email) Scan(src interface{}) (err error) {
 
 	switch t := src.(type) {
 	case bool, time.Time, int64, float64:
-		return errors.New(fmt.Errorf("Unsupported type to convert into an Email"))
+		return fmt.Errorf("Unsupported type to convert into an Email")
 
 	case []byte:
 		err = e.Set(string(t))

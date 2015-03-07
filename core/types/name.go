@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/rafaeljusto/druns/core/errors"
 )
 
 type Name struct {
@@ -49,7 +47,7 @@ func (n *Name) Scan(src interface{}) error {
 
 	switch t := src.(type) {
 	case int64, float64, bool, time.Time:
-		return errors.New(fmt.Errorf("Unsupported type to convert into a Name"))
+		return fmt.Errorf("Unsupported type to convert into a Name")
 
 	case []byte:
 		n.Set(string(t))

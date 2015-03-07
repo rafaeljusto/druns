@@ -24,12 +24,12 @@ func (s Service) FindById(id int) (Enrollment, error) {
 	return dao.findById(id)
 }
 
-func (s Service) FindByClient(clientId int) (Enrollments, error) {
+func (s Service) FindByClient(clientId int) ([]Enrollment, error) {
 	dao := newDAO(s.sqler, nil, 0)
 	return dao.findByClient(clientId)
 }
 
-func (s Service) FindByGroup(groupId int) (Enrollments, error) {
+func (s Service) FindByGroup(groupId int) ([]Enrollment, error) {
 	dao := newDAO(s.sqler, nil, 0)
 	return dao.findByGroup(groupId)
 }

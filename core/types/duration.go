@@ -62,7 +62,7 @@ func (d *Duration) Scan(src interface{}) (err error) {
 
 	switch t := src.(type) {
 	case bool, time.Time:
-		return errors.New(fmt.Errorf("Unsupported type to convert into a Duration"))
+		return fmt.Errorf("Unsupported type to convert into a Duration")
 
 	case int64:
 		d.Duration, err = time.ParseDuration(fmt.Sprintf("%dm", int64(t)))

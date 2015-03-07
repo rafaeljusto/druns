@@ -65,12 +65,12 @@ func (w Weekday) Value() (driver.Value, error) {
 
 func (w *Weekday) Scan(src interface{}) error {
 	if src == nil {
-		return errors.New(fmt.Errorf("Unsupported type to convert into a Weekday"))
+		return fmt.Errorf("Unsupported type to convert into a Weekday")
 	}
 
 	switch t := src.(type) {
 	case int64, float64, bool, time.Time:
-		return errors.New(fmt.Errorf("Unsupported type to convert into a Weekday"))
+		return fmt.Errorf("Unsupported type to convert into a Weekday")
 
 	case []byte:
 		w.Set(string(t))

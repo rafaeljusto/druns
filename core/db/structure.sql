@@ -155,6 +155,27 @@ CREATE TABLE enrollment_log (
 
 /****************************************/
 
+DROP TABLE IF EXISTS class CASCADE;
+CREATE TABLE class (
+	id SERIAL PRIMARY KEY,
+	client_group_id INT REFERENCES client_group(id),
+	class_date TIMESTAMPTZ
+);
+
+CREATE UNIQUE INDEX ON class(client_group_id, class_date);
+
+/****************************************/
+
+DROP TABLE IF EXISTS class_log CASCADE;
+CREATE TABLE class_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	client_group_id INT REFERENCES client_group(id),
+	class_date TIMESTAMPTZ
+);
+
+/****************************************/
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO druns;
 GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO druns;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO druns;

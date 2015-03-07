@@ -66,7 +66,7 @@ func (t *Time) Scan(src interface{}) (err error) {
 
 	switch v := src.(type) {
 	case int64, float64, bool:
-		return errors.New(fmt.Errorf("Unsupported type to convert into a Time"))
+		return fmt.Errorf("Unsupported type to convert into a Time")
 
 	case time.Time:
 		t.Time = v

@@ -12,8 +12,8 @@ import (
 
 type daoLog struct {
 	sqler       db.SQLer
-	IP          net.IP
-	Agent       int
+	ip          net.IP
+	agent       int
 	tableName   string
 	tableFields []string
 }
@@ -21,8 +21,8 @@ type daoLog struct {
 func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 	return daoLog{
 		sqler:     sqler,
-		IP:        ip,
-		Agent:     agent,
+		ip:        ip,
+		agent:     agent,
 		tableName: "client_log",
 		tableFields: []string{
 			"id",
@@ -34,7 +34,7 @@ func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 }
 
 func (dao *daoLog) save(c *Client, operation dblog.Operation) error {
-	dbLog, err := dblog.NewService().Create(dao.sqler, dao.Agent, dao.IP, operation)
+	dbLog, err := dblog.NewService(dao.sqler).Create(dao.agent, dao.ip, operation)
 	if err != nil {
 		return err
 	}

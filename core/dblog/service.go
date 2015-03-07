@@ -7,14 +7,15 @@ import (
 )
 
 type Service struct {
+	sqler db.SQLer
 }
 
-func NewService() Service {
-	return Service{}
+func NewService(sqler db.SQLer) Service {
+	return Service{sqler}
 }
 
-func (s Service) Create(sqler db.SQLer, agent int, ipAddress net.IP, operation Operation) (DBLog, error) {
+func (s Service) Create(agent int, ipAddress net.IP, operation Operation) (DBLog, error) {
 	dbLog := NewDBLog(agent, ipAddress, operation)
-	dao := newDAO(sqler)
+	dao := newDAO(s.sqler)
 	return dbLog, dao.save(&dbLog)
 }

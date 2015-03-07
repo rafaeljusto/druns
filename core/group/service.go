@@ -24,7 +24,7 @@ func (s Service) FindById(id int) (Group, error) {
 	return dao.findById(id)
 }
 
-func (s Service) FindAll() (Groups, error) {
+func (s Service) FindAll() ([]Group, error) {
 	dao := newDAO(s.sqler, nil, 0)
 	return dao.findAll()
 }
