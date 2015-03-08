@@ -28,13 +28,11 @@ func main() {
 
 	if err := config.LoadConfig(os.Args[1]); err != nil {
 		fmt.Printf("Error loading configuration file. Details: %s\n", err)
-		Logger.Critf("Error loading configuration file. Details: %s", err)
 		return
 	}
 
 	if err := initializeLogger(); err != nil {
 		fmt.Printf("Error initializing logger. Details: %s\n", err)
-		Logger.Critf("Error initializing logger. Details: %s", err)
 		return
 	}
 
@@ -43,6 +41,16 @@ func main() {
 		return
 	}
 	defer db.DB.Close()
+
+	addr, err := localAddress()
+	if err != nil {
+		Logger.Errorf("Error retrieving the local address. Details: %s\n", err)
+		return
+
+	} else if addr == nil {
+		Logger.Errorf("Couldn't retrieve the local address")
+		return
+	}
 
 	tx, err := db.DB.Begin()
 	if err != nil {
@@ -57,19 +65,62 @@ func main() {
 	}
 
 	now := time.Now()
-	twoWeeksFromNow := now.Add(2 * 7 * 24 * time.Hour)
+	twoWeeksFromNow := now.Add(7 * 24 * time.Hour)
 	classService := class.NewService(tx)
 
 	for _, group := range groups {
-		_, err = classService.FindByGroupIdBetweenDates(group.Id, now, twoWeeksFromNow)
+		classes, err := classService.FindByGroupIdBetweenDates(group.Id, now, twoWeeksFromNow)
 		if err != nil {
 			Logger.Errorf("Error retrieving classes. Details: %s", err)
 			return
 		}
 
-		// TODO: For each weekday, check if their already registered classes,
-		// if not create it! We could also remove classes that are not in the
-		// original time or day of the week determinated by the group
+		var scheduleDate time.Time
+		for i := 0; i < 7; i++ {
+			if d := now.Add(time.Duration(24*i) * time.Hour); d.Weekday() == group.Weekday.Weekday {
+				scheduleDate = d
+				break
+			}
+		}
+
+		if scheduleDate.IsZero() {
+			// Not on schedule yet, move on
+			continue
+		}
+
+		foundClass := false
+		for _, c := range classes {
+			if c.Date.Weekday() != group.Weekday.Weekday &&
+				c.Date.Hour() != group.Time.Hour() &&
+				c.Date.Minute() != group.Time.Minute() {
+
+				// TODO: We should remove this class
+				continue
+			}
+
+			foundClass = true
+		}
+
+		if foundClass {
+			// Class already created, move on
+			continue
+		}
+
+		c := class.Class{
+			Group: group,
+			Date: time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
+				group.Time.Hour(), group.Time.Minute(), 0, 0, time.UTC),
+		}
+
+		if err := classService.Save(addr, 1, &c); err != nil {
+			Logger.Errorf("Error saving new class. Details: %s", err)
+			return
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		Logger.Errorf("Error commiting transaction. Details: %s", err)
+		return
 	}
 }
 
@@ -94,4 +145,22 @@ func initializeDatabase() error {
 		dbPassword,
 		config.DrunsConfig.Database.Name,
 	)
+}
+
+func localAddress() (net.IP, error) {
+	name, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+
+	addrs, err := net.LookupHost(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(addrs) > 0 {
+		return net.ParseIP(addrs[0]), nil
+	}
+
+	return nil, nil
 }

@@ -143,7 +143,7 @@ func (dao *dao) findAll() ([]Class, error) {
 
 func (dao *dao) findByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE group_id = $1 AND class_date >= $2 AND class_date =< $3",
+		"SELECT %s FROM %s WHERE client_group_id = $1 AND class_date >= $2 AND class_date <= $3",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
