@@ -115,6 +115,33 @@ func (dao *studentDAO) findById(id int) (Student, error) {
 	return s, nil
 }
 
+func (dao *studentDAO) findByClass(classId int) ([]Student, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s WHERE class_id = $1",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	rows, err := dao.sqler.Query(query)
+	if err != nil {
+		return nil, errors.New(err)
+	}
+
+	var students []Student
+
+	for rows.Next() {
+		s, err := dao.load(rows, false)
+		if err != nil {
+			// TODO: Check ErrNotFound and ignore it
+			return nil, err
+		}
+
+		students = append(students, s)
+	}
+
+	return students, nil
+}
+
 func (dao *studentDAO) findAll() ([]Student, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s",

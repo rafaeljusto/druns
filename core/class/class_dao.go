@@ -141,6 +141,41 @@ func (dao *classDAO) findAll() ([]Class, error) {
 	return classes, nil
 }
 
+func (dao *classDAO) findBetweenDates(begin, end time.Time) ([]Class, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s WHERE class_date >= $2 AND class_date <= $3 ORDER BY class_date",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	rows, err := dao.sqler.Query(query, begin, end)
+	if err != nil {
+		return nil, errors.New(err)
+	}
+
+	var classes []Class
+
+	for rows.Next() {
+		c, err := dao.load(rows, false)
+		if err != nil {
+			// TODO: Check ErrNotFound and ignore it
+			return nil, err
+		}
+
+		classes = append(classes, c)
+	}
+
+	studentDAO := newStudentDAO(dao.sqler, dao.ip, dao.agent)
+	for i, c := range classes {
+		classes[i].Students, err = studentDAO.findByClass(c.Id)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return classes, nil
+}
+
 func (dao *classDAO) findByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE client_group_id = $1 AND class_date >= $2 AND class_date <= $3",

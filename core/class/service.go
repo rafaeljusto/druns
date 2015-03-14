@@ -30,6 +30,11 @@ func (s ClassService) FindAll() ([]Class, error) {
 	return dao.findAll()
 }
 
+func (s ClassService) FindBetweenDates(begin, end time.Time) ([]Class, error) {
+	dao := newClassDAO(s.sqler, nil, 0)
+	return dao.findBetweenDates(begin, end)
+}
+
 func (s ClassService) FindByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
 	dao := newClassDAO(s.sqler, nil, 0)
 	return dao.findByGroupIdBetweenDates(groupId, begin, end)
