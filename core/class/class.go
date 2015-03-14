@@ -10,5 +10,6 @@ type Class struct {
 	Id       int
 	Group    group.Group
 	Date     time.Time
+	Students []Student
 	revision uint64
 }

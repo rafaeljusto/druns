@@ -170,8 +170,29 @@ DROP TABLE IF EXISTS class_log CASCADE;
 CREATE TABLE class_log (
 	log_id INT REFERENCES log(id),
 	id INT,
-	client_group_id INT REFERENCES client_group(id),
+	client_group_id INT,
 	class_date TIMESTAMPTZ
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS student CASCADE;
+CREATE TABLE student (
+	id SERIAL PRIMARY KEY,
+	class_id INT REFERENCES class(id),
+	enrollment_id INT REFERENCES enrollment(id),
+	attended BOOLEAN
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS student_log CASCADE;
+CREATE TABLE student_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	class_id INT,
+	enrollment_id INT,
+	attended BOOLEAN
 );
 
 /****************************************/
