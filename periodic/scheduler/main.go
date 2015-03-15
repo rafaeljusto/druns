@@ -92,9 +92,9 @@ func main() {
 
 		foundClass := false
 		for _, c := range classes {
-			if c.Date.Weekday() != group.Weekday.Weekday &&
-				c.Date.Hour() != group.Time.Hour() &&
-				c.Date.Minute() != group.Time.Minute() {
+			if c.BeginAt.Weekday() != group.Weekday.Weekday &&
+				c.BeginAt.Hour() != group.Time.Hour() &&
+				c.BeginAt.Minute() != group.Time.Minute() {
 
 				// TODO: We should remove this class
 				continue
@@ -108,10 +108,13 @@ func main() {
 			continue
 		}
 
+		refDate := time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
+			group.Time.Hour(), group.Time.Minute(), 0, 0, time.UTC)
+
 		c := class.Class{
-			Group: group,
-			Date: time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
-				group.Time.Hour(), group.Time.Minute(), 0, 0, time.UTC),
+			Group:   group,
+			BeginAt: refDate,
+			EndAt:   refDate.Add(group.Duration.Duration),
 		}
 
 		if err := classService.Save(addr, 1, &c); err != nil {

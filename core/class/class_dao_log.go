@@ -27,7 +27,8 @@ func newClassDAOLog(sqler db.SQLer, ip net.IP, agent int) classDAOLog {
 		tableFields: []string{
 			"id",
 			"client_group_id",
-			"class_date",
+			"begin_at",
+			"end_at",
 			"log_id",
 		},
 	}
@@ -50,7 +51,8 @@ func (dao *classDAOLog) save(c *Class, operation dblog.Operation) error {
 		query,
 		c.Id,
 		c.Group.Id,
-		c.Date,
+		c.BeginAt,
+		c.EndAt,
 		dbLog.Id,
 	)
 

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"html/template"
 	"net/http"
 	"time"
 
@@ -59,7 +60,22 @@ func (h *schedule) Get(response trama.Response, r *http.Request) {
 }
 
 func (h *schedule) Templates() trama.TemplateGroupSet {
-	groupSet := trama.NewTemplateGroupSet(nil)
+	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
+		"filterByDate": func(classes []class.Class, begin, end time.Time) []class.Class {
+			var filtered []class.Class
+			for _, c := range classes {
+				beginInDate := (c.BeginAt.After(begin) || c.BeginAt.Equal(begin)) &&
+					(c.BeginAt.Before(end) || c.BeginAt.Equal(end))
+				endInDate := (c.EndAt.After(begin) || c.EndAt.Equal(begin)) &&
+					(c.EndAt.Before(end) || c.EndAt.Equal(end))
+
+				if beginInDate || endInDate {
+					filtered = append(filtered, c)
+				}
+			}
+			return filtered
+		},
+	})
 
 	for _, language := range config.DrunsConfig.Languages {
 		templates := config.DrunsConfig.HTMLTemplates(language, "schedule")

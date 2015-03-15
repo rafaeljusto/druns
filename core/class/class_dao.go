@@ -29,7 +29,8 @@ func newClassDAO(sqler db.SQLer, ip net.IP, agent int) classDAO {
 		tableFields: []string{
 			"id",
 			"client_group_id",
-			"class_date",
+			"begin_at",
+			"end_at",
 		},
 	}
 }
@@ -71,7 +72,8 @@ func (dao *classDAO) insert(c *Class) error {
 	row := dao.sqler.QueryRow(
 		query,
 		c.Group.Id,
-		c.Date,
+		c.BeginAt,
+		c.EndAt,
 	)
 
 	err := row.Scan(&c.Id)
@@ -84,13 +86,14 @@ func (dao *classDAO) update(c *Class) error {
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET class_date = $1 WHERE id = $2",
+		"UPDATE %s SET begin_at = $1, end_at = $2 WHERE id = $3",
 		dao.tableName,
 	)
 
 	_, err := dao.sqler.Exec(
 		query,
-		c.Date,
+		c.BeginAt,
+		c.EndAt,
 		c.Id,
 	)
 
@@ -143,7 +146,7 @@ func (dao *classDAO) findAll() ([]Class, error) {
 
 func (dao *classDAO) findBetweenDates(begin, end time.Time) ([]Class, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE class_date >= $2 AND class_date <= $3 ORDER BY class_date",
+		"SELECT %s FROM %s WHERE (begin_at BETWEEN $1 AND $2) OR (end_at BETWEEN $1 AND $2) ORDER BY begin_at, end_at",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
@@ -178,7 +181,7 @@ func (dao *classDAO) findBetweenDates(begin, end time.Time) ([]Class, error) {
 
 func (dao *classDAO) findByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE client_group_id = $1 AND class_date >= $2 AND class_date <= $3",
+		"SELECT %s FROM %s WHERE client_group_id = $1 AND ((begin_at BETWEEN $2 AND $3) OR (end_at BETWEEN $2 AND $3))",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
@@ -209,7 +212,8 @@ func (dao *classDAO) load(row db.Row, eager bool) (Class, error) {
 	err := row.Scan(
 		&c.Id,
 		&c.Group.Id,
-		&c.Date,
+		&c.BeginAt,
+		&c.EndAt,
 	)
 
 	if err != nil {

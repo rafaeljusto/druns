@@ -9,7 +9,8 @@ import (
 type Class struct {
 	Id       int
 	Group    group.Group
-	Date     time.Time
+	BeginAt  time.Time
+	EndAt    time.Time
 	Students []Student
 	revision uint64
 }

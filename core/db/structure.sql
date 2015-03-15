@@ -159,7 +159,8 @@ DROP TABLE IF EXISTS class CASCADE;
 CREATE TABLE class (
 	id SERIAL PRIMARY KEY,
 	client_group_id INT REFERENCES client_group(id),
-	class_date TIMESTAMPTZ
+	begin_at TIMESTAMPTZ,
+	end_at TIMESTAMPTZ
 );
 
 CREATE UNIQUE INDEX ON class(client_group_id, class_date);
@@ -171,7 +172,8 @@ CREATE TABLE class_log (
 	log_id INT REFERENCES log(id),
 	id INT,
 	client_group_id INT,
-	class_date TIMESTAMPTZ
+	begin_at TIMESTAMPTZ,
+	end_at TIMESTAMPTZ
 );
 
 /****************************************/
