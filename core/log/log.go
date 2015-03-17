@@ -18,46 +18,12 @@ func init() {
 }
 
 func Connect(name, hostAndPort string) (err error) {
-	drunsLog, err = syslog.Dial("tcp", hostAndPort,
-		syslog.LOG_ALERT|
-			syslog.LOG_CRIT|
-			syslog.LOG_DEBUG|
-			syslog.LOG_EMERG|
-			syslog.LOG_ERR|
-			syslog.LOG_INFO|
-			syslog.LOG_NOTICE|
-			syslog.LOG_WARNING,
-		name)
-
-	if err != nil {
-		// Fallback to UDP connection
-		drunsLog, err = syslog.Dial("udp", hostAndPort,
-			syslog.LOG_ALERT|
-				syslog.LOG_CRIT|
-				syslog.LOG_DEBUG|
-				syslog.LOG_EMERG|
-				syslog.LOG_ERR|
-				syslog.LOG_INFO|
-				syslog.LOG_NOTICE|
-				syslog.LOG_WARNING,
-			name)
-	}
-
+	drunsLog, err = syslog.Dial("tcp", hostAndPort, syslog.LOG_INFO|syslog.LOG_LOCAL0, name)
 	return
 }
 
 func ConnectLocal(name string) (err error) {
-	drunsLog, err = syslog.New(
-		syslog.LOG_ALERT|
-			syslog.LOG_CRIT|
-			syslog.LOG_DEBUG|
-			syslog.LOG_EMERG|
-			syslog.LOG_ERR|
-			syslog.LOG_INFO|
-			syslog.LOG_NOTICE|
-			syslog.LOG_WARNING,
-		name)
-
+	drunsLog, err = syslog.New(syslog.LOG_INFO|syslog.LOG_LOCAL0, name)
 	return
 }
 
