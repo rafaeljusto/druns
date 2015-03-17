@@ -9,6 +9,7 @@ import (
 
 	"github.com/rafaeljusto/druns/core/class"
 	"github.com/rafaeljusto/druns/core/db"
+	"github.com/rafaeljusto/druns/core/enrollment"
 	"github.com/rafaeljusto/druns/core/errors"
 	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/log"
@@ -66,7 +67,8 @@ func main() {
 
 	now := time.Now()
 	twoWeeksFromNow := now.Add(7 * 24 * time.Hour)
-	classService := class.NewService(tx)
+	classService := class.NewClassService(tx)
+	studentService := class.NewStudentService(tx)
 
 	for _, group := range groups {
 		classes, err := classService.FindByGroupIdBetweenDates(group.Id, now, twoWeeksFromNow)
@@ -90,9 +92,9 @@ func main() {
 
 		foundClass := false
 		for _, c := range classes {
-			if c.Date.Weekday() != group.Weekday.Weekday &&
-				c.Date.Hour() != group.Time.Hour() &&
-				c.Date.Minute() != group.Time.Minute() {
+			if c.BeginAt.Weekday() != group.Weekday.Weekday &&
+				c.BeginAt.Hour() != group.Time.Hour() &&
+				c.BeginAt.Minute() != group.Time.Minute() {
 
 				// TODO: We should remove this class
 				continue
@@ -106,16 +108,39 @@ func main() {
 			continue
 		}
 
+		refDate := time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
+			group.Time.Hour(), group.Time.Minute(), 0, 0, time.UTC)
+
 		c := class.Class{
-			Group: group,
-			Date: time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
-				group.Time.Hour(), group.Time.Minute(), 0, 0, time.UTC),
+			Group:   group,
+			BeginAt: refDate,
+			EndAt:   refDate.Add(group.Duration.Duration),
 		}
 
 		if err := classService.Save(addr, 1, &c); err != nil {
 			Logger.Errorf("Error saving new class. Details: %s", err)
 			return
 		}
+
+		enrollments, err := enrollment.NewService(tx).FindByGroup(group.Id)
+		if err != nil {
+			Logger.Errorf("Error retrieving enrollments for Group %d. Details: %s", group.Id, err)
+			return
+		}
+
+		for _, e := range enrollments {
+			s := class.Student{
+				Enrollment: e,
+			}
+
+			if err := studentService.Save(addr, 1, &s, c); err != nil {
+				Logger.Errorf("Error saving new student. Details: %s", err)
+				return
+			}
+
+			c.Students = append(c.Students, s)
+		}
+
 	}
 
 	if err := tx.Commit(); err != nil {

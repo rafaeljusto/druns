@@ -10,7 +10,7 @@ import (
 	"github.com/rafaeljusto/druns/core/errors"
 )
 
-type daoLog struct {
+type studentDAOLog struct {
 	sqler       db.SQLer
 	ip          net.IP
 	agent       int
@@ -18,22 +18,23 @@ type daoLog struct {
 	tableFields []string
 }
 
-func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
-	return daoLog{
+func newStudentDAOLog(sqler db.SQLer, ip net.IP, agent int) studentDAOLog {
+	return studentDAOLog{
 		sqler:     sqler,
 		ip:        ip,
 		agent:     agent,
-		tableName: "class_log",
+		tableName: "student_log",
 		tableFields: []string{
 			"id",
-			"client_group_id",
-			"class_date",
+			"class_id",
+			"enrollment_id",
+			"attended",
 			"log_id",
 		},
 	}
 }
 
-func (dao *daoLog) save(c *Class, operation dblog.Operation) error {
+func (dao *studentDAOLog) save(s *Student, c Class, operation dblog.Operation) error {
 	dbLog, err := dblog.NewService(dao.sqler).Create(dao.agent, dao.ip, operation)
 	if err != nil {
 		return err
@@ -48,9 +49,10 @@ func (dao *daoLog) save(c *Class, operation dblog.Operation) error {
 
 	_, err = dao.sqler.Exec(
 		query,
+		s.Id,
 		c.Id,
-		c.Group.Id,
-		c.Date,
+		s.Enrollment.Id,
+		s.Attended,
 		dbLog.Id,
 	)
 

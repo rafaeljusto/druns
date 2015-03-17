@@ -12,7 +12,7 @@ import (
 	"github.com/rafaeljusto/druns/core/group"
 )
 
-type dao struct {
+type classDAO struct {
 	sqler       db.SQLer
 	ip          net.IP
 	agent       int
@@ -20,8 +20,8 @@ type dao struct {
 	tableFields []string
 }
 
-func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
-	return dao{
+func newClassDAO(sqler db.SQLer, ip net.IP, agent int) classDAO {
+	return classDAO{
 		sqler:     sqler,
 		ip:        ip,
 		agent:     agent,
@@ -29,12 +29,13 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 		tableFields: []string{
 			"id",
 			"client_group_id",
-			"class_date",
+			"begin_at",
+			"end_at",
 		},
 	}
 }
 
-func (dao *dao) save(c *Class) error {
+func (dao *classDAO) save(c *Class) error {
 	if dao.agent == 0 || dao.ip == nil {
 		return errors.New(fmt.Errorf("No log information defined to persist information"))
 	}
@@ -56,11 +57,11 @@ func (dao *dao) save(c *Class) error {
 		operation = dblog.OperationUpdate
 	}
 
-	logDAO := newDAOLog(dao.sqler, dao.ip, dao.agent)
+	logDAO := newClassDAOLog(dao.sqler, dao.ip, dao.agent)
 	return logDAO.save(c, operation)
 }
 
-func (dao *dao) insert(c *Class) error {
+func (dao *classDAO) insert(c *Class) error {
 	query := fmt.Sprintf(
 		"INSERT INTO %s (%s) VALUES (DEFAULT, %s) RETURNING id",
 		dao.tableName,
@@ -71,33 +72,35 @@ func (dao *dao) insert(c *Class) error {
 	row := dao.sqler.QueryRow(
 		query,
 		c.Group.Id,
-		c.Date,
+		c.BeginAt,
+		c.EndAt,
 	)
 
 	err := row.Scan(&c.Id)
 	return errors.New(err)
 }
 
-func (dao *dao) update(c *Class) error {
+func (dao *classDAO) update(c *Class) error {
 	if c.revision == db.Revision(c) {
 		return nil
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET class_date = $1 WHERE id = $2",
+		"UPDATE %s SET begin_at = $1, end_at = $2 WHERE id = $3",
 		dao.tableName,
 	)
 
 	_, err := dao.sqler.Exec(
 		query,
-		c.Date,
+		c.BeginAt,
+		c.EndAt,
 		c.Id,
 	)
 
 	return errors.New(err)
 }
 
-func (dao *dao) findById(id int) (Class, error) {
+func (dao *classDAO) findById(id int) (Class, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s WHERE id = $1",
 		strings.Join(dao.tableFields, ", "),
@@ -114,7 +117,7 @@ func (dao *dao) findById(id int) (Class, error) {
 	return c, nil
 }
 
-func (dao *dao) findAll() ([]Class, error) {
+func (dao *classDAO) findAll() ([]Class, error) {
 	query := fmt.Sprintf(
 		"SELECT %s FROM %s",
 		strings.Join(dao.tableFields, ", "),
@@ -141,9 +144,44 @@ func (dao *dao) findAll() ([]Class, error) {
 	return classes, nil
 }
 
-func (dao *dao) findByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
+func (dao *classDAO) findBetweenDates(begin, end time.Time) ([]Class, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE client_group_id = $1 AND class_date >= $2 AND class_date <= $3",
+		"SELECT %s FROM %s WHERE (begin_at BETWEEN $1 AND $2) OR (end_at BETWEEN $1 AND $2) ORDER BY begin_at, end_at",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	rows, err := dao.sqler.Query(query, begin, end)
+	if err != nil {
+		return nil, errors.New(err)
+	}
+
+	var classes []Class
+
+	for rows.Next() {
+		c, err := dao.load(rows, false)
+		if err != nil {
+			// TODO: Check ErrNotFound and ignore it
+			return nil, err
+		}
+
+		classes = append(classes, c)
+	}
+
+	studentDAO := newStudentDAO(dao.sqler, dao.ip, dao.agent)
+	for i, c := range classes {
+		classes[i].Students, err = studentDAO.findByClass(c.Id)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return classes, nil
+}
+
+func (dao *classDAO) findByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s WHERE client_group_id = $1 AND ((begin_at BETWEEN $2 AND $3) OR (end_at BETWEEN $2 AND $3))",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
@@ -168,13 +206,14 @@ func (dao *dao) findByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]
 	return classes, nil
 }
 
-func (dao *dao) load(row db.Row, eager bool) (Class, error) {
+func (dao *classDAO) load(row db.Row, eager bool) (Class, error) {
 	var c Class
 
 	err := row.Scan(
 		&c.Id,
 		&c.Group.Id,
-		&c.Date,
+		&c.BeginAt,
+		&c.EndAt,
 	)
 
 	if err != nil {

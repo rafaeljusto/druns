@@ -7,30 +7,58 @@ import (
 	"github.com/rafaeljusto/druns/core/db"
 )
 
-type Service struct {
+type ClassService struct {
 	sqler db.SQLer
 }
 
-func NewService(sqler db.SQLer) Service {
-	return Service{sqler}
+func NewClassService(sqler db.SQLer) ClassService {
+	return ClassService{sqler}
 }
 
-func (s Service) Save(ip net.IP, agent int, c *Class) error {
-	dao := newDAO(s.sqler, ip, agent)
+func (s ClassService) Save(ip net.IP, agent int, c *Class) error {
+	dao := newClassDAO(s.sqler, ip, agent)
 	return dao.save(c)
 }
 
-func (s Service) FindById(id int) (Class, error) {
-	dao := newDAO(s.sqler, nil, 0)
+func (s ClassService) FindById(id int) (Class, error) {
+	dao := newClassDAO(s.sqler, nil, 0)
 	return dao.findById(id)
 }
 
-func (s Service) FindAll() ([]Class, error) {
-	dao := newDAO(s.sqler, nil, 0)
+func (s ClassService) FindAll() ([]Class, error) {
+	dao := newClassDAO(s.sqler, nil, 0)
 	return dao.findAll()
 }
 
-func (s Service) FindByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
-	dao := newDAO(s.sqler, nil, 0)
+func (s ClassService) FindBetweenDates(begin, end time.Time) ([]Class, error) {
+	dao := newClassDAO(s.sqler, nil, 0)
+	return dao.findBetweenDates(begin, end)
+}
+
+func (s ClassService) FindByGroupIdBetweenDates(groupId int, begin, end time.Time) ([]Class, error) {
+	dao := newClassDAO(s.sqler, nil, 0)
 	return dao.findByGroupIdBetweenDates(groupId, begin, end)
+}
+
+type StudentService struct {
+	sqler db.SQLer
+}
+
+func NewStudentService(sqler db.SQLer) StudentService {
+	return StudentService{sqler}
+}
+
+func (s StudentService) Save(ip net.IP, agent int, student *Student, c Class) error {
+	dao := newStudentDAO(s.sqler, ip, agent)
+	return dao.save(student, c)
+}
+
+func (s StudentService) FindById(id int) (Student, error) {
+	dao := newStudentDAO(s.sqler, nil, 0)
+	return dao.findById(id)
+}
+
+func (s StudentService) FindAll() ([]Student, error) {
+	dao := newStudentDAO(s.sqler, nil, 0)
+	return dao.findAll()
 }
