@@ -1,5 +1,55 @@
 [[template "prefix" .]]
 
-			[[template "menu" .]]
+      [[template "menu" .]]
+      [[$weekdays := getWeekdays .Begin .End]]
+      [[$workingHours := getWorkingHours]]
+      
+      <div class="container-fluid">
+        <div class="row hidden-xs hidden-sm">
+          <div class="col-md-1"></div>
+          [[range $weekday := $weekdays]]
+          <div class="col-md-1">
+            <h3>[[weekday $weekday]]</h3>
+          </div>
+          [[end]]
+        </div>
+        [[range $hour := $workingHours]]
+        <div class="row hidden-xs hidden-sm">
+          <div class="col-md-1">
+            [[printHour $hour]]
+          </div>
+          [[range $weekday := $weekdays]]
+          <div class="col-md-1">
+            [[range $class := filterClasses $.Classes $weekday $hour]]
+            <div>
+              [[$class.Group.Name]]
+            </div>
+            [[end]]
+          </div>
+          [[end]]
+        </div>
+        [[end]]
+      </div>
+      <div class="container-fluid">
+        [[range $weekday := $weekdays]]
+        <div class="row visible-xs visible-sm">
+          <div class="col-xs-12 col-sm-12">
+            <h3>[[weekday $weekday]]</h3>
+          </div>
+        </div>
+        [[range $hour := $workingHours]]
+        <div class="row visible-xs visible-sm">
+          <div class="col-xs-1 col-sm-1">[[printHour $hour]]</div>
+          <div class="col-xs-11 col-sm-11">
+            [[range $class := filterClasses $.Classes $weekday $hour]]
+            <div>
+              [[$class.Group.Name]]
+            </div>
+            [[end]]
+          </div>
+        </div>
+        [[end]]
+        [[end]]
+      </div>
 
 [[template "posfix" .]]

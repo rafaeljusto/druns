@@ -169,7 +169,14 @@ func (dao *classDAO) findBetweenDates(begin, end time.Time) ([]Class, error) {
 	}
 
 	studentDAO := newStudentDAO(dao.sqler, dao.ip, dao.agent)
+	groupService := group.NewService(dao.sqler)
+
 	for i, c := range classes {
+		classes[i].Group, err = groupService.FindById(c.Group.Id)
+		if err != nil {
+			return nil, err
+		}
+
 		classes[i].Students, err = studentDAO.findByClass(c.Id)
 		if err != nil {
 			return nil, err
@@ -222,6 +229,15 @@ func (dao *classDAO) load(row db.Row, eager bool) (Class, error) {
 
 	if eager {
 		c.Group, err = group.NewService(dao.sqler).FindById(c.Group.Id)
+		if err != nil {
+			return c, err
+		}
+
+		studentDAO := newStudentDAO(dao.sqler, dao.ip, dao.agent)
+		c.Students, err = studentDAO.findByClass(c.Id)
+		if err != nil {
+			return c, err
+		}
 	}
 
 	c.revision = db.Revision(c)

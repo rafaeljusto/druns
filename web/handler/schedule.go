@@ -61,7 +61,7 @@ func (h *schedule) Get(response trama.Response, r *http.Request) {
 
 func (h *schedule) Templates() trama.TemplateGroupSet {
 	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
-		"getDays": func(begin, end time.Time) []time.Time {
+		"getWeekdays": func(begin, end time.Time) []time.Time {
 			var days []time.Time
 			for begin.Day() <= end.Day() &&
 				begin.Month() <= end.Month() &&
