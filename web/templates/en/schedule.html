@@ -2,4 +2,28 @@
 
 			[[template "menu" .]]
 			
+      <div class="container-fluid">
+        <div class="row">
+          [[range $day := getDays .Begin .End]]
+          <div class="col-xs-12 col-md-1">
+            <h3>[[weekday $day]]</h3>
+            <div class="container">
+              <div class="row">
+                [[range $hour := getWorkingHours]]
+                <div class="col-md-1">
+                  [[printHour $hour]]
+                </div>
+                <div class="col-md-11">
+                  [[range $class := filterClasses $.Classes $day $hour]]
+                  [[$class.Id]]<br/>
+                  [[end]]
+                </div>
+                [[end]]
+              </div>
+            </div>
+          </div>
+          [[end]]
+        </div>
+      </div>
+
 [[template "posfix" .]]

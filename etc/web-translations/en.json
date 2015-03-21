@@ -7,5 +7,12 @@
 	"invalid-group-type": "Invalid group type",
 	"invalid-time": "Invalid time format",
 	"invalid-weekday": "Invalid weekday",
-	"session-expired": "Session expired"
+	"session-expired": "Session expired",
+	"sunday": "Sun",
+	"monday": "Mon",
+	"tuesday": "Tue",
+	"wednesday": "Wed",
+	"thursday": "Thu",
+	"friday": "Fri",
+	"saturday": "Sat"
 }

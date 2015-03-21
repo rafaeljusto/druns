@@ -122,7 +122,7 @@ func (dao *studentDAO) findByClass(classId int) ([]Student, error) {
 		dao.tableName,
 	)
 
-	rows, err := dao.sqler.Query(query)
+	rows, err := dao.sqler.Query(query, classId)
 	if err != nil {
 		return nil, errors.New(err)
 	}

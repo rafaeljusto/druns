@@ -7,5 +7,12 @@
 	"invalid-group-type": "Tipo do grupo inválido",
 	"invalid-time": "Formato do horário inválido",
 	"invalid-weekday": "Dia da semana inválido",
-	"session-expired": "Sessão expirada"
+	"session-expired": "Sessão expirada",
+	"sunday": "Dom",
+	"monday": "Seg",
+	"tuesday": "Ter",
+	"wednesday": "Qua",
+	"thursday": "Qui",
+	"friday": "Sex",
+	"saturday": "Sab"
 }
