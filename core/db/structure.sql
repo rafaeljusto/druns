@@ -163,7 +163,7 @@ CREATE TABLE class (
 	end_at TIMESTAMPTZ
 );
 
-CREATE UNIQUE INDEX ON class(client_group_id, class_date);
+CREATE UNIQUE INDEX ON class(client_group_id, begin_at, end_at);
 
 /****************************************/
 
