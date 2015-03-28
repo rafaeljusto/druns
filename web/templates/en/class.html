@@ -16,7 +16,7 @@
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Check-in</th>
+                <th>Attended?</th>
               </tr>
             </thead>
             <tbody>
@@ -27,7 +27,10 @@
                     [[$student.Enrollment.Client.Name]]
                   </a>
                 </td>
-                <td><input type="checkbox" name="student-[[$student.Id]]"></td>
+                <td>
+                  <input type="checkbox" name="student-[[$student.Id]]" 
+                    value="1" [[if $student.Attended]]checked="checked"[[end]]>
+                </td>
               </tr>
               [[end]]
             </tbody>

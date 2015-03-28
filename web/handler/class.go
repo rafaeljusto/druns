@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -54,6 +55,49 @@ func (h *classHandler) Get(response trama.Response, r *http.Request) {
 		h.Logger().Error(err)
 		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 		return
+	}
+
+	response.ExecuteTemplate(h.Response(r))
+}
+
+func (h *classHandler) Post(response trama.Response, r *http.Request) {
+	if len(r.FormValue("id")) == 0 {
+		response.ExecuteTemplate(h.Response(r))
+		return
+	}
+
+	id, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		h.Logger().Error(errors.New(err))
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
+	if h.Class, err = class.NewClassService(h.Tx()).FindById(id); err != nil {
+		// TODO: Check ErrNotFound. Redirect to the list page with an automatic error message (like login)
+		h.Logger().Error(err)
+		response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+		return
+	}
+
+	studentService := class.NewStudentService(h.Tx())
+
+	for i, s := range h.Class.Students {
+		attended := r.FormValue(fmt.Sprintf("student-%d", s.Id))
+		if attended == "1" {
+			s.Attended = true
+		} else {
+			s.Attended = false
+		}
+
+		err := studentService.Save(h.RemoteAddress(), h.Session().User.Id, &s, h.Class)
+		if err != nil {
+			h.Logger().Error(err)
+			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
+			return
+		}
+
+		h.Class.Students[i] = s
 	}
 
 	response.ExecuteTemplate(h.Response(r))
