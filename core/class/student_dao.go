@@ -139,6 +139,14 @@ func (dao *studentDAO) findByClass(classId int) ([]Student, error) {
 		students = append(students, s)
 	}
 
+	enrollmentService := enrollment.NewService(dao.sqler)
+	for i, s := range students {
+		students[i].Enrollment, err = enrollmentService.FindById(s.Enrollment.Id)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return students, nil
 }
 

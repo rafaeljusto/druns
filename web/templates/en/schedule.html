@@ -22,7 +22,7 @@
           <div class="col-md-1">
             [[range $class := filterClasses $.Classes $weekday $hour]]
             <div>
-              [[$class.Group.Name]]
+              <a href="[[url "class"]]?id=[[$class.Id]]">[[$class.Group.Name]]</a>
             </div>
             [[end]]
           </div>
@@ -43,7 +43,7 @@
           <div class="col-xs-11 col-sm-11">
             [[range $class := filterClasses $.Classes $weekday $hour]]
             <div>
-              [[$class.Group.Name]]
+              <a href="[[url "class"]]?id=[[$class.Id]]">[[$class.Group.Name]]</a>
             </div>
             [[end]]
           </div>
