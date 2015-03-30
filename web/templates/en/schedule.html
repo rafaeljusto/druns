@@ -8,26 +8,28 @@
         <div class="row hidden-xs hidden-sm">
           <div class="col-md-1"></div>
           [[range $weekday := $weekdays]]
-          <div class="col-md-1">
+          <div class="col-md-1 text-center">
             <h3>[[weekday $weekday]]</h3>
           </div>
           [[end]]
         </div>
+        <hr class="hidden-xs hidden-sm">
         [[range $hour := $workingHours]]
-        <div class="row hidden-xs hidden-sm">
+        <div class="row hidden-xs hidden-sm vertical-align">
           <div class="col-md-1">
             [[printHour $hour]]
           </div>
           [[range $weekday := $weekdays]]
           <div class="col-md-1">
             [[range $class := filterClasses $.Classes $weekday $hour]]
-            <div>
+            <div class="class" style="background-color: [[getColor $class.Id]]">
               <a href="[[url "class"]]?id=[[$class.Id]]">[[$class.Group.Name]]</a>
             </div>
             [[end]]
           </div>
           [[end]]
         </div>
+        <hr class="hidden-xs hidden-sm">
         [[end]]
       </div>
       <div class="container-fluid">
@@ -37,17 +39,19 @@
             <h3>[[weekday $weekday]]</h3>
           </div>
         </div>
+        <hr class="visible-xs visible-sm">
         [[range $hour := $workingHours]]
-        <div class="row visible-xs visible-sm">
+        <div class="row visible-xs visible-sm vertical-align">
           <div class="col-xs-1 col-sm-1">[[printHour $hour]]</div>
           <div class="col-xs-11 col-sm-11">
             [[range $class := filterClasses $.Classes $weekday $hour]]
-            <div>
+            <div class="class" style="background-color: [[getColor $class.Id]]">
               <a href="[[url "class"]]?id=[[$class.Id]]">[[$class.Group.Name]]</a>
             </div>
             [[end]]
           </div>
         </div>
+        <hr class="visible-xs visible-sm">
         [[end]]
         [[end]]
       </div>

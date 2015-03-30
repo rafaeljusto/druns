@@ -2,8 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/class"
@@ -104,7 +106,11 @@ func (h *classHandler) Post(response trama.Response, r *http.Request) {
 }
 
 func (h *classHandler) Templates() trama.TemplateGroupSet {
-	groupSet := trama.NewTemplateGroupSet(nil)
+	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
+		"printDate": func(date time.Time) string {
+			return date.Format("2006-01-02 15:04:05")
+		},
+	})
 
 	for _, language := range config.DrunsConfig.Languages {
 		templates := config.DrunsConfig.HTMLTemplates(language, "class")

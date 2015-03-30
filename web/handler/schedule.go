@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"fmt"
+	"hash/crc64"
 	"html/template"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
@@ -63,9 +66,9 @@ func (h *schedule) Templates() trama.TemplateGroupSet {
 	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
 		"getWeekdays": func(begin, end time.Time) []time.Time {
 			var days []time.Time
-			for begin.Day() <= end.Day() &&
-				begin.Month() <= end.Month() &&
-				begin.Year() <= end.Year() {
+			for begin.Day() <= end.Day() ||
+				begin.Month() < end.Month() ||
+				begin.Year() < end.Year() {
 
 				days = append(days, begin)
 				begin = begin.Add(24 * time.Hour)
@@ -118,6 +121,10 @@ func (h *schedule) Templates() trama.TemplateGroupSet {
 				}
 			}
 			return filtered
+		},
+		"getColor": func(id int) string {
+			hash := crc64.Checksum([]byte(strconv.Itoa(id)), crc64.MakeTable(crc64.ISO))
+			return fmt.Sprintf("#%02X%02X%02X", hash%255, (hash<<1)%255, (hash<<2)%255)
 		},
 	})
 
