@@ -40,6 +40,8 @@ cd $workspace/utils/bootstrap
 go build
 cd $workspace/utils/password
 go build
+cd $workspace/periodic/scheduler
+go build
 cd $current_dir
 
 if [ -f $pack_name*.deb ]; then
@@ -51,8 +53,8 @@ if [ -d $tmp_dir ]; then
   rm -rf $tmp_dir
 fi
 
-mkdir -p $tmp_dir$install_path/bin $tmp_dir$install_path/web $tmp_dir$install_path/db
-mv $workspace/druns $workspace/utils/bootstrap/bootstrap $workspace/utils/password/password $project_root/bin/
+mkdir -p $project_root/bin $project_root/web $project_root/db
+mv $workspace/druns $workspace/utils/bootstrap/bootstrap $workspace/utils/password/password $workspace/periodic/scheduler/scheduler $project_root/bin/
 cp -r $workspace/web/templates $project_root/web/
 cp -r $workspace/web/assets $project_root/web/
 cp -r $workspace/etc $project_root/

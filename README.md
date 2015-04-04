@@ -41,3 +41,11 @@ install
 ```
 % /usr/druns/bin/bootstrap -config /usr/druns/etc/webserver.conf -email <email> -name "<name>" -password "<password>"
 ```
+
+6. Add periodics to crontab
+
+```
+% crontab -e
+
+*/10 * * * * /usr/druns/bin/scheduler /usr/druns/etc/webserver.conf
+```

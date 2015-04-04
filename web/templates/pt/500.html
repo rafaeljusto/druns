@@ -1,38 +1,13 @@
-<!doctype html>
+[[template "prefix" .]]
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="description" content="Web application to manage clients">
-		<meta name="author" content="Rafael Dantas Justo">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-
-		<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-		<link rel="stylesheet" href="/assets/css/bootstrap-theme.min.css">
-
-		<title>FOCO SPORTS</title>
-	</head>
-	
-	<body>
-		<div class="container">
-			<div class="page-header">
-				<h1>FOCO SPORTS<br/><small>Assessoria Esportiva</small></h1>
-			</div>
-
-			<div class="panel panel-danger">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-					<h3 class="panel-title">Erro</h3>
-				</div>
-				<div class="panel-body">
-					Um erro ocorreu em nosso sistema. Por favor entre em contato com o administrador e informe
-					ele sobre o ticket {{.Ticket}}.
-				</div>
-			</div>
-			
-			<footer>
-	      <small>© Copyright 2015 Rafael Dantas Justo. Todos os direitos reservados.</small>
-	    </footer>
-		</div>
-	</body>
-</html>
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <h3 class="panel-title">Error</h3>
+        </div>
+        <div class="panel-body">
+          Um erro ocorreu em nosso sistema. Por favor entre em contato com o administrador e informe
+          ele sobre o ticket [[.Ticket]].
+        </div>
+      </div>
+      
+[[template "posfix" .]]
