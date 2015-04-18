@@ -1,0 +1,30 @@
+[[template "prefix" .]]
+
+      [[template "menu" .]]
+      
+      <h2>Recebimentos por Grupo</h2>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Grupo</th>
+              <th>M&ecirc;s</th>
+              <th>Previsto</th>
+              <th>Recebimentos</th>
+            </tr>
+          </thead>
+          <tbody>
+        [[range $incoming := .Incomings]]
+            <tr>
+              <td><a href="[[url "group"]]?id=[[$incoming.Group.Id]]">[[$incoming.Group.Name]]</a></td>
+              <td>[[month $incoming.Month]]</td>
+              <td>R$[[$incoming.Foreseen]]</td>
+              <td>R$[[$incoming.Value]]</td>
+            </tr>
+        [[end]]
+          </tbody>
+        </table>
+      </div>
+
+[[template "posfix" .]]

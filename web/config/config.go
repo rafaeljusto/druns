@@ -60,6 +60,8 @@ type Config struct {
 		Secret  string
 		Timeout Duration
 	}
+
+	ClassValue float64
 }
 
 func (c Config) TLS() (string, string) {
