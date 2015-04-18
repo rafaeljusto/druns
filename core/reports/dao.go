@@ -113,7 +113,7 @@ func (dao *dao) incomingPerGroup(month time.Time, classValue float64) ([]Incomin
 		incomings = append(incomings, Incoming{
 			Group:    g,
 			Month:    month,
-			Foreseen: float64(students.foreseenQuantity) * classValue,
+			Foreseen: (float64(students.realQuantity) * classValue) + (float64(students.foreseenQuantity) * classValue),
 			Value:    float64(students.realQuantity) * classValue,
 		})
 
