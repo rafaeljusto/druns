@@ -23,6 +23,15 @@
           <p class="help-block">[[$msg]]</p>
           [[end]]
         </div>
+        [[$msg := index .FieldMessage "weight"]]
+        <div class="form-group [[if ne $msg ""]]has-error[[end]]">
+          <label for="weight" class="control-label">Weight</label>
+          <input type="number" class="form-control" id="weight" name="weight"
+            value="[[.Client.Weight]]">
+          [[if ne $msg ""]]
+          <p class="help-block">[[$msg]]</p>
+          [[end]]
+        </div>
         
         <button type="submit" class="btn btn-success">Save</button>
       </form>

@@ -28,6 +28,7 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 			"id",
 			"name",
 			"birthday",
+			"weight",
 		},
 	}
 }
@@ -70,6 +71,7 @@ func (dao *dao) insert(c *Client) error {
 		query,
 		c.Name,
 		c.Birthday,
+		c.Weight,
 	)
 
 	err := row.Scan(&c.Id)
@@ -82,7 +84,7 @@ func (dao *dao) update(c *Client) error {
 	}
 
 	query := fmt.Sprintf(
-		"UPDATE %s SET name = $1, birthday = $2 WHERE id = $3",
+		"UPDATE %s SET name = $1, birthday = $2, weight = $3 WHERE id = $4",
 		dao.tableName,
 	)
 
@@ -90,6 +92,7 @@ func (dao *dao) update(c *Client) error {
 		query,
 		c.Name,
 		c.Birthday,
+		c.Weight,
 		c.Id,
 	)
 
@@ -147,6 +150,7 @@ func (dao *dao) load(row db.Row) (Client, error) {
 		&c.Id,
 		&c.Name,
 		&c.Birthday,
+		&c.Weight,
 	)
 
 	c.revision = db.Revision(c)

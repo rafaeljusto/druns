@@ -28,6 +28,7 @@ func newDAOLog(sqler db.SQLer, ip net.IP, agent int) daoLog {
 			"id",
 			"name",
 			"birthday",
+			"weight",
 			"log_id",
 		},
 	}
@@ -51,6 +52,7 @@ func (dao *daoLog) save(c *Client, operation dblog.Operation) error {
 		c.Id,
 		c.Name,
 		c.Birthday,
+		c.Weight,
 		dbLog.Id,
 	)
 
