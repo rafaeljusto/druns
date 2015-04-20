@@ -343,8 +343,8 @@ func generateGroups(tx db.Transaction, ip net.IP, agent int) bool {
 		g := group.Group{
 			Name:     types.NewName(fmt.Sprintf("Group %d", i)),
 			Place:    place.Place{Id: rand.Intn(2) + 1},
-			Weekday:  types.NewWeekday(time.Weekday(rand.Intn(7))),
-			Time:     types.NewTime(time.Date(0, 0, 0, rand.Intn(24), rand.Intn(60), 0, 0, time.UTC)),
+			Weekday:  types.NewWeekday(time.Weekday(rand.Intn(5) + 1)),
+			Time:     types.NewTime(time.Date(0, 0, 0, rand.Intn(17)+6, rand.Intn(60), 0, 0, time.Local)),
 			Duration: types.NewDuration(time.Duration(rand.Intn(120)) * time.Minute),
 			Type:     groupType,
 			Capacity: rand.Intn(20) + 10,
