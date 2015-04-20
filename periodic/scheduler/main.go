@@ -109,7 +109,7 @@ func main() {
 		}
 
 		refDate := time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
-			group.Time.Hour(), group.Time.Minute(), 0, 0, time.UTC)
+			group.Time.Hour(), group.Time.Minute(), 0, 0, time.Local)
 
 		c := class.Class{
 			Group:   group,
@@ -117,7 +117,7 @@ func main() {
 			EndAt:   refDate.Add(group.Duration.Duration),
 		}
 
-		if err := classService.Save(addr, 1, &c); err != nil {
+		if err := classService.Save(addr, systemUser.Id, &c); err != nil {
 			Logger.Errorf("Error saving new class. Details: %s", err)
 			return
 		}
@@ -133,7 +133,7 @@ func main() {
 				Enrollment: e,
 			}
 
-			if err := studentService.Save(addr, 1, &s, c); err != nil {
+			if err := studentService.Save(addr, systemUser.Id, &s, c); err != nil {
 				Logger.Errorf("Error saving new student. Details: %s", err)
 				return
 			}

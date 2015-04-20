@@ -101,12 +101,12 @@ func (h *schedule) Templates() trama.TemplateGroupSet {
 		"getWorkingHours": func() []time.Time {
 			var workingHours []time.Time
 			for i := 6; i <= 23; i++ {
-				workingHours = append(workingHours, time.Date(0, 0, 0, i, 0, 0, 0, time.UTC))
+				workingHours = append(workingHours, time.Date(0, 0, 0, i, 0, 0, 0, time.Local))
 			}
 			return workingHours
 		},
 		"filterClasses": func(classes []class.Class, date time.Time, hour time.Time) []class.Class {
-			begin := time.Date(date.Year(), date.Month(), date.Day(), hour.Hour(), 0, 0, 0, time.UTC)
+			begin := time.Date(date.Year(), date.Month(), date.Day(), hour.Hour(), 0, 0, 0, time.Local)
 			end := begin.Add(1 * time.Hour)
 
 			var filtered []class.Class
