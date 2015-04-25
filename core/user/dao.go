@@ -13,6 +13,8 @@ import (
 	"github.com/rafaeljusto/druns/core/errors"
 )
 
+var systemEmail = "system@druns.com.br"
+
 type dao struct {
 	sqler       db.SQLer
 	ip          net.IP
@@ -140,15 +142,32 @@ func (dao *dao) findByEmail(email string) (User, error) {
 	return u, nil
 }
 
-func (dao *dao) findAll() ([]User, error) {
-	// Avoid selecting the BOOTSTRAP user
+func (dao *dao) systemUser() (User, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE email != ''",
+		"SELECT %s FROM %s WHERE name = $1 AND email = $2",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)
 
-	rows, err := dao.sqler.Query(query)
+	row := dao.sqler.QueryRow(query, "System", systemEmail)
+
+	u, err := dao.load(row)
+	if err != nil {
+		return u, err
+	}
+
+	return u, nil
+}
+
+func (dao *dao) findAll() ([]User, error) {
+	// Avoid selecting the BOOTSTRAP user
+	query := fmt.Sprintf(
+		"SELECT %s FROM %s WHERE email != $1",
+		strings.Join(dao.tableFields, ", "),
+		dao.tableName,
+	)
+
+	rows, err := dao.sqler.Query(query, systemEmail)
 	if err != nil {
 		return nil, errors.New(err)
 	}

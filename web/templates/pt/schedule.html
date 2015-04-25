@@ -1,9 +1,19 @@
 [[template "prefix" .]]
 
       [[template "menu" .]]
-      [[$weekdays := getWeekdays .Begin .End]]
+      [[$weekdays := days .Begin .End]]
       [[$workingHours := getWorkingHours]]
-      
+
+      <div class="pull-right options">
+        <p class="text-info">[[date .Begin]] &rarr; [[date .End]]</p>
+        <a class="btn btn-default" aria-label="Left Align" href="[[url "schedule"]]?begin=[[date .Previous]]">
+          <span class="glyphicon glyphicon-circle-arrow-left" aria-hidden="true"></span>
+        </a>
+        <a class="btn btn-default" aria-label="Left Align" href="[[url "schedule"]]?begin=[[date .Next]]">
+          <span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span>
+        </a>
+      </div>
+
       <div class="container-fluid">
         <div class="row hidden-xs hidden-sm">
           <div class="col-md-1"></div>
@@ -22,7 +32,7 @@
           [[range $weekday := $weekdays]]
           <div class="col-md-1">
             [[range $class := filterClasses $.Classes $weekday $hour]]
-            <div class="class" style="background-color: [[getColor $class.Id]]">
+            <div class="class" style="background-color: [[getColor $class.Group.Name]]">
               <a href="[[url "class"]]?id=[[$class.Id]]">[[$class.Group.Name]]</a>
             </div>
             [[end]]
@@ -45,7 +55,7 @@
           <div class="col-xs-1 col-sm-1">[[printHour $hour]]</div>
           <div class="col-xs-11 col-sm-11">
             [[range $class := filterClasses $.Classes $weekday $hour]]
-            <div class="class" style="background-color: [[getColor $class.Id]]">
+            <div class="class" style="background-color: [[getColor $class.Group.Name]]">
               <a href="[[url "class"]]?id=[[$class.Id]]">[[$class.Group.Name]]</a>
             </div>
             [[end]]

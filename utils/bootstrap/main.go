@@ -84,8 +84,8 @@ func main() {
 	}
 
 	// Bootstrap user doesn't have password to avoid using it in running enviroment
-	row := tx.QueryRow("INSERT INTO adm_user(id, name) " +
-		"VALUES (DEFAULT, 'BOOTSTRAP') RETURNING id")
+	row := tx.QueryRow("INSERT INTO adm_user(id, name, email) " +
+		"VALUES (DEFAULT, 'System', 'system@druns.com.br') RETURNING id")
 
 	var id int
 	if err := row.Scan(&id); err != nil {

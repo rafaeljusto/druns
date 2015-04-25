@@ -9,16 +9,22 @@ import (
 
 type Schedule struct {
 	Logged
-	Begin   time.Time
-	End     time.Time
-	Classes []class.Class
+	Begin    time.Time
+	End      time.Time
+	Classes  []class.Class
+	Next     time.Time
+	Previous time.Time
 }
 
-func NewSchedule(username types.Name, menu Menu, begin, end time.Time, classes []class.Class) Schedule {
+func NewSchedule(username types.Name, menu Menu, begin, end time.Time,
+	classes []class.Class, next, previous time.Time) Schedule {
+
 	return Schedule{
-		Logged:  NewLogged(username, menu),
-		Begin:   begin,
-		End:     end,
-		Classes: classes,
+		Logged:   NewLogged(username, menu),
+		Begin:    begin,
+		End:      end,
+		Classes:  classes,
+		Next:     next,
+		Previous: previous,
 	}
 }

@@ -6,6 +6,10 @@
 	text-align: center;
 }
 
+.options {
+	margin: 10px 0px 10px 0px;
+}
+
 .vertical-align {
 	display: flex;
     align-items: center;

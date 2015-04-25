@@ -35,6 +35,11 @@ func (s Service) FindAll() ([]User, error) {
 	return dao.findAll()
 }
 
+func (s Service) SystemUser() (User, error) {
+	dao := newDAO(s.sqler, nil, 0)
+	return dao.systemUser()
+}
+
 func (s Service) VerifyPassword(email mail.Address, password string) (bool, error) {
 	dao := newDAO(s.sqler, nil, 0)
 	return dao.verifyPassword(email, password)

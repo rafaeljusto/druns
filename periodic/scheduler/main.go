@@ -14,11 +14,16 @@ import (
 	"github.com/rafaeljusto/druns/core/group"
 	"github.com/rafaeljusto/druns/core/log"
 	"github.com/rafaeljusto/druns/core/password"
+	"github.com/rafaeljusto/druns/core/user"
 	"github.com/rafaeljusto/druns/web/config"
 )
 
 var (
 	Logger = log.NewLogger("system")
+)
+
+const (
+	daysAhead = 30
 )
 
 func main() {
@@ -59,6 +64,16 @@ func main() {
 		return
 	}
 
+	systemUser, err := user.NewService(tx).SystemUser()
+	if err == errors.NotFound {
+		Logger.Errorf("System user not found!")
+		return
+
+	} else if err != nil {
+		Logger.Errorf("Error retrieving system user. Details: %s", err)
+		return
+	}
+
 	groups, err := group.NewService(tx).FindAll()
 	if err != nil {
 		Logger.Errorf("Error retrieving groups. Details: %s", err)
@@ -66,81 +81,77 @@ func main() {
 	}
 
 	now := time.Now()
-	twoWeeksFromNow := now.Add(7 * 24 * time.Hour)
+	daysAheadFromNow := now.Add(daysAhead * 24 * time.Hour)
 	classService := class.NewClassService(tx)
 	studentService := class.NewStudentService(tx)
 
 	for _, group := range groups {
-		classes, err := classService.FindByGroupIdBetweenDates(group.Id, now, twoWeeksFromNow)
+		classes, err := classService.FindByGroupIdBetweenDates(group.Id, now, daysAheadFromNow)
 		if err != nil {
 			Logger.Errorf("Error retrieving classes. Details: %s", err)
 			return
 		}
 
-		var scheduleDate time.Time
-		for i := 0; i < 7; i++ {
-			if d := now.Add(time.Duration(24*i) * time.Hour); d.Weekday() == group.Weekday.Weekday {
-				scheduleDate = d
-				break
-			}
-		}
+		for i := 0; i < daysAhead; i++ {
+			scheduleDate := now.Add(time.Duration(24*i) * time.Hour)
 
-		if scheduleDate.IsZero() {
-			// Not on schedule yet, move on
-			continue
-		}
-
-		foundClass := false
-		for _, c := range classes {
-			if c.BeginAt.Weekday() != group.Weekday.Weekday &&
-				c.BeginAt.Hour() != group.Time.Hour() &&
-				c.BeginAt.Minute() != group.Time.Minute() {
-
-				// TODO: We should remove this class
+			if scheduleDate.Weekday() != group.Weekday.Weekday {
 				continue
 			}
 
-			foundClass = true
-		}
+			refDate := time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
+				group.Time.Hour(), group.Time.Minute(), 0, 0, time.Local)
 
-		if foundClass {
-			// Class already created, move on
-			continue
-		}
+			foundClass := false
+			for _, c := range classes {
+				if c.BeginAt.Weekday() != group.Weekday.Weekday &&
+					c.BeginAt.Hour() != group.Time.Hour() &&
+					c.BeginAt.Minute() != group.Time.Minute() {
+					// TODO: We should remove this class
+					continue
+				}
 
-		refDate := time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(),
-			group.Time.Hour(), group.Time.Minute(), 0, 0, time.Local)
-
-		c := class.Class{
-			Group:   group,
-			BeginAt: refDate,
-			EndAt:   refDate.Add(group.Duration.Duration),
-		}
-
-		if err := classService.Save(addr, systemUser.Id, &c); err != nil {
-			Logger.Errorf("Error saving new class. Details: %s", err)
-			return
-		}
-
-		enrollments, err := enrollment.NewService(tx).FindByGroup(group.Id)
-		if err != nil {
-			Logger.Errorf("Error retrieving enrollments for Group %d. Details: %s", group.Id, err)
-			return
-		}
-
-		for _, e := range enrollments {
-			s := class.Student{
-				Enrollment: e,
+				if c.BeginAt.Equal(refDate) {
+					foundClass = true
+					break
+				}
 			}
 
-			if err := studentService.Save(addr, systemUser.Id, &s, c); err != nil {
-				Logger.Errorf("Error saving new student. Details: %s", err)
+			if foundClass {
+				// Class already created, move on
+				continue
+			}
+
+			c := class.Class{
+				Group:   group,
+				BeginAt: refDate,
+				EndAt:   refDate.Add(group.Duration.Duration),
+			}
+
+			if err := classService.Save(addr, systemUser.Id, &c); err != nil {
+				Logger.Errorf("Error saving new class. Details: %s", err)
 				return
 			}
 
-			c.Students = append(c.Students, s)
-		}
+			enrollments, err := enrollment.NewService(tx).FindByGroup(group.Id)
+			if err != nil {
+				Logger.Errorf("Error retrieving enrollments for Group %d. Details: %s", group.Id, err)
+				return
+			}
 
+			for _, e := range enrollments {
+				s := class.Student{
+					Enrollment: e,
+				}
+
+				if err := studentService.Save(addr, systemUser.Id, &s, c); err != nil {
+					Logger.Errorf("Error saving new student. Details: %s", err)
+					return
+				}
+
+				c.Students = append(c.Students, s)
+			}
+		}
 	}
 
 	if err := tx.Commit(); err != nil {

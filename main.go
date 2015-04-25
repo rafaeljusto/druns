@@ -147,6 +147,9 @@ func initializeTrama() error {
 				return "#"
 			}
 		},
+		"date": func(date time.Time) string {
+			return date.Format("2006-01-02")
+		},
 	}
 
 	handler.Mux.GlobalTemplates = groupSet

@@ -5,12 +5,12 @@ import (
 	"hash/crc64"
 	"html/template"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/rafaeljusto/druns/Godeps/_workspace/src/github.com/gustavo-hms/trama"
 	"github.com/rafaeljusto/druns/core/class"
 	"github.com/rafaeljusto/druns/core/errors"
+	"github.com/rafaeljusto/druns/core/types"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -58,21 +58,26 @@ func (h *schedule) Get(response trama.Response, r *http.Request) {
 		return
 	}
 
+	next := begin.Add(24 * time.Hour)
+	previous := begin.Add(-24 * time.Hour)
+
 	response.ExecuteTemplate("schedule.html",
-		data.NewSchedule(h.Session().User.Name, data.MenuSchedule, begin, end, classes))
+		data.NewSchedule(h.Session().User.Name, data.MenuSchedule,
+			begin, end, classes, next, previous))
 }
 
 func (h *schedule) Templates() trama.TemplateGroupSet {
 	groupSet := trama.NewTemplateGroupSet(template.FuncMap{
-		"getWeekdays": func(begin, end time.Time) []time.Time {
-			var days []time.Time
-			for begin.Day() <= end.Day() ||
-				begin.Month() < end.Month() ||
-				begin.Year() < end.Year() {
+		"days": func(begin, end time.Time) []time.Time {
+			begin = time.Date(begin.Year(), begin.Month(), begin.Day(), 0, 0, 0, 0, time.Local)
+			end = time.Date(end.Year(), end.Month(), end.Day(), 0, 0, 0, 0, time.Local)
 
+			var days []time.Time
+			for begin.Before(end) || begin.Equal(end) {
 				days = append(days, begin)
 				begin = begin.Add(24 * time.Hour)
 			}
+
 			return days
 		},
 		"weekday": func(date time.Time) string {
@@ -122,8 +127,8 @@ func (h *schedule) Templates() trama.TemplateGroupSet {
 			}
 			return filtered
 		},
-		"getColor": func(id int) string {
-			hash := crc64.Checksum([]byte(strconv.Itoa(id)), crc64.MakeTable(crc64.ISO))
+		"getColor": func(name types.Name) string {
+			hash := crc64.Checksum([]byte(name.String()), crc64.MakeTable(crc64.ISO))
 			return fmt.Sprintf("#%02X%02X%02X", hash%255, (hash<<1)%255, (hash<<2)%255)
 		},
 	})
