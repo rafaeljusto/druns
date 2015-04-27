@@ -36,7 +36,7 @@ func (h *schedule) Get(response trama.Response, r *http.Request) {
 
 	if r.FormValue("begin") != "" {
 		var err error
-		if begin, err = time.Parse("2006-01-02", r.FormValue("begin")); err != nil {
+		if begin, err = time.ParseInLocation("2006-01-02", r.FormValue("begin"), time.Local); err != nil {
 			h.Logger().Error(errors.New(err))
 			response.ExecuteTemplate("500.html", data.NewInternalServerError(h.HTTPId()))
 			return
@@ -50,6 +50,7 @@ func (h *schedule) Get(response trama.Response, r *http.Request) {
 	}
 
 	end := begin.Add(time.Duration(6*24) * time.Hour)
+	end = time.Date(end.Year(), end.Month(), end.Day(), 23, 59, 59, 0, time.Local)
 	classes, err := class.NewClassService(h.Tx()).FindBetweenDates(begin, end)
 
 	if err != nil {
@@ -121,7 +122,7 @@ func (h *schedule) Templates() trama.TemplateGroupSet {
 				endInDate := (c.EndAt.After(begin) || c.EndAt.Equal(begin)) &&
 					(c.EndAt.Before(end) || c.EndAt.Equal(end))
 
-				if beginInDate || endInDate {
+				if beginInDate || endInDate || (c.BeginAt.Before(begin) && c.EndAt.After(end)) {
 					filtered = append(filtered, c)
 				}
 			}
