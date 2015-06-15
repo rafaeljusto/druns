@@ -201,6 +201,29 @@ CREATE TABLE student_log (
 
 /****************************************/
 
+DROP TABLE IF EXISTS payment CASCADE;
+CREATE TABLE payment (
+	id SERIAL PRIMARY KEY,
+	client_id INT REFERENCES client(id),
+	status INT,
+	expires_at TIMESTAMPTZ,
+	value INT
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS payment_log CASCADE;
+CREATE TABLE payment_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	client_id INT,
+	status INT,
+	expires_at TIMESTAMPTZ,
+	value INT
+);
+
+/****************************************/
+
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO druns;
 GRANT SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO druns;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO druns;
