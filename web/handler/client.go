@@ -8,6 +8,7 @@ import (
 	"github.com/rafaeljusto/druns/core/client"
 	"github.com/rafaeljusto/druns/core/enrollment"
 	"github.com/rafaeljusto/druns/core/errors"
+	"github.com/rafaeljusto/druns/core/payment"
 	"github.com/rafaeljusto/druns/web/config"
 	"github.com/rafaeljusto/druns/web/interceptor"
 	"github.com/rafaeljusto/druns/web/templates/data"
@@ -37,7 +38,13 @@ func (h clientHandler) Response(r *http.Request) (string, data.Former) {
 
 	if h.Client.Id > 0 {
 		var err error
+
 		data.Enrollments, err = enrollment.NewService(h.Tx()).FindByClient(h.Client.Id)
+		if err != nil {
+			h.Logger().Error(errors.New(err))
+		}
+
+		data.Payments, err = payment.NewService(h.Tx()).FindByClient(h.Client.Id)
 		if err != nil {
 			h.Logger().Error(errors.New(err))
 		}

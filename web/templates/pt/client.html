@@ -64,6 +64,28 @@
       <a class="btn btn-default" aria-label="Left Align" href="[[url "enrollment"]]?back=[[url "client"]]%3Fid=[[.Client.Id]]">
         <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Nova Matr&iacute;cula
       </a>
+
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <caption>Pagamentos</caption>
+          <thead>
+            <tr>
+              <th>Expira&ccedil;&atilde;o</th>
+              <th>Situa&ccedil;&atilde;o</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            [[range $payment := .Payments]]
+            <tr>
+              <td>[[$payment.ExpiresAt]]</td>
+              <td>[[$payment.Status]]</td>
+              <td>[[$payment.Value]]</td>
+            </tr>
+            [[end]]
+          </tbody>
+        </table>
+      </div>
       [[end]]
 
       [[if ne .Message ""]]
