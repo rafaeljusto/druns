@@ -29,9 +29,6 @@ func newDAO(sqler db.SQLer, ip net.IP, agent int) dao {
 			"id",
 			"name",
 			"place_id",
-			"weekday",
-			"time",
-			"duration",
 			"type",
 			"capacity",
 		},
@@ -61,7 +58,21 @@ func (dao *dao) save(g *Group) error {
 	}
 
 	logDAO := newDAOLog(dao.sqler, dao.ip, dao.agent)
-	return logDAO.save(g, operation)
+	if err := logDAO.save(g, operation); err != nil {
+		return err
+	}
+
+	scheduleDAO := newScheduleDAO(dao.sqler, dao.ip, dao.agent)
+
+	for i, s := range g.Schedules {
+		if err := scheduleDAO.save(&s, g.Id); err != nil {
+			return err
+		}
+
+		g.Schedules[i] = s
+	}
+
+	return nil
 }
 
 func (dao *dao) insert(g *Group) error {
@@ -76,9 +87,6 @@ func (dao *dao) insert(g *Group) error {
 		query,
 		g.Name,
 		g.Place.Id,
-		g.Weekday,
-		g.Time,
-		g.Duration,
 		g.Type,
 		g.Capacity,
 	)
@@ -101,9 +109,6 @@ func (dao *dao) update(g *Group) error {
 		query,
 		g.Name,
 		g.Place.Id,
-		g.Weekday,
-		g.Time,
-		g.Duration,
 		g.Type,
 		g.Capacity,
 		g.Id,
@@ -123,6 +128,11 @@ func (dao *dao) findById(id int) (Group, error) {
 
 	g, err := dao.load(row, true)
 	if err != nil {
+		return g, err
+	}
+
+	scheduleDAO := newScheduleDAO(dao.sqler, dao.ip, dao.agent)
+	if g.Schedules, err = scheduleDAO.findByGroup(g.Id); err != nil {
 		return g, err
 	}
 
@@ -155,11 +165,18 @@ func (dao *dao) findAll() ([]Group, error) {
 
 	// We cannot load a composite object while we are iterating over the main
 	// result, that's why we only load it after we finish the iteration
+	scheduleDAO := newScheduleDAO(dao.sqler, dao.ip, dao.agent)
 	placeService := place.NewService(dao.sqler)
+
 	for i, g := range groups {
+		if g.Schedules, err = scheduleDAO.findByGroup(g.Id); err != nil {
+			return nil, err
+		}
+
 		if g.Place, err = placeService.FindById(g.Place.Id); err != nil {
 			return nil, err
 		}
+
 		groups[i] = g
 	}
 
@@ -173,9 +190,6 @@ func (dao *dao) load(row db.Row, eager bool) (Group, error) {
 		&g.Id,
 		&g.Name,
 		&g.Place.Id,
-		&g.Weekday,
-		&g.Time,
-		&g.Duration,
 		&g.Type,
 		&g.Capacity,
 	)

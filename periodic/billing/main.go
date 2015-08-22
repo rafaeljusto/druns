@@ -2,12 +2,20 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
+	"strconv"
 
 	"github.com/rafaeljusto/druns/core/db"
 	"github.com/rafaeljusto/druns/core/errors"
+	"github.com/rafaeljusto/druns/core/log"
+	"github.com/rafaeljusto/druns/core/password"
 	"github.com/rafaeljusto/druns/core/user"
-	"github.com/rafaeljusto/shelter/config"
+	"github.com/rafaeljusto/druns/web/config"
+)
+
+var (
+	Logger = log.NewLogger("system")
 )
 
 func main() {
@@ -59,4 +67,45 @@ func main() {
 	}
 
 	// TODO!
+}
+
+func initializeLogger() error {
+	logAddr := net.JoinHostPort(config.DrunsConfig.Log.Host, strconv.Itoa(config.DrunsConfig.Log.Port))
+	if err := log.Connect("druns", logAddr); err != nil {
+		return errors.New(err)
+	}
+	return nil
+}
+
+func initializeDatabase() error {
+	dbPassword, err := password.Decrypt(config.DrunsConfig.Database.Password)
+	if err != nil {
+		return err
+	}
+
+	return db.Start(
+		config.DrunsConfig.Database.Host,
+		config.DrunsConfig.Database.Port,
+		config.DrunsConfig.Database.User,
+		dbPassword,
+		config.DrunsConfig.Database.Name,
+	)
+}
+
+func localAddress() (net.IP, error) {
+	name, err := os.Hostname()
+	if err != nil {
+		return nil, err
+	}
+
+	addrs, err := net.LookupHost(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(addrs) > 0 {
+		return net.ParseIP(addrs[0]), nil
+	}
+
+	return nil, nil
 }

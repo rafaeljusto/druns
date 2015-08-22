@@ -120,11 +120,31 @@ CREATE TABLE client_group_log (
 	id INT,
 	name VARCHAR,
 	place_id INT,
-	weekday WEEKDAY,
-	time TIME,
-	duration INT,
 	type CLIENT_GROUP_TYPE,
 	capacity INT
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS client_group_schedule CASCADE;
+CREATE TABLE client_group_schedule (
+	id SERIAL PRIMARY KEY,
+	group_id INT REFERENCES group(id),
+	weekday WEEKDAY,
+	time TIME,
+	duration INT
+);
+
+/****************************************/
+
+DROP TABLE IF EXISTS client_group_schedule_log CASCADE;
+CREATE TABLE client_group_schedule_log (
+	log_id INT REFERENCES log(id),
+	id INT,
+	group_id INT REFERENCES group(id),
+	weekday WEEKDAY,
+	time TIME,
+	duration INT
 );
 
 /****************************************/

@@ -78,13 +78,19 @@ func (g *Type) Scan(src interface{}) error {
 }
 
 type Group struct {
+	Id        int
+	Name      types.Name
+	Place     place.Place
+	Schedules []Schedule
+	Type      Type
+	Capacity  int
+	revision  uint64
+}
+
+type Schedule struct {
 	Id       int
-	Name     types.Name
-	Place    place.Place
 	Weekday  types.Weekday
 	Time     types.Time
 	Duration types.Duration
-	Type     Type
-	Capacity int
 	revision uint64
 }
