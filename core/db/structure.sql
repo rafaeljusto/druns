@@ -129,7 +129,7 @@ CREATE TABLE client_group_log (
 DROP TABLE IF EXISTS client_group_schedule CASCADE;
 CREATE TABLE client_group_schedule (
 	id SERIAL PRIMARY KEY,
-	group_id INT REFERENCES group(id),
+	client_group_id INT REFERENCES client_group(id),
 	weekday WEEKDAY,
 	time TIME,
 	duration INT
@@ -141,7 +141,7 @@ DROP TABLE IF EXISTS client_group_schedule_log CASCADE;
 CREATE TABLE client_group_schedule_log (
 	log_id INT REFERENCES log(id),
 	id INT,
-	group_id INT REFERENCES group(id),
+	client_group_id INT REFERENCES client_group(id),
 	weekday WEEKDAY,
 	time TIME,
 	duration INT

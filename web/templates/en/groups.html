@@ -9,7 +9,6 @@
               <th>Name</th>
               <th>Place</th>
               <th>Weekday</th>
-              <th>Time</th>
             </tr>
           </thead>
           <tbody>
@@ -17,14 +16,17 @@
             <tr>
               <td><a href="[[url "group"]]?id=[[$group.Id]]">[[$group.Name]]</a></td>
               <td>[[$group.Place.Name]]</td>
-              <td>[[$group.Weekday]]</td>
-              <td>[[$group.Time]]</td>
+              <td>
+                [[range $schedule := $group.Schedules]]
+                [[$schedule.Weekday]]&nbsp;
+                [[end]]
+              </td>
             </tr>
         [[end]]
           </tbody>
         </table>
       </div>
-      
+
       <a class="btn btn-default" aria-label="Left Align" href="[[url "group"]]">
         <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> New Group
       </a>

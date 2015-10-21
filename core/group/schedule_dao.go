@@ -26,7 +26,7 @@ func newScheduleDAO(sqler db.SQLer, ip net.IP, agent int) scheduleDAO {
 		tableName: "client_group_schedule",
 		tableFields: []string{
 			"id",
-			"group_id",
+			"client_group_id",
 			"weekday",
 			"time",
 			"duration",
@@ -120,7 +120,7 @@ func (dao *scheduleDAO) findById(id int) (Schedule, error) {
 
 func (dao *scheduleDAO) findByGroup(groupID int) ([]Schedule, error) {
 	query := fmt.Sprintf(
-		"SELECT %s FROM %s WHERE group_id = $1",
+		"SELECT %s FROM %s WHERE client_group_id = $1",
 		strings.Join(dao.tableFields, ", "),
 		dao.tableName,
 	)

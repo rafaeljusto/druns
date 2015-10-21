@@ -23,10 +23,10 @@ func newScheduleDAOLog(sqler db.SQLer, ip net.IP, agent int) scheduleDAOLog {
 		sqler:     sqler,
 		ip:        ip,
 		agent:     agent,
-		tableName: "schedule_client_group_log",
+		tableName: "client_group_schedule_log",
 		tableFields: []string{
 			"id",
-			"group_id",
+			"client_group_id",
 			"weekday",
 			"time",
 			"duration",
